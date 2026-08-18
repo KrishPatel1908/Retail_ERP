@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/constants/app_constants.dart';
 import '../../../core/navigation/app_page.dart';
 
 /// A single clickable sidebar destination.
@@ -34,7 +35,11 @@ class SidebarItem extends StatelessWidget {
     final Widget content = AnimatedContainer(
       duration: const Duration(milliseconds: 180),
       curve: Curves.easeOut,
-      margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+      clipBehavior: Clip.hardEdge,
+      margin: EdgeInsets.symmetric(
+        horizontal: expanded ? 10 : 8,
+        vertical: expanded ? 2 : 4,
+      ),
       padding: expanded
           ? const EdgeInsets.symmetric(horizontal: 12, vertical: 11)
           : EdgeInsets.zero,
@@ -43,30 +48,37 @@ class SidebarItem extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
       ),
       child: expanded
-          ? Row(
-              children: [
-                Icon(iconData, size: 20, color: iconColor),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Text(
-                    page.title,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: textTheme.bodyMedium?.copyWith(
-                      fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
-                      color: selected
-                          ? colorScheme.primary
-                          : colorScheme.onSurfaceVariant,
+          ? SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              physics: const NeverScrollableScrollPhysics(),
+              child: SizedBox(
+                width: AppConstants.sidebarExpandedWidth - 44,
+                child: Row(
+                  children: [
+                    Icon(iconData, size: 20, color: iconColor),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Text(
+                        page.title,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: textTheme.bodyMedium?.copyWith(
+                          fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+                          color: selected
+                              ? colorScheme.primary
+                              : colorScheme.onSurfaceVariant,
+                        ),
+                      ),
                     ),
-                  ),
+                  ],
                 ),
-              ],
+              ),
             )
           : SizedBox(
-              // Matches the collapsed group item height for consistent
-              // tap targets in the icon-only rail.
               height: 44,
-              child: Center(child: Icon(iconData, size: 20, color: iconColor)),
+              child: Center(
+                child: Icon(iconData, size: 20, color: iconColor),
+              ),
             ),
     );
 

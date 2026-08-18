@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../../app/theme/app_theme.dart';
 import '../../../../../shared/widgets/app_data_table.dart';
+import '../../../../../shared/widgets/description_preview.dart';
 import '../../domain/entities/product_uom_display.dart';
 
 /// Read-only desktop table for the Product UOM list powered by [AppDataTable].
@@ -162,10 +163,8 @@ class _ProductUomTableState extends State<ProductUomTable> {
         flex: 3,
         minWidth: 150,
         cellBuilder: (context, conversion) {
-          return Text(
-            conversion.description ?? '—',
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+          return DescriptionPreview(
+            description: conversion.description,
             style: mutedStyle,
           );
         },

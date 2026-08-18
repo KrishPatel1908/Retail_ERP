@@ -87,7 +87,9 @@ void main() {
     expect(find.text('Gamma'), findsOneWidget);
   });
 
-  testWidgets('triggers column sorting callback when header is tapped', (tester) async {
+  testWidgets('triggers column sorting callback when header is tapped', (
+    tester,
+  ) async {
     int? sortedCol;
     bool? sortedAsc;
 
@@ -176,5 +178,26 @@ void main() {
 
     // Verify widget builds without error under keyboard interaction
     expect(find.text('Alpha'), findsOneWidget);
+  });
+
+  testWidgets('does not overflow when less than header height is available', (
+    tester,
+  ) async {
+    await tester.pumpWidget(
+      MaterialApp(
+        home: Scaffold(
+          body: SizedBox(
+            height: 34,
+            child: AppDataTable<SampleItem>(
+              items: testItems,
+              columns: testColumns,
+              keyExtractor: (item) => item.id,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    expect(tester.takeException(), isNull);
   });
 }

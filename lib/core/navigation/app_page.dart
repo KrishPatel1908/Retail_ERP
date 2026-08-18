@@ -29,7 +29,7 @@ enum AppPage {
   taxType('Tax Type', Icons.percent_outlined, Icons.percent),
   customer('Customer', Icons.group_outlined, Icons.group),
   supplier('Supplier', Icons.local_shipping_outlined, Icons.local_shipping),
-  product('Product', Icons.inventory_2_outlined, Icons.inventory_2),
+  product('Product Master', Icons.inventory_2_outlined, Icons.inventory_2),
   purchase('Purchase', Icons.shopping_cart_outlined, Icons.shopping_cart),
   salesPos('Sales (POS)', Icons.point_of_sale_outlined, Icons.point_of_sale),
   inventory('Inventory', Icons.warehouse_outlined, Icons.warehouse),

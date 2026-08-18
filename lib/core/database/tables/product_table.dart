@@ -2,7 +2,6 @@ import 'package:drift/drift.dart';
 
 import 'brand_table.dart';
 import 'category_table.dart';
-import 'hsn_master_table.dart';
 import 'tax_category_table.dart';
 import 'tax_type_table.dart';
 import 'unit_table.dart';
@@ -22,7 +21,6 @@ import 'warehouse_table.dart';
   columns: {#categoryId, #subCategoryId},
 )
 @TableIndex(name: 'idx_product_brand', columns: {#brandId})
-@TableIndex(name: 'idx_product_hsn', columns: {#hsnId})
 @TableIndex(
   name: 'idx_product_default_warehouse',
   columns: {#defaultWarehouseId},
@@ -37,7 +35,6 @@ class Products extends Table {
   TextColumn get productCode => text().unique()();
   TextColumn get productName => text()();
   TextColumn get barcode => text().nullable().unique()();
-  IntColumn get hsnId => integer().nullable().references(HsnMasters, #id)();
   IntColumn get categoryId => integer().references(Categories, #id)();
 
   /// Belongs to `category_id`; enforced by the composite foreign key in

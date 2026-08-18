@@ -192,7 +192,8 @@ class _AppDataTableState<T> extends State<AppDataTable<T>> {
 
   void _toggleSelectAll() {
     if (widget.onSelectionChanged == null) return;
-    final allSelected = widget.items.isNotEmpty && widget.items.every(_isItemSelected);
+    final allSelected =
+        widget.items.isNotEmpty && widget.items.every(_isItemSelected);
     if (allSelected) {
       final updated = Set<T>.from(widget.selectedItems);
       for (final item in widget.items) {
@@ -267,7 +268,8 @@ class _AppDataTableState<T> extends State<AppDataTable<T>> {
       child: LayoutBuilder(
         builder: (context, constraints) {
           final selectWidth = widget.selectable ? 48.0 : 0.0;
-          final totalFixedWidth = selectWidth +
+          final totalFixedWidth =
+              selectWidth +
               widget.columns.fold<double>(
                 0.0,
                 (sum, col) => sum + (col.width ?? 0.0),
@@ -275,7 +277,8 @@ class _AppDataTableState<T> extends State<AppDataTable<T>> {
 
           final minRequiredFlexWidth = widget.columns.fold<double>(
             0.0,
-            (sum, col) => sum + (col.width == null ? (col.minWidth ?? 80.0) : 0.0),
+            (sum, col) =>
+                sum + (col.width == null ? (col.minWidth ?? 80.0) : 0.0),
           );
 
           final minTableWidth = math.max(
@@ -301,8 +304,9 @@ class _AppDataTableState<T> extends State<AppDataTable<T>> {
               columnWidths.add(col.width!);
             } else if (totalFlex > 0) {
               final w = (col.flex / totalFlex) * remainingFlexWidth;
-              final finalW =
-                  col.minWidth != null && w < col.minWidth! ? col.minWidth! : w;
+              final finalW = col.minWidth != null && w < col.minWidth!
+                  ? col.minWidth!
+                  : w;
               columnWidths.add(finalW);
             } else {
               columnWidths.add(120.0);
@@ -324,6 +328,26 @@ class _AppDataTableState<T> extends State<AppDataTable<T>> {
             tableContent = _buildRowsList(columnWidths, finalTableWidth);
           }
 
+          final tableBody = SizedBox(
+            width: finalTableWidth,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                _buildHeaderRow(columnWidths, textTheme, colorScheme),
+                Expanded(child: tableContent),
+              ],
+            ),
+          );
+
+          // A table can briefly receive less space than its fixed-height
+          // header during a window resize or a page transition. In that case,
+          // do not build the header-and-body Column: its 44px header cannot
+          // fit and causes a RenderFlex overflow. The header remains visible
+          // (clipped to the available space) until the table can render its
+          // scrollable body again.
+          final constrainedHeight =
+              constraints.maxHeight <= widget.headerHeight;
+
           return Container(
             clipBehavior: Clip.antiAlias,
             decoration: BoxDecoration(
@@ -338,20 +362,16 @@ class _AppDataTableState<T> extends State<AppDataTable<T>> {
                 Expanded(
                   child: SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
-                    child: SizedBox(
-                      width: finalTableWidth,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          _buildHeaderRow(
-                            columnWidths,
-                            textTheme,
-                            colorScheme,
-                          ),
-                          Expanded(child: tableContent),
-                        ],
-                      ),
-                    ),
+                    child: constrainedHeight
+                        ? SizedBox(
+                            width: finalTableWidth,
+                            child: _buildHeaderRow(
+                              columnWidths,
+                              textTheme,
+                              colorScheme,
+                            ),
+                          )
+                        : tableBody,
                   ),
                 ),
                 if (widget.showPagination && !widget.isLoading)
@@ -371,8 +391,7 @@ class _AppDataTableState<T> extends State<AppDataTable<T>> {
   ) {
     final allSelected =
         widget.items.isNotEmpty && widget.items.every(_isItemSelected);
-    final someSelected =
-        widget.items.any(_isItemSelected) && !allSelected;
+    final someSelected = widget.items.any(_isItemSelected) && !allSelected;
 
     return Container(
       height: widget.headerHeight,
@@ -436,8 +455,8 @@ class _AppDataTableState<T> extends State<AppDataTable<T>> {
           Icon(
             isSorted
                 ? (widget.sortAscending
-                    ? Icons.arrow_upward_rounded
-                    : Icons.arrow_downward_rounded)
+                      ? Icons.arrow_downward_rounded
+                      : Icons.arrow_upward_rounded)
                 : Icons.unfold_more_rounded,
             size: 14,
             color: isSorted ? AppTheme.primary : AppTheme.textMuted,
@@ -457,11 +476,8 @@ class _AppDataTableState<T> extends State<AppDataTable<T>> {
   }
 
   Widget _buildRowsList(List<double> columnWidths, double totalWidth) {
-    return ListView.separated(
+    return ListView.builder(
       itemCount: widget.items.length,
-      separatorBuilder:
-          (context, index) =>
-              Divider(height: 1, thickness: 1, color: AppTheme.border.withValues(alpha: 0.5)),
       itemBuilder: (context, rowIndex) {
         final item = widget.items[rowIndex];
         final isSelected = _isItemSelected(item);
@@ -520,7 +536,11 @@ class _AppDataTableState<T> extends State<AppDataTable<T>> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(Icons.error_outline_rounded, color: AppTheme.danger, size: 36),
+            const Icon(
+              Icons.error_outline_rounded,
+              color: AppTheme.danger,
+              size: 36,
+            ),
             const SizedBox(height: 12),
             Text(
               'An error occurred: ${widget.error}',
@@ -568,7 +588,9 @@ class _AppDataTableState<T> extends State<AppDataTable<T>> {
             children: [
               Text(
                 'Showing $start to $end of $total entries',
-                style: textTheme.bodySmall?.copyWith(color: AppTheme.textSecondary),
+                style: textTheme.bodySmall?.copyWith(
+                  color: AppTheme.textSecondary,
+                ),
               ),
               if (widget.onPageSizeChanged != null) ...[
                 const SizedBox(width: 16),
@@ -604,7 +626,9 @@ class _AppDataTableState<T> extends State<AppDataTable<T>> {
                 padding: const EdgeInsets.symmetric(horizontal: 8),
                 child: Text(
                   'Page $page of $maxPage',
-                  style: textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w600),
+                  style: textTheme.bodySmall?.copyWith(
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
               IconButton(
@@ -667,7 +691,7 @@ class _AppDataTableRowState<T> extends State<_AppDataTableRow<T>> {
     } else if (_isHovered) {
       bg = AppTheme.hover;
     } else if (widget.zebraRows && !widget.isEven) {
-      bg = const Color(0xFFFAFAFC);
+      bg = const Color(0xFFF1F5F9);
     }
 
     if (widget.isFocused) {

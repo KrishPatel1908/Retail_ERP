@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../../app/theme/app_theme.dart';
 import '../../../../../shared/widgets/app_data_table.dart';
+import '../../../../../shared/widgets/description_preview.dart';
 import '../../../../../shared/widgets/table_action_button.dart';
 import '../../domain/entities/uom_conversion.dart';
 
@@ -129,12 +130,9 @@ class _UomConversionTableState extends State<UomConversionTable> {
         flex: 3,
         minWidth: 200,
         cellBuilder: (context, conversion) {
-          final description = conversion.description;
-          return Text(
-            description?.isNotEmpty == true ? description! : '—',
+          return DescriptionPreview(
+            description: conversion.description,
             style: mutedStyle,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
           );
         },
       ),

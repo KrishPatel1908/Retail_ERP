@@ -45,23 +45,28 @@ class _SearchFieldState extends State<SearchField> {
         setState(() => _hasText = value.isNotEmpty);
         widget.onChanged?.call(value);
       },
-      style: const TextStyle(fontSize: 14),
+      style: const TextStyle(fontSize: 13, fontWeight: FontWeight.normal),
       decoration: InputDecoration(
         hintText: widget.hintText,
+        hintStyle: TextStyle(
+          fontSize: 13,
+          fontWeight: FontWeight.normal,
+          color: colorScheme.onSurfaceVariant,
+        ),
         prefixIcon: Icon(
           Icons.search_rounded,
-          size: 20,
+          size: 18,
           color: colorScheme.onSurfaceVariant,
         ),
         suffixIcon: _hasText
             ? IconButton(
                 tooltip: 'Clear search',
-                icon: const Icon(Icons.close_rounded, size: 18),
+                icon: const Icon(Icons.close_rounded, size: 16),
                 onPressed: _clear,
               )
             : null,
         isDense: true,
-        contentPadding: const EdgeInsets.symmetric(vertical: 12),
+        contentPadding: const EdgeInsets.symmetric(vertical: 8),
       ),
     );
 

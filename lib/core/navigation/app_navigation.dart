@@ -13,6 +13,7 @@ const List<NavSection> appNavigation = [
       icon: Icons.dns_outlined,
       children: [
         NavItem('Company Settings', AppPage.companySettings),
+        NavItem('Product Master', AppPage.product),
         NavItem('Category', AppPage.category),
         NavItem('Sub Category', AppPage.subCategory),
         NavItem('Brand', AppPage.brand),
@@ -23,7 +24,6 @@ const List<NavSection> appNavigation = [
         NavItem('Tax Type', AppPage.taxType),
         NavItem('Customer', AppPage.customer),
         NavItem('Supplier', AppPage.supplier),
-        NavItem('Product', AppPage.product),
       ],
     ),
     NavItem('Purchase', AppPage.purchase),

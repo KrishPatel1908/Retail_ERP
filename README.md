@@ -21,6 +21,10 @@ name/role text hides below 900 px. Light and dark themes follow the system.
 
 - **Category** — list page (breadcrumb, search, Add button, empty state) and a
   dedicated Create Category page reached through content-area navigation.
+- **Company Settings** — single-company configuration page (identity,
+  address, logo, tax/billing, financial, bank and invoice settings) with
+  cached access for future invoice, POS, purchase, sales, GST and reporting
+  modules.
 
 ## Folder structure
 

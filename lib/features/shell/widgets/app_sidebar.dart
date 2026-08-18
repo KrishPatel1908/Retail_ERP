@@ -10,8 +10,9 @@ import 'sidebar_section_label.dart';
 /// The collapsible left navigation sidebar.
 ///
 /// Expanded shows icon + label rows and expandable groups; collapsed shows a
-/// narrow rail of icon-only destinations with tooltips. A fixed user profile
-/// block sits at the bottom of the sidebar in both states.
+/// narrow rail of icon-only destinations with tooltips while maintaining full
+/// tree hierarchy and child item visibility. A fixed user profile block sits
+/// at the bottom of the sidebar in both states.
 class AppSidebar extends StatefulWidget {
   const AppSidebar({
     super.key,
@@ -53,8 +54,6 @@ class _AppSidebarState extends State<AppSidebar> {
         color: colorScheme.surface,
         border: Border(right: BorderSide(color: colorScheme.outlineVariant)),
       ),
-      // Content is always laid out at full width; it is clipped by the
-      // animating container for a smooth "drawer" slide effect.
       child: ClipRect(
         child: LayoutBuilder(
           builder: (context, constraints) {
@@ -65,7 +64,9 @@ class _AppSidebarState extends State<AppSidebar> {
               minHeight: 0,
               maxHeight: constraints.maxHeight,
               child: SizedBox(
-                width: AppConstants.sidebarExpandedWidth,
+                width: widget.expanded
+                    ? AppConstants.sidebarExpandedWidth
+                    : AppConstants.sidebarCollapsedWidth,
                 child: Column(
                   children: [
                     Expanded(
@@ -160,16 +161,10 @@ class _AppSidebarState extends State<AppSidebar> {
         border: Border(top: BorderSide(color: colorScheme.outlineVariant)),
       ),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: SizedBox(
-          width: widget.expanded
-              ? double.infinity
-              : AppConstants.sidebarCollapsedWidth - 24,
-          child: widget.expanded
-              ? _buildExpandedProfile()
-              : _buildCollapsedProfile(),
-        ),
+      child: Center(
+        child: widget.expanded
+            ? _buildExpandedProfile()
+            : _buildCollapsedProfile(),
       ),
     );
   }
@@ -232,27 +227,39 @@ class _AppSidebarState extends State<AppSidebar> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Column(
+      mainAxisSize: MainAxisSize.min,
       children: [
-        CircleAvatar(
-          radius: 15,
-          backgroundColor: colorScheme.primaryContainer,
-          child: Text(
-            _initials(AppConstants.placeholderUserName),
-            style: TextStyle(
-              color: colorScheme.onPrimaryContainer,
-              fontWeight: FontWeight.w700,
-              fontSize: 11,
+        Tooltip(
+          message:
+              '${AppConstants.placeholderUserName}\n${AppConstants.placeholderUserRole}',
+          child: CircleAvatar(
+            radius: 16,
+            backgroundColor: colorScheme.primaryContainer,
+            child: Text(
+              _initials(AppConstants.placeholderUserName),
+              style: TextStyle(
+                color: colorScheme.onPrimaryContainer,
+                fontWeight: FontWeight.w700,
+                fontSize: 12,
+              ),
             ),
           ),
         ),
-        const SizedBox(height: 6),
-        // Visual placeholder only — authentication is not wired up yet.
-        IconButton(
-          tooltip: 'Sign Out',
-          onPressed: () {},
-          padding: EdgeInsets.zero,
-          visualDensity: VisualDensity.compact,
-          icon: const Icon(Icons.logout_rounded, size: 18),
+        const SizedBox(height: 8),
+        Tooltip(
+          message: 'Sign Out',
+          child: IconButton(
+            onPressed: () {
+              // Visual placeholder only — authentication is not wired up yet.
+            },
+            padding: EdgeInsets.zero,
+            constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
+            icon: Icon(
+              Icons.logout_rounded,
+              size: 18,
+              color: colorScheme.primary,
+            ),
+          ),
         ),
       ],
     );

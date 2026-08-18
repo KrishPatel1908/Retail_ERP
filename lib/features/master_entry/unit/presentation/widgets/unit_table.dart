@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../../app/theme/app_theme.dart';
 import '../../../../../shared/widgets/app_data_table.dart';
+import '../../../../../shared/widgets/description_preview.dart';
 import '../../../../../shared/widgets/table_action_button.dart';
 import '../../domain/entities/unit.dart';
 
@@ -107,12 +108,9 @@ class _UnitTableState extends State<UnitTable> {
         flex: 4,
         minWidth: 220,
         cellBuilder: (context, unit) {
-          final description = unit.description;
-          return Text(
-            description?.isNotEmpty == true ? description! : '—',
+          return DescriptionPreview(
+            description: unit.description,
             style: mutedStyle,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
           );
         },
       ),

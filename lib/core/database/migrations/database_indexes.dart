@@ -49,19 +49,24 @@ class DatabaseIndexes {
       columns: ['tax_type_code'],
     ),
     (
-      name: 'idx_hsn_code_nocase_unique',
-      table: 'hsn_master',
-      columns: ['hsn_code'],
-    ),
-    (
       name: 'idx_customer_gst_nocase_unique',
       table: 'customer',
       columns: ['gst_number'],
     ),
     (
+      name: 'idx_customer_email_nocase_unique',
+      table: 'customer',
+      columns: ['email'],
+    ),
+    (
       name: 'idx_supplier_gst_nocase_unique',
       table: 'supplier',
       columns: ['gst_number'],
+    ),
+    (
+      name: 'idx_supplier_email_nocase_unique',
+      table: 'supplier',
+      columns: ['email'],
     ),
     (
       name: 'idx_warehouse_name_nocase_unique',
@@ -89,13 +94,29 @@ class DatabaseIndexes {
       table: 'product_uom',
       columns: ['to_unit_id'],
     ),
+    // Party lookup indexes: filters (city / state / created_at) and the
+    // created-date sort run against these columns.
+    (name: 'idx_customer_city', table: 'customer', columns: ['city']),
+    (name: 'idx_customer_state', table: 'customer', columns: ['state']),
+    (
+      name: 'idx_customer_created_at',
+      table: 'customer',
+      columns: ['created_at'],
+    ),
+    (name: 'idx_supplier_city', table: 'supplier', columns: ['city']),
+    (name: 'idx_supplier_state', table: 'supplier', columns: ['state']),
+    (
+      name: 'idx_supplier_created_at',
+      table: 'supplier',
+      columns: ['created_at'],
+    ),
   ];
 
   /// Unique partial indexes that cannot be expressed with `@TableIndex`.
   static const List<String> _partialUniqueStatements = [
     // At most one default conversion per product.
     'CREATE UNIQUE INDEX IF NOT EXISTS idx_product_uom_one_default '
-    'ON product_uom (product_id) WHERE is_default = 1',
+        'ON product_uom (product_id) WHERE is_default = 1',
   ];
 
   /// Creates every index. All statements are idempotent (`IF NOT EXISTS`),

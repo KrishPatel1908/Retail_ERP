@@ -7,6 +7,10 @@ import 'database_seeder.dart';
 import 'migration_step.dart';
 import 'migration_versions.dart';
 import 'upgrade_to_v2.dart';
+import 'upgrade_to_v3.dart';
+import 'upgrade_to_v4.dart';
+import 'upgrade_to_v5.dart';
+import 'upgrade_to_v6.dart';
 
 /// Builds the [MigrationStrategy] used by [AppDatabase].
 ///
@@ -86,5 +90,9 @@ class DatabaseMigrationStrategy {
 abstract final class _UpgradeSteps {
   static const Map<int, MigrationStep> all = {
     2: upgradeToV2,
+    3: upgradeToV3,
+    4: upgradeToV4,
+    5: upgradeToV5,
+    6: upgradeToV6,
   };
 }

@@ -7,7 +7,6 @@ import 'tables/category_table.dart';
 import 'tables/company_settings_table.dart';
 import 'tables/customer_table.dart';
 import 'tables/document_number_sequence_table.dart';
-import 'tables/hsn_master_table.dart';
 import 'tables/product_table.dart';
 import 'tables/product_uom_table.dart';
 import 'tables/sub_category_table.dart';
@@ -37,7 +36,6 @@ part 'app_database.g.dart';
     TaxCategories,
     TaxCategoryRates,
     TaxTypes,
-    HsnMasters,
     Customers,
     Suppliers,
     Warehouses,

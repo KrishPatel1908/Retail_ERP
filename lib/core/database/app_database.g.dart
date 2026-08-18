@@ -33,16 +33,43 @@ class $CompanySettingsTableTable extends CompanySettingsTable
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _logoPathMeta = const VerificationMeta(
-    'logoPath',
+  static const VerificationMeta _legalNameMeta = const VerificationMeta(
+    'legalName',
   );
   @override
-  late final GeneratedColumn<String> logoPath = GeneratedColumn<String>(
-    'logo_path',
+  late final GeneratedColumn<String> legalName = GeneratedColumn<String>(
+    'legal_name',
     aliasedName,
     true,
     type: DriftSqlType.string,
     requiredDuringInsert: false,
+  );
+  static const VerificationMeta _businessTypeMeta = const VerificationMeta(
+    'businessType',
+  );
+  @override
+  late final GeneratedColumn<String> businessType = GeneratedColumn<String>(
+    'business_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('PROPRIETORSHIP'),
+  );
+  static const VerificationMeta _gstRegisteredMeta = const VerificationMeta(
+    'gstRegistered',
+  );
+  @override
+  late final GeneratedColumn<bool> gstRegistered = GeneratedColumn<bool>(
+    'gst_registered',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("gst_registered" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
   );
   static const VerificationMeta _gstNumberMeta = const VerificationMeta(
     'gstNumber',
@@ -66,10 +93,10 @@ class $CompanySettingsTableTable extends CompanySettingsTable
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _emailMeta = const VerificationMeta('email');
+  static const VerificationMeta _cinMeta = const VerificationMeta('cin');
   @override
-  late final GeneratedColumn<String> email = GeneratedColumn<String>(
-    'email',
+  late final GeneratedColumn<String> cin = GeneratedColumn<String>(
+    'cin',
     aliasedName,
     true,
     type: DriftSqlType.string,
@@ -79,6 +106,15 @@ class $CompanySettingsTableTable extends CompanySettingsTable
   @override
   late final GeneratedColumn<String> mobile = GeneratedColumn<String>(
     'mobile',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _emailMeta = const VerificationMeta('email');
+  @override
+  late final GeneratedColumn<String> email = GeneratedColumn<String>(
+    'email',
     aliasedName,
     true,
     type: DriftSqlType.string,
@@ -95,12 +131,23 @@ class $CompanySettingsTableTable extends CompanySettingsTable
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _addressMeta = const VerificationMeta(
-    'address',
+  static const VerificationMeta _addressLine1Meta = const VerificationMeta(
+    'addressLine1',
   );
   @override
-  late final GeneratedColumn<String> address = GeneratedColumn<String>(
-    'address',
+  late final GeneratedColumn<String> addressLine1 = GeneratedColumn<String>(
+    'address_line1',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _addressLine2Meta = const VerificationMeta(
+    'addressLine2',
+  );
+  @override
+  late final GeneratedColumn<String> addressLine2 = GeneratedColumn<String>(
+    'address_line2',
     aliasedName,
     true,
     type: DriftSqlType.string,
@@ -157,30 +204,31 @@ class $CompanySettingsTableTable extends CompanySettingsTable
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _currencyCodeMeta = const VerificationMeta(
-    'currencyCode',
+  static const VerificationMeta _logoPathMeta = const VerificationMeta(
+    'logoPath',
   );
   @override
-  late final GeneratedColumn<String> currencyCode = GeneratedColumn<String>(
-    'currency_code',
+  late final GeneratedColumn<String> logoPath = GeneratedColumn<String>(
+    'logo_path',
     aliasedName,
-    false,
+    true,
     type: DriftSqlType.string,
     requiredDuringInsert: false,
-    defaultValue: const Constant('INR'),
   );
-  static const VerificationMeta _financialYearStartMonthMeta =
-      const VerificationMeta('financialYearStartMonth');
+  static const VerificationMeta _pricesInclusiveOfTaxMeta =
+      const VerificationMeta('pricesInclusiveOfTax');
   @override
-  late final GeneratedColumn<int> financialYearStartMonth =
-      GeneratedColumn<int>(
-        'financial_year_start_month',
-        aliasedName,
-        false,
-        type: DriftSqlType.int,
-        requiredDuringInsert: false,
-        defaultValue: const Constant(4),
-      );
+  late final GeneratedColumn<bool> pricesInclusiveOfTax = GeneratedColumn<bool>(
+    'prices_inclusive_of_tax',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("prices_inclusive_of_tax" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
   static const VerificationMeta _invoicePrefixMeta = const VerificationMeta(
     'invoicePrefix',
   );
@@ -192,6 +240,17 @@ class $CompanySettingsTableTable extends CompanySettingsTable
     type: DriftSqlType.string,
     requiredDuringInsert: false,
     defaultValue: const Constant('INV-'),
+  );
+  static const VerificationMeta _invoiceStartNumberMeta =
+      const VerificationMeta('invoiceStartNumber');
+  @override
+  late final GeneratedColumn<int> invoiceStartNumber = GeneratedColumn<int>(
+    'invoice_start_number',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
   );
   static const VerificationMeta _purchasePrefixMeta = const VerificationMeta(
     'purchasePrefix',
@@ -217,6 +276,54 @@ class $CompanySettingsTableTable extends CompanySettingsTable
     requiredDuringInsert: false,
     defaultValue: const Constant('RCT-'),
   );
+  static const VerificationMeta _financialYearStartMonthMeta =
+      const VerificationMeta('financialYearStartMonth');
+  @override
+  late final GeneratedColumn<int> financialYearStartMonth =
+      GeneratedColumn<int>(
+        'financial_year_start_month',
+        aliasedName,
+        false,
+        type: DriftSqlType.int,
+        requiredDuringInsert: false,
+        defaultValue: const Constant(4),
+      );
+  static const VerificationMeta _currencyCodeMeta = const VerificationMeta(
+    'currencyCode',
+  );
+  @override
+  late final GeneratedColumn<String> currencyCode = GeneratedColumn<String>(
+    'currency_code',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('INR'),
+  );
+  static const VerificationMeta _currencySymbolMeta = const VerificationMeta(
+    'currencySymbol',
+  );
+  @override
+  late final GeneratedColumn<String> currencySymbol = GeneratedColumn<String>(
+    'currency_symbol',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('\u20B9'),
+  );
+  static const VerificationMeta _decimalPlacesMeta = const VerificationMeta(
+    'decimalPlaces',
+  );
+  @override
+  late final GeneratedColumn<int> decimalPlaces = GeneratedColumn<int>(
+    'decimal_places',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(2),
+  );
   static const VerificationMeta _timezoneMeta = const VerificationMeta(
     'timezone',
   );
@@ -229,20 +336,149 @@ class $CompanySettingsTableTable extends CompanySettingsTable
     requiredDuringInsert: false,
     defaultValue: const Constant('Asia/Kolkata'),
   );
-  static const VerificationMeta _pricesInclusiveOfTaxMeta =
-      const VerificationMeta('pricesInclusiveOfTax');
+  static const VerificationMeta _bankNameMeta = const VerificationMeta(
+    'bankName',
+  );
   @override
-  late final GeneratedColumn<bool> pricesInclusiveOfTax = GeneratedColumn<bool>(
-    'prices_inclusive_of_tax',
+  late final GeneratedColumn<String> bankName = GeneratedColumn<String>(
+    'bank_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _bankAccountNameMeta = const VerificationMeta(
+    'bankAccountName',
+  );
+  @override
+  late final GeneratedColumn<String> bankAccountName = GeneratedColumn<String>(
+    'bank_account_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _bankAccountNumberMeta = const VerificationMeta(
+    'bankAccountNumber',
+  );
+  @override
+  late final GeneratedColumn<String> bankAccountNumber =
+      GeneratedColumn<String>(
+        'bank_account_number',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _bankIfscMeta = const VerificationMeta(
+    'bankIfsc',
+  );
+  @override
+  late final GeneratedColumn<String> bankIfsc = GeneratedColumn<String>(
+    'bank_ifsc',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _bankBranchMeta = const VerificationMeta(
+    'bankBranch',
+  );
+  @override
+  late final GeneratedColumn<String> bankBranch = GeneratedColumn<String>(
+    'bank_branch',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _upiIdMeta = const VerificationMeta('upiId');
+  @override
+  late final GeneratedColumn<String> upiId = GeneratedColumn<String>(
+    'upi_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _invoiceFooterMeta = const VerificationMeta(
+    'invoiceFooter',
+  );
+  @override
+  late final GeneratedColumn<String> invoiceFooter = GeneratedColumn<String>(
+    'invoice_footer',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _invoiceTermsMeta = const VerificationMeta(
+    'invoiceTerms',
+  );
+  @override
+  late final GeneratedColumn<String> invoiceTerms = GeneratedColumn<String>(
+    'invoice_terms',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _invoiceThankYouMessageMeta =
+      const VerificationMeta('invoiceThankYouMessage');
+  @override
+  late final GeneratedColumn<String> invoiceThankYouMessage =
+      GeneratedColumn<String>(
+        'invoice_thank_you_message',
+        aliasedName,
+        true,
+        type: DriftSqlType.string,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _showLogoOnInvoiceMeta = const VerificationMeta(
+    'showLogoOnInvoice',
+  );
+  @override
+  late final GeneratedColumn<bool> showLogoOnInvoice = GeneratedColumn<bool>(
+    'show_logo_on_invoice',
     aliasedName,
     false,
     type: DriftSqlType.bool,
     requiredDuringInsert: false,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'CHECK ("prices_inclusive_of_tax" IN (0, 1))',
+      'CHECK ("show_logo_on_invoice" IN (0, 1))',
     ),
-    defaultValue: const Constant(false),
+    defaultValue: const Constant(true),
   );
+  static const VerificationMeta _showBankDetailsOnInvoiceMeta =
+      const VerificationMeta('showBankDetailsOnInvoice');
+  @override
+  late final GeneratedColumn<bool> showBankDetailsOnInvoice =
+      GeneratedColumn<bool>(
+        'show_bank_details_on_invoice',
+        aliasedName,
+        false,
+        type: DriftSqlType.bool,
+        requiredDuringInsert: false,
+        defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'CHECK ("show_bank_details_on_invoice" IN (0, 1))',
+        ),
+        defaultValue: const Constant(true),
+      );
+  static const VerificationMeta _showGstDetailsOnInvoiceMeta =
+      const VerificationMeta('showGstDetailsOnInvoice');
+  @override
+  late final GeneratedColumn<bool> showGstDetailsOnInvoice =
+      GeneratedColumn<bool>(
+        'show_gst_details_on_invoice',
+        aliasedName,
+        false,
+        type: DriftSqlType.bool,
+        requiredDuringInsert: false,
+        defaultConstraints: GeneratedColumn.constraintIsAlways(
+          'CHECK ("show_gst_details_on_invoice" IN (0, 1))',
+        ),
+        defaultValue: const Constant(true),
+      );
   static const VerificationMeta _isActiveMeta = const VerificationMeta(
     'isActive',
   );
@@ -286,25 +522,45 @@ class $CompanySettingsTableTable extends CompanySettingsTable
   List<GeneratedColumn> get $columns => [
     id,
     companyName,
-    logoPath,
+    legalName,
+    businessType,
+    gstRegistered,
     gstNumber,
     panNumber,
-    email,
+    cin,
     mobile,
+    email,
     website,
-    address,
+    addressLine1,
+    addressLine2,
     city,
     state,
     stateCode,
     country,
     pincode,
-    currencyCode,
-    financialYearStartMonth,
+    logoPath,
+    pricesInclusiveOfTax,
     invoicePrefix,
+    invoiceStartNumber,
     purchasePrefix,
     receiptPrefix,
+    financialYearStartMonth,
+    currencyCode,
+    currencySymbol,
+    decimalPlaces,
     timezone,
-    pricesInclusiveOfTax,
+    bankName,
+    bankAccountName,
+    bankAccountNumber,
+    bankIfsc,
+    bankBranch,
+    upiId,
+    invoiceFooter,
+    invoiceTerms,
+    invoiceThankYouMessage,
+    showLogoOnInvoice,
+    showBankDetailsOnInvoice,
+    showGstDetailsOnInvoice,
     isActive,
     createdAt,
     updatedAt,
@@ -335,10 +591,28 @@ class $CompanySettingsTableTable extends CompanySettingsTable
     } else if (isInserting) {
       context.missing(_companyNameMeta);
     }
-    if (data.containsKey('logo_path')) {
+    if (data.containsKey('legal_name')) {
       context.handle(
-        _logoPathMeta,
-        logoPath.isAcceptableOrUnknown(data['logo_path']!, _logoPathMeta),
+        _legalNameMeta,
+        legalName.isAcceptableOrUnknown(data['legal_name']!, _legalNameMeta),
+      );
+    }
+    if (data.containsKey('business_type')) {
+      context.handle(
+        _businessTypeMeta,
+        businessType.isAcceptableOrUnknown(
+          data['business_type']!,
+          _businessTypeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('gst_registered')) {
+      context.handle(
+        _gstRegisteredMeta,
+        gstRegistered.isAcceptableOrUnknown(
+          data['gst_registered']!,
+          _gstRegisteredMeta,
+        ),
       );
     }
     if (data.containsKey('gst_number')) {
@@ -353,10 +627,10 @@ class $CompanySettingsTableTable extends CompanySettingsTable
         panNumber.isAcceptableOrUnknown(data['pan_number']!, _panNumberMeta),
       );
     }
-    if (data.containsKey('email')) {
+    if (data.containsKey('cin')) {
       context.handle(
-        _emailMeta,
-        email.isAcceptableOrUnknown(data['email']!, _emailMeta),
+        _cinMeta,
+        cin.isAcceptableOrUnknown(data['cin']!, _cinMeta),
       );
     }
     if (data.containsKey('mobile')) {
@@ -365,16 +639,34 @@ class $CompanySettingsTableTable extends CompanySettingsTable
         mobile.isAcceptableOrUnknown(data['mobile']!, _mobileMeta),
       );
     }
+    if (data.containsKey('email')) {
+      context.handle(
+        _emailMeta,
+        email.isAcceptableOrUnknown(data['email']!, _emailMeta),
+      );
+    }
     if (data.containsKey('website')) {
       context.handle(
         _websiteMeta,
         website.isAcceptableOrUnknown(data['website']!, _websiteMeta),
       );
     }
-    if (data.containsKey('address')) {
+    if (data.containsKey('address_line1')) {
       context.handle(
-        _addressMeta,
-        address.isAcceptableOrUnknown(data['address']!, _addressMeta),
+        _addressLine1Meta,
+        addressLine1.isAcceptableOrUnknown(
+          data['address_line1']!,
+          _addressLine1Meta,
+        ),
+      );
+    }
+    if (data.containsKey('address_line2')) {
+      context.handle(
+        _addressLine2Meta,
+        addressLine2.isAcceptableOrUnknown(
+          data['address_line2']!,
+          _addressLine2Meta,
+        ),
       );
     }
     if (data.containsKey('city')) {
@@ -407,21 +699,18 @@ class $CompanySettingsTableTable extends CompanySettingsTable
         pincode.isAcceptableOrUnknown(data['pincode']!, _pincodeMeta),
       );
     }
-    if (data.containsKey('currency_code')) {
+    if (data.containsKey('logo_path')) {
       context.handle(
-        _currencyCodeMeta,
-        currencyCode.isAcceptableOrUnknown(
-          data['currency_code']!,
-          _currencyCodeMeta,
-        ),
+        _logoPathMeta,
+        logoPath.isAcceptableOrUnknown(data['logo_path']!, _logoPathMeta),
       );
     }
-    if (data.containsKey('financial_year_start_month')) {
+    if (data.containsKey('prices_inclusive_of_tax')) {
       context.handle(
-        _financialYearStartMonthMeta,
-        financialYearStartMonth.isAcceptableOrUnknown(
-          data['financial_year_start_month']!,
-          _financialYearStartMonthMeta,
+        _pricesInclusiveOfTaxMeta,
+        pricesInclusiveOfTax.isAcceptableOrUnknown(
+          data['prices_inclusive_of_tax']!,
+          _pricesInclusiveOfTaxMeta,
         ),
       );
     }
@@ -431,6 +720,15 @@ class $CompanySettingsTableTable extends CompanySettingsTable
         invoicePrefix.isAcceptableOrUnknown(
           data['invoice_prefix']!,
           _invoicePrefixMeta,
+        ),
+      );
+    }
+    if (data.containsKey('invoice_start_number')) {
+      context.handle(
+        _invoiceStartNumberMeta,
+        invoiceStartNumber.isAcceptableOrUnknown(
+          data['invoice_start_number']!,
+          _invoiceStartNumberMeta,
         ),
       );
     }
@@ -452,18 +750,141 @@ class $CompanySettingsTableTable extends CompanySettingsTable
         ),
       );
     }
+    if (data.containsKey('financial_year_start_month')) {
+      context.handle(
+        _financialYearStartMonthMeta,
+        financialYearStartMonth.isAcceptableOrUnknown(
+          data['financial_year_start_month']!,
+          _financialYearStartMonthMeta,
+        ),
+      );
+    }
+    if (data.containsKey('currency_code')) {
+      context.handle(
+        _currencyCodeMeta,
+        currencyCode.isAcceptableOrUnknown(
+          data['currency_code']!,
+          _currencyCodeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('currency_symbol')) {
+      context.handle(
+        _currencySymbolMeta,
+        currencySymbol.isAcceptableOrUnknown(
+          data['currency_symbol']!,
+          _currencySymbolMeta,
+        ),
+      );
+    }
+    if (data.containsKey('decimal_places')) {
+      context.handle(
+        _decimalPlacesMeta,
+        decimalPlaces.isAcceptableOrUnknown(
+          data['decimal_places']!,
+          _decimalPlacesMeta,
+        ),
+      );
+    }
     if (data.containsKey('timezone')) {
       context.handle(
         _timezoneMeta,
         timezone.isAcceptableOrUnknown(data['timezone']!, _timezoneMeta),
       );
     }
-    if (data.containsKey('prices_inclusive_of_tax')) {
+    if (data.containsKey('bank_name')) {
       context.handle(
-        _pricesInclusiveOfTaxMeta,
-        pricesInclusiveOfTax.isAcceptableOrUnknown(
-          data['prices_inclusive_of_tax']!,
-          _pricesInclusiveOfTaxMeta,
+        _bankNameMeta,
+        bankName.isAcceptableOrUnknown(data['bank_name']!, _bankNameMeta),
+      );
+    }
+    if (data.containsKey('bank_account_name')) {
+      context.handle(
+        _bankAccountNameMeta,
+        bankAccountName.isAcceptableOrUnknown(
+          data['bank_account_name']!,
+          _bankAccountNameMeta,
+        ),
+      );
+    }
+    if (data.containsKey('bank_account_number')) {
+      context.handle(
+        _bankAccountNumberMeta,
+        bankAccountNumber.isAcceptableOrUnknown(
+          data['bank_account_number']!,
+          _bankAccountNumberMeta,
+        ),
+      );
+    }
+    if (data.containsKey('bank_ifsc')) {
+      context.handle(
+        _bankIfscMeta,
+        bankIfsc.isAcceptableOrUnknown(data['bank_ifsc']!, _bankIfscMeta),
+      );
+    }
+    if (data.containsKey('bank_branch')) {
+      context.handle(
+        _bankBranchMeta,
+        bankBranch.isAcceptableOrUnknown(data['bank_branch']!, _bankBranchMeta),
+      );
+    }
+    if (data.containsKey('upi_id')) {
+      context.handle(
+        _upiIdMeta,
+        upiId.isAcceptableOrUnknown(data['upi_id']!, _upiIdMeta),
+      );
+    }
+    if (data.containsKey('invoice_footer')) {
+      context.handle(
+        _invoiceFooterMeta,
+        invoiceFooter.isAcceptableOrUnknown(
+          data['invoice_footer']!,
+          _invoiceFooterMeta,
+        ),
+      );
+    }
+    if (data.containsKey('invoice_terms')) {
+      context.handle(
+        _invoiceTermsMeta,
+        invoiceTerms.isAcceptableOrUnknown(
+          data['invoice_terms']!,
+          _invoiceTermsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('invoice_thank_you_message')) {
+      context.handle(
+        _invoiceThankYouMessageMeta,
+        invoiceThankYouMessage.isAcceptableOrUnknown(
+          data['invoice_thank_you_message']!,
+          _invoiceThankYouMessageMeta,
+        ),
+      );
+    }
+    if (data.containsKey('show_logo_on_invoice')) {
+      context.handle(
+        _showLogoOnInvoiceMeta,
+        showLogoOnInvoice.isAcceptableOrUnknown(
+          data['show_logo_on_invoice']!,
+          _showLogoOnInvoiceMeta,
+        ),
+      );
+    }
+    if (data.containsKey('show_bank_details_on_invoice')) {
+      context.handle(
+        _showBankDetailsOnInvoiceMeta,
+        showBankDetailsOnInvoice.isAcceptableOrUnknown(
+          data['show_bank_details_on_invoice']!,
+          _showBankDetailsOnInvoiceMeta,
+        ),
+      );
+    }
+    if (data.containsKey('show_gst_details_on_invoice')) {
+      context.handle(
+        _showGstDetailsOnInvoiceMeta,
+        showGstDetailsOnInvoice.isAcceptableOrUnknown(
+          data['show_gst_details_on_invoice']!,
+          _showGstDetailsOnInvoiceMeta,
         ),
       );
     }
@@ -502,10 +923,18 @@ class $CompanySettingsTableTable extends CompanySettingsTable
         DriftSqlType.string,
         data['${effectivePrefix}company_name'],
       )!,
-      logoPath: attachedDatabase.typeMapping.read(
+      legalName: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}logo_path'],
+        data['${effectivePrefix}legal_name'],
       ),
+      businessType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}business_type'],
+      )!,
+      gstRegistered: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}gst_registered'],
+      )!,
       gstNumber: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}gst_number'],
@@ -514,21 +943,29 @@ class $CompanySettingsTableTable extends CompanySettingsTable
         DriftSqlType.string,
         data['${effectivePrefix}pan_number'],
       ),
-      email: attachedDatabase.typeMapping.read(
+      cin: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}email'],
+        data['${effectivePrefix}cin'],
       ),
       mobile: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}mobile'],
       ),
+      email: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}email'],
+      ),
       website: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}website'],
       ),
-      address: attachedDatabase.typeMapping.read(
+      addressLine1: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}address'],
+        data['${effectivePrefix}address_line1'],
+      ),
+      addressLine2: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}address_line2'],
       ),
       city: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
@@ -550,17 +987,21 @@ class $CompanySettingsTableTable extends CompanySettingsTable
         DriftSqlType.string,
         data['${effectivePrefix}pincode'],
       ),
-      currencyCode: attachedDatabase.typeMapping.read(
+      logoPath: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}currency_code'],
-      )!,
-      financialYearStartMonth: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}financial_year_start_month'],
+        data['${effectivePrefix}logo_path'],
+      ),
+      pricesInclusiveOfTax: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}prices_inclusive_of_tax'],
       )!,
       invoicePrefix: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}invoice_prefix'],
+      )!,
+      invoiceStartNumber: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}invoice_start_number'],
       )!,
       purchasePrefix: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
@@ -570,13 +1011,73 @@ class $CompanySettingsTableTable extends CompanySettingsTable
         DriftSqlType.string,
         data['${effectivePrefix}receipt_prefix'],
       )!,
+      financialYearStartMonth: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}financial_year_start_month'],
+      )!,
+      currencyCode: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}currency_code'],
+      )!,
+      currencySymbol: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}currency_symbol'],
+      )!,
+      decimalPlaces: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}decimal_places'],
+      )!,
       timezone: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}timezone'],
       )!,
-      pricesInclusiveOfTax: attachedDatabase.typeMapping.read(
+      bankName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}bank_name'],
+      ),
+      bankAccountName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}bank_account_name'],
+      ),
+      bankAccountNumber: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}bank_account_number'],
+      ),
+      bankIfsc: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}bank_ifsc'],
+      ),
+      bankBranch: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}bank_branch'],
+      ),
+      upiId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}upi_id'],
+      ),
+      invoiceFooter: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}invoice_footer'],
+      ),
+      invoiceTerms: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}invoice_terms'],
+      ),
+      invoiceThankYouMessage: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}invoice_thank_you_message'],
+      ),
+      showLogoOnInvoice: attachedDatabase.typeMapping.read(
         DriftSqlType.bool,
-        data['${effectivePrefix}prices_inclusive_of_tax'],
+        data['${effectivePrefix}show_logo_on_invoice'],
+      )!,
+      showBankDetailsOnInvoice: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}show_bank_details_on_invoice'],
+      )!,
+      showGstDetailsOnInvoice: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}show_gst_details_on_invoice'],
       )!,
       isActive: attachedDatabase.typeMapping.read(
         DriftSqlType.bool,
@@ -602,51 +1103,104 @@ class $CompanySettingsTableTable extends CompanySettingsTable
 class CompanySettings extends DataClass implements Insertable<CompanySettings> {
   /// Primary key. `CHECK (id = 1)` enforces the single-row rule.
   final int id;
+
+  /// The name displayed throughout the ERP.
   final String companyName;
-  final String? logoPath;
+  final String? legalName;
+
+  /// One of the [BusinessType] db values (e.g. `PROPRIETORSHIP`).
+  final String businessType;
+
+  /// Whether the business is registered for GST; when true the GSTIN is
+  /// required by the application layer.
+  final bool gstRegistered;
   final String? gstNumber;
   final String? panNumber;
-  final String? email;
+  final String? cin;
   final String? mobile;
+  final String? email;
   final String? website;
-  final String? address;
+  final String? addressLine1;
+  final String? addressLine2;
   final String? city;
   final String? state;
   final String? stateCode;
   final String? country;
   final String? pincode;
-  final String currencyCode;
-  final int financialYearStartMonth;
+
+  /// Absolute path of the logo file stored outside the database.
+  final String? logoPath;
+
+  /// `true` = tax inclusive, `false` = tax exclusive (the default tax type).
+  final bool pricesInclusiveOfTax;
   final String invoicePrefix;
+  final int invoiceStartNumber;
   final String purchasePrefix;
   final String receiptPrefix;
+
+  /// 1–12; April (4) is the default Indian financial-year start.
+  final int financialYearStartMonth;
+  final String currencyCode;
+  final String currencySymbol;
+  final int decimalPlaces;
   final String timezone;
-  final bool pricesInclusiveOfTax;
+  final String? bankName;
+  final String? bankAccountName;
+  final String? bankAccountNumber;
+  final String? bankIfsc;
+  final String? bankBranch;
+  final String? upiId;
+  final String? invoiceFooter;
+  final String? invoiceTerms;
+  final String? invoiceThankYouMessage;
+  final bool showLogoOnInvoice;
+  final bool showBankDetailsOnInvoice;
+  final bool showGstDetailsOnInvoice;
   final bool isActive;
   final DateTime createdAt;
   final DateTime updatedAt;
   const CompanySettings({
     required this.id,
     required this.companyName,
-    this.logoPath,
+    this.legalName,
+    required this.businessType,
+    required this.gstRegistered,
     this.gstNumber,
     this.panNumber,
-    this.email,
+    this.cin,
     this.mobile,
+    this.email,
     this.website,
-    this.address,
+    this.addressLine1,
+    this.addressLine2,
     this.city,
     this.state,
     this.stateCode,
     this.country,
     this.pincode,
-    required this.currencyCode,
-    required this.financialYearStartMonth,
+    this.logoPath,
+    required this.pricesInclusiveOfTax,
     required this.invoicePrefix,
+    required this.invoiceStartNumber,
     required this.purchasePrefix,
     required this.receiptPrefix,
+    required this.financialYearStartMonth,
+    required this.currencyCode,
+    required this.currencySymbol,
+    required this.decimalPlaces,
     required this.timezone,
-    required this.pricesInclusiveOfTax,
+    this.bankName,
+    this.bankAccountName,
+    this.bankAccountNumber,
+    this.bankIfsc,
+    this.bankBranch,
+    this.upiId,
+    this.invoiceFooter,
+    this.invoiceTerms,
+    this.invoiceThankYouMessage,
+    required this.showLogoOnInvoice,
+    required this.showBankDetailsOnInvoice,
+    required this.showGstDetailsOnInvoice,
     required this.isActive,
     required this.createdAt,
     required this.updatedAt,
@@ -656,26 +1210,34 @@ class CompanySettings extends DataClass implements Insertable<CompanySettings> {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['company_name'] = Variable<String>(companyName);
-    if (!nullToAbsent || logoPath != null) {
-      map['logo_path'] = Variable<String>(logoPath);
+    if (!nullToAbsent || legalName != null) {
+      map['legal_name'] = Variable<String>(legalName);
     }
+    map['business_type'] = Variable<String>(businessType);
+    map['gst_registered'] = Variable<bool>(gstRegistered);
     if (!nullToAbsent || gstNumber != null) {
       map['gst_number'] = Variable<String>(gstNumber);
     }
     if (!nullToAbsent || panNumber != null) {
       map['pan_number'] = Variable<String>(panNumber);
     }
-    if (!nullToAbsent || email != null) {
-      map['email'] = Variable<String>(email);
+    if (!nullToAbsent || cin != null) {
+      map['cin'] = Variable<String>(cin);
     }
     if (!nullToAbsent || mobile != null) {
       map['mobile'] = Variable<String>(mobile);
     }
+    if (!nullToAbsent || email != null) {
+      map['email'] = Variable<String>(email);
+    }
     if (!nullToAbsent || website != null) {
       map['website'] = Variable<String>(website);
     }
-    if (!nullToAbsent || address != null) {
-      map['address'] = Variable<String>(address);
+    if (!nullToAbsent || addressLine1 != null) {
+      map['address_line1'] = Variable<String>(addressLine1);
+    }
+    if (!nullToAbsent || addressLine2 != null) {
+      map['address_line2'] = Variable<String>(addressLine2);
     }
     if (!nullToAbsent || city != null) {
       map['city'] = Variable<String>(city);
@@ -692,13 +1254,55 @@ class CompanySettings extends DataClass implements Insertable<CompanySettings> {
     if (!nullToAbsent || pincode != null) {
       map['pincode'] = Variable<String>(pincode);
     }
-    map['currency_code'] = Variable<String>(currencyCode);
-    map['financial_year_start_month'] = Variable<int>(financialYearStartMonth);
+    if (!nullToAbsent || logoPath != null) {
+      map['logo_path'] = Variable<String>(logoPath);
+    }
+    map['prices_inclusive_of_tax'] = Variable<bool>(pricesInclusiveOfTax);
     map['invoice_prefix'] = Variable<String>(invoicePrefix);
+    map['invoice_start_number'] = Variable<int>(invoiceStartNumber);
     map['purchase_prefix'] = Variable<String>(purchasePrefix);
     map['receipt_prefix'] = Variable<String>(receiptPrefix);
+    map['financial_year_start_month'] = Variable<int>(financialYearStartMonth);
+    map['currency_code'] = Variable<String>(currencyCode);
+    map['currency_symbol'] = Variable<String>(currencySymbol);
+    map['decimal_places'] = Variable<int>(decimalPlaces);
     map['timezone'] = Variable<String>(timezone);
-    map['prices_inclusive_of_tax'] = Variable<bool>(pricesInclusiveOfTax);
+    if (!nullToAbsent || bankName != null) {
+      map['bank_name'] = Variable<String>(bankName);
+    }
+    if (!nullToAbsent || bankAccountName != null) {
+      map['bank_account_name'] = Variable<String>(bankAccountName);
+    }
+    if (!nullToAbsent || bankAccountNumber != null) {
+      map['bank_account_number'] = Variable<String>(bankAccountNumber);
+    }
+    if (!nullToAbsent || bankIfsc != null) {
+      map['bank_ifsc'] = Variable<String>(bankIfsc);
+    }
+    if (!nullToAbsent || bankBranch != null) {
+      map['bank_branch'] = Variable<String>(bankBranch);
+    }
+    if (!nullToAbsent || upiId != null) {
+      map['upi_id'] = Variable<String>(upiId);
+    }
+    if (!nullToAbsent || invoiceFooter != null) {
+      map['invoice_footer'] = Variable<String>(invoiceFooter);
+    }
+    if (!nullToAbsent || invoiceTerms != null) {
+      map['invoice_terms'] = Variable<String>(invoiceTerms);
+    }
+    if (!nullToAbsent || invoiceThankYouMessage != null) {
+      map['invoice_thank_you_message'] = Variable<String>(
+        invoiceThankYouMessage,
+      );
+    }
+    map['show_logo_on_invoice'] = Variable<bool>(showLogoOnInvoice);
+    map['show_bank_details_on_invoice'] = Variable<bool>(
+      showBankDetailsOnInvoice,
+    );
+    map['show_gst_details_on_invoice'] = Variable<bool>(
+      showGstDetailsOnInvoice,
+    );
     map['is_active'] = Variable<bool>(isActive);
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
@@ -709,27 +1313,33 @@ class CompanySettings extends DataClass implements Insertable<CompanySettings> {
     return CompanySettingsTableCompanion(
       id: Value(id),
       companyName: Value(companyName),
-      logoPath: logoPath == null && nullToAbsent
+      legalName: legalName == null && nullToAbsent
           ? const Value.absent()
-          : Value(logoPath),
+          : Value(legalName),
+      businessType: Value(businessType),
+      gstRegistered: Value(gstRegistered),
       gstNumber: gstNumber == null && nullToAbsent
           ? const Value.absent()
           : Value(gstNumber),
       panNumber: panNumber == null && nullToAbsent
           ? const Value.absent()
           : Value(panNumber),
-      email: email == null && nullToAbsent
-          ? const Value.absent()
-          : Value(email),
+      cin: cin == null && nullToAbsent ? const Value.absent() : Value(cin),
       mobile: mobile == null && nullToAbsent
           ? const Value.absent()
           : Value(mobile),
+      email: email == null && nullToAbsent
+          ? const Value.absent()
+          : Value(email),
       website: website == null && nullToAbsent
           ? const Value.absent()
           : Value(website),
-      address: address == null && nullToAbsent
+      addressLine1: addressLine1 == null && nullToAbsent
           ? const Value.absent()
-          : Value(address),
+          : Value(addressLine1),
+      addressLine2: addressLine2 == null && nullToAbsent
+          ? const Value.absent()
+          : Value(addressLine2),
       city: city == null && nullToAbsent ? const Value.absent() : Value(city),
       state: state == null && nullToAbsent
           ? const Value.absent()
@@ -743,13 +1353,49 @@ class CompanySettings extends DataClass implements Insertable<CompanySettings> {
       pincode: pincode == null && nullToAbsent
           ? const Value.absent()
           : Value(pincode),
-      currencyCode: Value(currencyCode),
-      financialYearStartMonth: Value(financialYearStartMonth),
+      logoPath: logoPath == null && nullToAbsent
+          ? const Value.absent()
+          : Value(logoPath),
+      pricesInclusiveOfTax: Value(pricesInclusiveOfTax),
       invoicePrefix: Value(invoicePrefix),
+      invoiceStartNumber: Value(invoiceStartNumber),
       purchasePrefix: Value(purchasePrefix),
       receiptPrefix: Value(receiptPrefix),
+      financialYearStartMonth: Value(financialYearStartMonth),
+      currencyCode: Value(currencyCode),
+      currencySymbol: Value(currencySymbol),
+      decimalPlaces: Value(decimalPlaces),
       timezone: Value(timezone),
-      pricesInclusiveOfTax: Value(pricesInclusiveOfTax),
+      bankName: bankName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(bankName),
+      bankAccountName: bankAccountName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(bankAccountName),
+      bankAccountNumber: bankAccountNumber == null && nullToAbsent
+          ? const Value.absent()
+          : Value(bankAccountNumber),
+      bankIfsc: bankIfsc == null && nullToAbsent
+          ? const Value.absent()
+          : Value(bankIfsc),
+      bankBranch: bankBranch == null && nullToAbsent
+          ? const Value.absent()
+          : Value(bankBranch),
+      upiId: upiId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(upiId),
+      invoiceFooter: invoiceFooter == null && nullToAbsent
+          ? const Value.absent()
+          : Value(invoiceFooter),
+      invoiceTerms: invoiceTerms == null && nullToAbsent
+          ? const Value.absent()
+          : Value(invoiceTerms),
+      invoiceThankYouMessage: invoiceThankYouMessage == null && nullToAbsent
+          ? const Value.absent()
+          : Value(invoiceThankYouMessage),
+      showLogoOnInvoice: Value(showLogoOnInvoice),
+      showBankDetailsOnInvoice: Value(showBankDetailsOnInvoice),
+      showGstDetailsOnInvoice: Value(showGstDetailsOnInvoice),
       isActive: Value(isActive),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
@@ -764,28 +1410,56 @@ class CompanySettings extends DataClass implements Insertable<CompanySettings> {
     return CompanySettings(
       id: serializer.fromJson<int>(json['id']),
       companyName: serializer.fromJson<String>(json['companyName']),
-      logoPath: serializer.fromJson<String?>(json['logoPath']),
+      legalName: serializer.fromJson<String?>(json['legalName']),
+      businessType: serializer.fromJson<String>(json['businessType']),
+      gstRegistered: serializer.fromJson<bool>(json['gstRegistered']),
       gstNumber: serializer.fromJson<String?>(json['gstNumber']),
       panNumber: serializer.fromJson<String?>(json['panNumber']),
-      email: serializer.fromJson<String?>(json['email']),
+      cin: serializer.fromJson<String?>(json['cin']),
       mobile: serializer.fromJson<String?>(json['mobile']),
+      email: serializer.fromJson<String?>(json['email']),
       website: serializer.fromJson<String?>(json['website']),
-      address: serializer.fromJson<String?>(json['address']),
+      addressLine1: serializer.fromJson<String?>(json['addressLine1']),
+      addressLine2: serializer.fromJson<String?>(json['addressLine2']),
       city: serializer.fromJson<String?>(json['city']),
       state: serializer.fromJson<String?>(json['state']),
       stateCode: serializer.fromJson<String?>(json['stateCode']),
       country: serializer.fromJson<String?>(json['country']),
       pincode: serializer.fromJson<String?>(json['pincode']),
-      currencyCode: serializer.fromJson<String>(json['currencyCode']),
+      logoPath: serializer.fromJson<String?>(json['logoPath']),
+      pricesInclusiveOfTax: serializer.fromJson<bool>(
+        json['pricesInclusiveOfTax'],
+      ),
+      invoicePrefix: serializer.fromJson<String>(json['invoicePrefix']),
+      invoiceStartNumber: serializer.fromJson<int>(json['invoiceStartNumber']),
+      purchasePrefix: serializer.fromJson<String>(json['purchasePrefix']),
+      receiptPrefix: serializer.fromJson<String>(json['receiptPrefix']),
       financialYearStartMonth: serializer.fromJson<int>(
         json['financialYearStartMonth'],
       ),
-      invoicePrefix: serializer.fromJson<String>(json['invoicePrefix']),
-      purchasePrefix: serializer.fromJson<String>(json['purchasePrefix']),
-      receiptPrefix: serializer.fromJson<String>(json['receiptPrefix']),
+      currencyCode: serializer.fromJson<String>(json['currencyCode']),
+      currencySymbol: serializer.fromJson<String>(json['currencySymbol']),
+      decimalPlaces: serializer.fromJson<int>(json['decimalPlaces']),
       timezone: serializer.fromJson<String>(json['timezone']),
-      pricesInclusiveOfTax: serializer.fromJson<bool>(
-        json['pricesInclusiveOfTax'],
+      bankName: serializer.fromJson<String?>(json['bankName']),
+      bankAccountName: serializer.fromJson<String?>(json['bankAccountName']),
+      bankAccountNumber: serializer.fromJson<String?>(
+        json['bankAccountNumber'],
+      ),
+      bankIfsc: serializer.fromJson<String?>(json['bankIfsc']),
+      bankBranch: serializer.fromJson<String?>(json['bankBranch']),
+      upiId: serializer.fromJson<String?>(json['upiId']),
+      invoiceFooter: serializer.fromJson<String?>(json['invoiceFooter']),
+      invoiceTerms: serializer.fromJson<String?>(json['invoiceTerms']),
+      invoiceThankYouMessage: serializer.fromJson<String?>(
+        json['invoiceThankYouMessage'],
+      ),
+      showLogoOnInvoice: serializer.fromJson<bool>(json['showLogoOnInvoice']),
+      showBankDetailsOnInvoice: serializer.fromJson<bool>(
+        json['showBankDetailsOnInvoice'],
+      ),
+      showGstDetailsOnInvoice: serializer.fromJson<bool>(
+        json['showGstDetailsOnInvoice'],
       ),
       isActive: serializer.fromJson<bool>(json['isActive']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
@@ -798,27 +1472,53 @@ class CompanySettings extends DataClass implements Insertable<CompanySettings> {
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'companyName': serializer.toJson<String>(companyName),
-      'logoPath': serializer.toJson<String?>(logoPath),
+      'legalName': serializer.toJson<String?>(legalName),
+      'businessType': serializer.toJson<String>(businessType),
+      'gstRegistered': serializer.toJson<bool>(gstRegistered),
       'gstNumber': serializer.toJson<String?>(gstNumber),
       'panNumber': serializer.toJson<String?>(panNumber),
-      'email': serializer.toJson<String?>(email),
+      'cin': serializer.toJson<String?>(cin),
       'mobile': serializer.toJson<String?>(mobile),
+      'email': serializer.toJson<String?>(email),
       'website': serializer.toJson<String?>(website),
-      'address': serializer.toJson<String?>(address),
+      'addressLine1': serializer.toJson<String?>(addressLine1),
+      'addressLine2': serializer.toJson<String?>(addressLine2),
       'city': serializer.toJson<String?>(city),
       'state': serializer.toJson<String?>(state),
       'stateCode': serializer.toJson<String?>(stateCode),
       'country': serializer.toJson<String?>(country),
       'pincode': serializer.toJson<String?>(pincode),
-      'currencyCode': serializer.toJson<String>(currencyCode),
+      'logoPath': serializer.toJson<String?>(logoPath),
+      'pricesInclusiveOfTax': serializer.toJson<bool>(pricesInclusiveOfTax),
+      'invoicePrefix': serializer.toJson<String>(invoicePrefix),
+      'invoiceStartNumber': serializer.toJson<int>(invoiceStartNumber),
+      'purchasePrefix': serializer.toJson<String>(purchasePrefix),
+      'receiptPrefix': serializer.toJson<String>(receiptPrefix),
       'financialYearStartMonth': serializer.toJson<int>(
         financialYearStartMonth,
       ),
-      'invoicePrefix': serializer.toJson<String>(invoicePrefix),
-      'purchasePrefix': serializer.toJson<String>(purchasePrefix),
-      'receiptPrefix': serializer.toJson<String>(receiptPrefix),
+      'currencyCode': serializer.toJson<String>(currencyCode),
+      'currencySymbol': serializer.toJson<String>(currencySymbol),
+      'decimalPlaces': serializer.toJson<int>(decimalPlaces),
       'timezone': serializer.toJson<String>(timezone),
-      'pricesInclusiveOfTax': serializer.toJson<bool>(pricesInclusiveOfTax),
+      'bankName': serializer.toJson<String?>(bankName),
+      'bankAccountName': serializer.toJson<String?>(bankAccountName),
+      'bankAccountNumber': serializer.toJson<String?>(bankAccountNumber),
+      'bankIfsc': serializer.toJson<String?>(bankIfsc),
+      'bankBranch': serializer.toJson<String?>(bankBranch),
+      'upiId': serializer.toJson<String?>(upiId),
+      'invoiceFooter': serializer.toJson<String?>(invoiceFooter),
+      'invoiceTerms': serializer.toJson<String?>(invoiceTerms),
+      'invoiceThankYouMessage': serializer.toJson<String?>(
+        invoiceThankYouMessage,
+      ),
+      'showLogoOnInvoice': serializer.toJson<bool>(showLogoOnInvoice),
+      'showBankDetailsOnInvoice': serializer.toJson<bool>(
+        showBankDetailsOnInvoice,
+      ),
+      'showGstDetailsOnInvoice': serializer.toJson<bool>(
+        showGstDetailsOnInvoice,
+      ),
       'isActive': serializer.toJson<bool>(isActive),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
@@ -828,51 +1528,101 @@ class CompanySettings extends DataClass implements Insertable<CompanySettings> {
   CompanySettings copyWith({
     int? id,
     String? companyName,
-    Value<String?> logoPath = const Value.absent(),
+    Value<String?> legalName = const Value.absent(),
+    String? businessType,
+    bool? gstRegistered,
     Value<String?> gstNumber = const Value.absent(),
     Value<String?> panNumber = const Value.absent(),
-    Value<String?> email = const Value.absent(),
+    Value<String?> cin = const Value.absent(),
     Value<String?> mobile = const Value.absent(),
+    Value<String?> email = const Value.absent(),
     Value<String?> website = const Value.absent(),
-    Value<String?> address = const Value.absent(),
+    Value<String?> addressLine1 = const Value.absent(),
+    Value<String?> addressLine2 = const Value.absent(),
     Value<String?> city = const Value.absent(),
     Value<String?> state = const Value.absent(),
     Value<String?> stateCode = const Value.absent(),
     Value<String?> country = const Value.absent(),
     Value<String?> pincode = const Value.absent(),
-    String? currencyCode,
-    int? financialYearStartMonth,
+    Value<String?> logoPath = const Value.absent(),
+    bool? pricesInclusiveOfTax,
     String? invoicePrefix,
+    int? invoiceStartNumber,
     String? purchasePrefix,
     String? receiptPrefix,
+    int? financialYearStartMonth,
+    String? currencyCode,
+    String? currencySymbol,
+    int? decimalPlaces,
     String? timezone,
-    bool? pricesInclusiveOfTax,
+    Value<String?> bankName = const Value.absent(),
+    Value<String?> bankAccountName = const Value.absent(),
+    Value<String?> bankAccountNumber = const Value.absent(),
+    Value<String?> bankIfsc = const Value.absent(),
+    Value<String?> bankBranch = const Value.absent(),
+    Value<String?> upiId = const Value.absent(),
+    Value<String?> invoiceFooter = const Value.absent(),
+    Value<String?> invoiceTerms = const Value.absent(),
+    Value<String?> invoiceThankYouMessage = const Value.absent(),
+    bool? showLogoOnInvoice,
+    bool? showBankDetailsOnInvoice,
+    bool? showGstDetailsOnInvoice,
     bool? isActive,
     DateTime? createdAt,
     DateTime? updatedAt,
   }) => CompanySettings(
     id: id ?? this.id,
     companyName: companyName ?? this.companyName,
-    logoPath: logoPath.present ? logoPath.value : this.logoPath,
+    legalName: legalName.present ? legalName.value : this.legalName,
+    businessType: businessType ?? this.businessType,
+    gstRegistered: gstRegistered ?? this.gstRegistered,
     gstNumber: gstNumber.present ? gstNumber.value : this.gstNumber,
     panNumber: panNumber.present ? panNumber.value : this.panNumber,
-    email: email.present ? email.value : this.email,
+    cin: cin.present ? cin.value : this.cin,
     mobile: mobile.present ? mobile.value : this.mobile,
+    email: email.present ? email.value : this.email,
     website: website.present ? website.value : this.website,
-    address: address.present ? address.value : this.address,
+    addressLine1: addressLine1.present ? addressLine1.value : this.addressLine1,
+    addressLine2: addressLine2.present ? addressLine2.value : this.addressLine2,
     city: city.present ? city.value : this.city,
     state: state.present ? state.value : this.state,
     stateCode: stateCode.present ? stateCode.value : this.stateCode,
     country: country.present ? country.value : this.country,
     pincode: pincode.present ? pincode.value : this.pincode,
-    currencyCode: currencyCode ?? this.currencyCode,
-    financialYearStartMonth:
-        financialYearStartMonth ?? this.financialYearStartMonth,
+    logoPath: logoPath.present ? logoPath.value : this.logoPath,
+    pricesInclusiveOfTax: pricesInclusiveOfTax ?? this.pricesInclusiveOfTax,
     invoicePrefix: invoicePrefix ?? this.invoicePrefix,
+    invoiceStartNumber: invoiceStartNumber ?? this.invoiceStartNumber,
     purchasePrefix: purchasePrefix ?? this.purchasePrefix,
     receiptPrefix: receiptPrefix ?? this.receiptPrefix,
+    financialYearStartMonth:
+        financialYearStartMonth ?? this.financialYearStartMonth,
+    currencyCode: currencyCode ?? this.currencyCode,
+    currencySymbol: currencySymbol ?? this.currencySymbol,
+    decimalPlaces: decimalPlaces ?? this.decimalPlaces,
     timezone: timezone ?? this.timezone,
-    pricesInclusiveOfTax: pricesInclusiveOfTax ?? this.pricesInclusiveOfTax,
+    bankName: bankName.present ? bankName.value : this.bankName,
+    bankAccountName: bankAccountName.present
+        ? bankAccountName.value
+        : this.bankAccountName,
+    bankAccountNumber: bankAccountNumber.present
+        ? bankAccountNumber.value
+        : this.bankAccountNumber,
+    bankIfsc: bankIfsc.present ? bankIfsc.value : this.bankIfsc,
+    bankBranch: bankBranch.present ? bankBranch.value : this.bankBranch,
+    upiId: upiId.present ? upiId.value : this.upiId,
+    invoiceFooter: invoiceFooter.present
+        ? invoiceFooter.value
+        : this.invoiceFooter,
+    invoiceTerms: invoiceTerms.present ? invoiceTerms.value : this.invoiceTerms,
+    invoiceThankYouMessage: invoiceThankYouMessage.present
+        ? invoiceThankYouMessage.value
+        : this.invoiceThankYouMessage,
+    showLogoOnInvoice: showLogoOnInvoice ?? this.showLogoOnInvoice,
+    showBankDetailsOnInvoice:
+        showBankDetailsOnInvoice ?? this.showBankDetailsOnInvoice,
+    showGstDetailsOnInvoice:
+        showGstDetailsOnInvoice ?? this.showGstDetailsOnInvoice,
     isActive: isActive ?? this.isActive,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
@@ -883,37 +1633,89 @@ class CompanySettings extends DataClass implements Insertable<CompanySettings> {
       companyName: data.companyName.present
           ? data.companyName.value
           : this.companyName,
-      logoPath: data.logoPath.present ? data.logoPath.value : this.logoPath,
+      legalName: data.legalName.present ? data.legalName.value : this.legalName,
+      businessType: data.businessType.present
+          ? data.businessType.value
+          : this.businessType,
+      gstRegistered: data.gstRegistered.present
+          ? data.gstRegistered.value
+          : this.gstRegistered,
       gstNumber: data.gstNumber.present ? data.gstNumber.value : this.gstNumber,
       panNumber: data.panNumber.present ? data.panNumber.value : this.panNumber,
-      email: data.email.present ? data.email.value : this.email,
+      cin: data.cin.present ? data.cin.value : this.cin,
       mobile: data.mobile.present ? data.mobile.value : this.mobile,
+      email: data.email.present ? data.email.value : this.email,
       website: data.website.present ? data.website.value : this.website,
-      address: data.address.present ? data.address.value : this.address,
+      addressLine1: data.addressLine1.present
+          ? data.addressLine1.value
+          : this.addressLine1,
+      addressLine2: data.addressLine2.present
+          ? data.addressLine2.value
+          : this.addressLine2,
       city: data.city.present ? data.city.value : this.city,
       state: data.state.present ? data.state.value : this.state,
       stateCode: data.stateCode.present ? data.stateCode.value : this.stateCode,
       country: data.country.present ? data.country.value : this.country,
       pincode: data.pincode.present ? data.pincode.value : this.pincode,
-      currencyCode: data.currencyCode.present
-          ? data.currencyCode.value
-          : this.currencyCode,
-      financialYearStartMonth: data.financialYearStartMonth.present
-          ? data.financialYearStartMonth.value
-          : this.financialYearStartMonth,
+      logoPath: data.logoPath.present ? data.logoPath.value : this.logoPath,
+      pricesInclusiveOfTax: data.pricesInclusiveOfTax.present
+          ? data.pricesInclusiveOfTax.value
+          : this.pricesInclusiveOfTax,
       invoicePrefix: data.invoicePrefix.present
           ? data.invoicePrefix.value
           : this.invoicePrefix,
+      invoiceStartNumber: data.invoiceStartNumber.present
+          ? data.invoiceStartNumber.value
+          : this.invoiceStartNumber,
       purchasePrefix: data.purchasePrefix.present
           ? data.purchasePrefix.value
           : this.purchasePrefix,
       receiptPrefix: data.receiptPrefix.present
           ? data.receiptPrefix.value
           : this.receiptPrefix,
+      financialYearStartMonth: data.financialYearStartMonth.present
+          ? data.financialYearStartMonth.value
+          : this.financialYearStartMonth,
+      currencyCode: data.currencyCode.present
+          ? data.currencyCode.value
+          : this.currencyCode,
+      currencySymbol: data.currencySymbol.present
+          ? data.currencySymbol.value
+          : this.currencySymbol,
+      decimalPlaces: data.decimalPlaces.present
+          ? data.decimalPlaces.value
+          : this.decimalPlaces,
       timezone: data.timezone.present ? data.timezone.value : this.timezone,
-      pricesInclusiveOfTax: data.pricesInclusiveOfTax.present
-          ? data.pricesInclusiveOfTax.value
-          : this.pricesInclusiveOfTax,
+      bankName: data.bankName.present ? data.bankName.value : this.bankName,
+      bankAccountName: data.bankAccountName.present
+          ? data.bankAccountName.value
+          : this.bankAccountName,
+      bankAccountNumber: data.bankAccountNumber.present
+          ? data.bankAccountNumber.value
+          : this.bankAccountNumber,
+      bankIfsc: data.bankIfsc.present ? data.bankIfsc.value : this.bankIfsc,
+      bankBranch: data.bankBranch.present
+          ? data.bankBranch.value
+          : this.bankBranch,
+      upiId: data.upiId.present ? data.upiId.value : this.upiId,
+      invoiceFooter: data.invoiceFooter.present
+          ? data.invoiceFooter.value
+          : this.invoiceFooter,
+      invoiceTerms: data.invoiceTerms.present
+          ? data.invoiceTerms.value
+          : this.invoiceTerms,
+      invoiceThankYouMessage: data.invoiceThankYouMessage.present
+          ? data.invoiceThankYouMessage.value
+          : this.invoiceThankYouMessage,
+      showLogoOnInvoice: data.showLogoOnInvoice.present
+          ? data.showLogoOnInvoice.value
+          : this.showLogoOnInvoice,
+      showBankDetailsOnInvoice: data.showBankDetailsOnInvoice.present
+          ? data.showBankDetailsOnInvoice.value
+          : this.showBankDetailsOnInvoice,
+      showGstDetailsOnInvoice: data.showGstDetailsOnInvoice.present
+          ? data.showGstDetailsOnInvoice.value
+          : this.showGstDetailsOnInvoice,
       isActive: data.isActive.present ? data.isActive.value : this.isActive,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
@@ -925,25 +1727,45 @@ class CompanySettings extends DataClass implements Insertable<CompanySettings> {
     return (StringBuffer('CompanySettings(')
           ..write('id: $id, ')
           ..write('companyName: $companyName, ')
-          ..write('logoPath: $logoPath, ')
+          ..write('legalName: $legalName, ')
+          ..write('businessType: $businessType, ')
+          ..write('gstRegistered: $gstRegistered, ')
           ..write('gstNumber: $gstNumber, ')
           ..write('panNumber: $panNumber, ')
-          ..write('email: $email, ')
+          ..write('cin: $cin, ')
           ..write('mobile: $mobile, ')
+          ..write('email: $email, ')
           ..write('website: $website, ')
-          ..write('address: $address, ')
+          ..write('addressLine1: $addressLine1, ')
+          ..write('addressLine2: $addressLine2, ')
           ..write('city: $city, ')
           ..write('state: $state, ')
           ..write('stateCode: $stateCode, ')
           ..write('country: $country, ')
           ..write('pincode: $pincode, ')
-          ..write('currencyCode: $currencyCode, ')
-          ..write('financialYearStartMonth: $financialYearStartMonth, ')
+          ..write('logoPath: $logoPath, ')
+          ..write('pricesInclusiveOfTax: $pricesInclusiveOfTax, ')
           ..write('invoicePrefix: $invoicePrefix, ')
+          ..write('invoiceStartNumber: $invoiceStartNumber, ')
           ..write('purchasePrefix: $purchasePrefix, ')
           ..write('receiptPrefix: $receiptPrefix, ')
+          ..write('financialYearStartMonth: $financialYearStartMonth, ')
+          ..write('currencyCode: $currencyCode, ')
+          ..write('currencySymbol: $currencySymbol, ')
+          ..write('decimalPlaces: $decimalPlaces, ')
           ..write('timezone: $timezone, ')
-          ..write('pricesInclusiveOfTax: $pricesInclusiveOfTax, ')
+          ..write('bankName: $bankName, ')
+          ..write('bankAccountName: $bankAccountName, ')
+          ..write('bankAccountNumber: $bankAccountNumber, ')
+          ..write('bankIfsc: $bankIfsc, ')
+          ..write('bankBranch: $bankBranch, ')
+          ..write('upiId: $upiId, ')
+          ..write('invoiceFooter: $invoiceFooter, ')
+          ..write('invoiceTerms: $invoiceTerms, ')
+          ..write('invoiceThankYouMessage: $invoiceThankYouMessage, ')
+          ..write('showLogoOnInvoice: $showLogoOnInvoice, ')
+          ..write('showBankDetailsOnInvoice: $showBankDetailsOnInvoice, ')
+          ..write('showGstDetailsOnInvoice: $showGstDetailsOnInvoice, ')
           ..write('isActive: $isActive, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
@@ -955,25 +1777,45 @@ class CompanySettings extends DataClass implements Insertable<CompanySettings> {
   int get hashCode => Object.hashAll([
     id,
     companyName,
-    logoPath,
+    legalName,
+    businessType,
+    gstRegistered,
     gstNumber,
     panNumber,
-    email,
+    cin,
     mobile,
+    email,
     website,
-    address,
+    addressLine1,
+    addressLine2,
     city,
     state,
     stateCode,
     country,
     pincode,
-    currencyCode,
-    financialYearStartMonth,
+    logoPath,
+    pricesInclusiveOfTax,
     invoicePrefix,
+    invoiceStartNumber,
     purchasePrefix,
     receiptPrefix,
+    financialYearStartMonth,
+    currencyCode,
+    currencySymbol,
+    decimalPlaces,
     timezone,
-    pricesInclusiveOfTax,
+    bankName,
+    bankAccountName,
+    bankAccountNumber,
+    bankIfsc,
+    bankBranch,
+    upiId,
+    invoiceFooter,
+    invoiceTerms,
+    invoiceThankYouMessage,
+    showLogoOnInvoice,
+    showBankDetailsOnInvoice,
+    showGstDetailsOnInvoice,
     isActive,
     createdAt,
     updatedAt,
@@ -984,25 +1826,45 @@ class CompanySettings extends DataClass implements Insertable<CompanySettings> {
       (other is CompanySettings &&
           other.id == this.id &&
           other.companyName == this.companyName &&
-          other.logoPath == this.logoPath &&
+          other.legalName == this.legalName &&
+          other.businessType == this.businessType &&
+          other.gstRegistered == this.gstRegistered &&
           other.gstNumber == this.gstNumber &&
           other.panNumber == this.panNumber &&
-          other.email == this.email &&
+          other.cin == this.cin &&
           other.mobile == this.mobile &&
+          other.email == this.email &&
           other.website == this.website &&
-          other.address == this.address &&
+          other.addressLine1 == this.addressLine1 &&
+          other.addressLine2 == this.addressLine2 &&
           other.city == this.city &&
           other.state == this.state &&
           other.stateCode == this.stateCode &&
           other.country == this.country &&
           other.pincode == this.pincode &&
-          other.currencyCode == this.currencyCode &&
-          other.financialYearStartMonth == this.financialYearStartMonth &&
+          other.logoPath == this.logoPath &&
+          other.pricesInclusiveOfTax == this.pricesInclusiveOfTax &&
           other.invoicePrefix == this.invoicePrefix &&
+          other.invoiceStartNumber == this.invoiceStartNumber &&
           other.purchasePrefix == this.purchasePrefix &&
           other.receiptPrefix == this.receiptPrefix &&
+          other.financialYearStartMonth == this.financialYearStartMonth &&
+          other.currencyCode == this.currencyCode &&
+          other.currencySymbol == this.currencySymbol &&
+          other.decimalPlaces == this.decimalPlaces &&
           other.timezone == this.timezone &&
-          other.pricesInclusiveOfTax == this.pricesInclusiveOfTax &&
+          other.bankName == this.bankName &&
+          other.bankAccountName == this.bankAccountName &&
+          other.bankAccountNumber == this.bankAccountNumber &&
+          other.bankIfsc == this.bankIfsc &&
+          other.bankBranch == this.bankBranch &&
+          other.upiId == this.upiId &&
+          other.invoiceFooter == this.invoiceFooter &&
+          other.invoiceTerms == this.invoiceTerms &&
+          other.invoiceThankYouMessage == this.invoiceThankYouMessage &&
+          other.showLogoOnInvoice == this.showLogoOnInvoice &&
+          other.showBankDetailsOnInvoice == this.showBankDetailsOnInvoice &&
+          other.showGstDetailsOnInvoice == this.showGstDetailsOnInvoice &&
           other.isActive == this.isActive &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
@@ -1011,50 +1873,90 @@ class CompanySettings extends DataClass implements Insertable<CompanySettings> {
 class CompanySettingsTableCompanion extends UpdateCompanion<CompanySettings> {
   final Value<int> id;
   final Value<String> companyName;
-  final Value<String?> logoPath;
+  final Value<String?> legalName;
+  final Value<String> businessType;
+  final Value<bool> gstRegistered;
   final Value<String?> gstNumber;
   final Value<String?> panNumber;
-  final Value<String?> email;
+  final Value<String?> cin;
   final Value<String?> mobile;
+  final Value<String?> email;
   final Value<String?> website;
-  final Value<String?> address;
+  final Value<String?> addressLine1;
+  final Value<String?> addressLine2;
   final Value<String?> city;
   final Value<String?> state;
   final Value<String?> stateCode;
   final Value<String?> country;
   final Value<String?> pincode;
-  final Value<String> currencyCode;
-  final Value<int> financialYearStartMonth;
+  final Value<String?> logoPath;
+  final Value<bool> pricesInclusiveOfTax;
   final Value<String> invoicePrefix;
+  final Value<int> invoiceStartNumber;
   final Value<String> purchasePrefix;
   final Value<String> receiptPrefix;
+  final Value<int> financialYearStartMonth;
+  final Value<String> currencyCode;
+  final Value<String> currencySymbol;
+  final Value<int> decimalPlaces;
   final Value<String> timezone;
-  final Value<bool> pricesInclusiveOfTax;
+  final Value<String?> bankName;
+  final Value<String?> bankAccountName;
+  final Value<String?> bankAccountNumber;
+  final Value<String?> bankIfsc;
+  final Value<String?> bankBranch;
+  final Value<String?> upiId;
+  final Value<String?> invoiceFooter;
+  final Value<String?> invoiceTerms;
+  final Value<String?> invoiceThankYouMessage;
+  final Value<bool> showLogoOnInvoice;
+  final Value<bool> showBankDetailsOnInvoice;
+  final Value<bool> showGstDetailsOnInvoice;
   final Value<bool> isActive;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
   const CompanySettingsTableCompanion({
     this.id = const Value.absent(),
     this.companyName = const Value.absent(),
-    this.logoPath = const Value.absent(),
+    this.legalName = const Value.absent(),
+    this.businessType = const Value.absent(),
+    this.gstRegistered = const Value.absent(),
     this.gstNumber = const Value.absent(),
     this.panNumber = const Value.absent(),
-    this.email = const Value.absent(),
+    this.cin = const Value.absent(),
     this.mobile = const Value.absent(),
+    this.email = const Value.absent(),
     this.website = const Value.absent(),
-    this.address = const Value.absent(),
+    this.addressLine1 = const Value.absent(),
+    this.addressLine2 = const Value.absent(),
     this.city = const Value.absent(),
     this.state = const Value.absent(),
     this.stateCode = const Value.absent(),
     this.country = const Value.absent(),
     this.pincode = const Value.absent(),
-    this.currencyCode = const Value.absent(),
-    this.financialYearStartMonth = const Value.absent(),
+    this.logoPath = const Value.absent(),
+    this.pricesInclusiveOfTax = const Value.absent(),
     this.invoicePrefix = const Value.absent(),
+    this.invoiceStartNumber = const Value.absent(),
     this.purchasePrefix = const Value.absent(),
     this.receiptPrefix = const Value.absent(),
+    this.financialYearStartMonth = const Value.absent(),
+    this.currencyCode = const Value.absent(),
+    this.currencySymbol = const Value.absent(),
+    this.decimalPlaces = const Value.absent(),
     this.timezone = const Value.absent(),
-    this.pricesInclusiveOfTax = const Value.absent(),
+    this.bankName = const Value.absent(),
+    this.bankAccountName = const Value.absent(),
+    this.bankAccountNumber = const Value.absent(),
+    this.bankIfsc = const Value.absent(),
+    this.bankBranch = const Value.absent(),
+    this.upiId = const Value.absent(),
+    this.invoiceFooter = const Value.absent(),
+    this.invoiceTerms = const Value.absent(),
+    this.invoiceThankYouMessage = const Value.absent(),
+    this.showLogoOnInvoice = const Value.absent(),
+    this.showBankDetailsOnInvoice = const Value.absent(),
+    this.showGstDetailsOnInvoice = const Value.absent(),
     this.isActive = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
@@ -1062,25 +1964,45 @@ class CompanySettingsTableCompanion extends UpdateCompanion<CompanySettings> {
   CompanySettingsTableCompanion.insert({
     this.id = const Value.absent(),
     required String companyName,
-    this.logoPath = const Value.absent(),
+    this.legalName = const Value.absent(),
+    this.businessType = const Value.absent(),
+    this.gstRegistered = const Value.absent(),
     this.gstNumber = const Value.absent(),
     this.panNumber = const Value.absent(),
-    this.email = const Value.absent(),
+    this.cin = const Value.absent(),
     this.mobile = const Value.absent(),
+    this.email = const Value.absent(),
     this.website = const Value.absent(),
-    this.address = const Value.absent(),
+    this.addressLine1 = const Value.absent(),
+    this.addressLine2 = const Value.absent(),
     this.city = const Value.absent(),
     this.state = const Value.absent(),
     this.stateCode = const Value.absent(),
     this.country = const Value.absent(),
     this.pincode = const Value.absent(),
-    this.currencyCode = const Value.absent(),
-    this.financialYearStartMonth = const Value.absent(),
+    this.logoPath = const Value.absent(),
+    this.pricesInclusiveOfTax = const Value.absent(),
     this.invoicePrefix = const Value.absent(),
+    this.invoiceStartNumber = const Value.absent(),
     this.purchasePrefix = const Value.absent(),
     this.receiptPrefix = const Value.absent(),
+    this.financialYearStartMonth = const Value.absent(),
+    this.currencyCode = const Value.absent(),
+    this.currencySymbol = const Value.absent(),
+    this.decimalPlaces = const Value.absent(),
     this.timezone = const Value.absent(),
-    this.pricesInclusiveOfTax = const Value.absent(),
+    this.bankName = const Value.absent(),
+    this.bankAccountName = const Value.absent(),
+    this.bankAccountNumber = const Value.absent(),
+    this.bankIfsc = const Value.absent(),
+    this.bankBranch = const Value.absent(),
+    this.upiId = const Value.absent(),
+    this.invoiceFooter = const Value.absent(),
+    this.invoiceTerms = const Value.absent(),
+    this.invoiceThankYouMessage = const Value.absent(),
+    this.showLogoOnInvoice = const Value.absent(),
+    this.showBankDetailsOnInvoice = const Value.absent(),
+    this.showGstDetailsOnInvoice = const Value.absent(),
     this.isActive = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
@@ -1088,25 +2010,45 @@ class CompanySettingsTableCompanion extends UpdateCompanion<CompanySettings> {
   static Insertable<CompanySettings> custom({
     Expression<int>? id,
     Expression<String>? companyName,
-    Expression<String>? logoPath,
+    Expression<String>? legalName,
+    Expression<String>? businessType,
+    Expression<bool>? gstRegistered,
     Expression<String>? gstNumber,
     Expression<String>? panNumber,
-    Expression<String>? email,
+    Expression<String>? cin,
     Expression<String>? mobile,
+    Expression<String>? email,
     Expression<String>? website,
-    Expression<String>? address,
+    Expression<String>? addressLine1,
+    Expression<String>? addressLine2,
     Expression<String>? city,
     Expression<String>? state,
     Expression<String>? stateCode,
     Expression<String>? country,
     Expression<String>? pincode,
-    Expression<String>? currencyCode,
-    Expression<int>? financialYearStartMonth,
+    Expression<String>? logoPath,
+    Expression<bool>? pricesInclusiveOfTax,
     Expression<String>? invoicePrefix,
+    Expression<int>? invoiceStartNumber,
     Expression<String>? purchasePrefix,
     Expression<String>? receiptPrefix,
+    Expression<int>? financialYearStartMonth,
+    Expression<String>? currencyCode,
+    Expression<String>? currencySymbol,
+    Expression<int>? decimalPlaces,
     Expression<String>? timezone,
-    Expression<bool>? pricesInclusiveOfTax,
+    Expression<String>? bankName,
+    Expression<String>? bankAccountName,
+    Expression<String>? bankAccountNumber,
+    Expression<String>? bankIfsc,
+    Expression<String>? bankBranch,
+    Expression<String>? upiId,
+    Expression<String>? invoiceFooter,
+    Expression<String>? invoiceTerms,
+    Expression<String>? invoiceThankYouMessage,
+    Expression<bool>? showLogoOnInvoice,
+    Expression<bool>? showBankDetailsOnInvoice,
+    Expression<bool>? showGstDetailsOnInvoice,
     Expression<bool>? isActive,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
@@ -1114,27 +2056,51 @@ class CompanySettingsTableCompanion extends UpdateCompanion<CompanySettings> {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (companyName != null) 'company_name': companyName,
-      if (logoPath != null) 'logo_path': logoPath,
+      if (legalName != null) 'legal_name': legalName,
+      if (businessType != null) 'business_type': businessType,
+      if (gstRegistered != null) 'gst_registered': gstRegistered,
       if (gstNumber != null) 'gst_number': gstNumber,
       if (panNumber != null) 'pan_number': panNumber,
-      if (email != null) 'email': email,
+      if (cin != null) 'cin': cin,
       if (mobile != null) 'mobile': mobile,
+      if (email != null) 'email': email,
       if (website != null) 'website': website,
-      if (address != null) 'address': address,
+      if (addressLine1 != null) 'address_line1': addressLine1,
+      if (addressLine2 != null) 'address_line2': addressLine2,
       if (city != null) 'city': city,
       if (state != null) 'state': state,
       if (stateCode != null) 'state_code': stateCode,
       if (country != null) 'country': country,
       if (pincode != null) 'pincode': pincode,
-      if (currencyCode != null) 'currency_code': currencyCode,
-      if (financialYearStartMonth != null)
-        'financial_year_start_month': financialYearStartMonth,
-      if (invoicePrefix != null) 'invoice_prefix': invoicePrefix,
-      if (purchasePrefix != null) 'purchase_prefix': purchasePrefix,
-      if (receiptPrefix != null) 'receipt_prefix': receiptPrefix,
-      if (timezone != null) 'timezone': timezone,
+      if (logoPath != null) 'logo_path': logoPath,
       if (pricesInclusiveOfTax != null)
         'prices_inclusive_of_tax': pricesInclusiveOfTax,
+      if (invoicePrefix != null) 'invoice_prefix': invoicePrefix,
+      if (invoiceStartNumber != null)
+        'invoice_start_number': invoiceStartNumber,
+      if (purchasePrefix != null) 'purchase_prefix': purchasePrefix,
+      if (receiptPrefix != null) 'receipt_prefix': receiptPrefix,
+      if (financialYearStartMonth != null)
+        'financial_year_start_month': financialYearStartMonth,
+      if (currencyCode != null) 'currency_code': currencyCode,
+      if (currencySymbol != null) 'currency_symbol': currencySymbol,
+      if (decimalPlaces != null) 'decimal_places': decimalPlaces,
+      if (timezone != null) 'timezone': timezone,
+      if (bankName != null) 'bank_name': bankName,
+      if (bankAccountName != null) 'bank_account_name': bankAccountName,
+      if (bankAccountNumber != null) 'bank_account_number': bankAccountNumber,
+      if (bankIfsc != null) 'bank_ifsc': bankIfsc,
+      if (bankBranch != null) 'bank_branch': bankBranch,
+      if (upiId != null) 'upi_id': upiId,
+      if (invoiceFooter != null) 'invoice_footer': invoiceFooter,
+      if (invoiceTerms != null) 'invoice_terms': invoiceTerms,
+      if (invoiceThankYouMessage != null)
+        'invoice_thank_you_message': invoiceThankYouMessage,
+      if (showLogoOnInvoice != null) 'show_logo_on_invoice': showLogoOnInvoice,
+      if (showBankDetailsOnInvoice != null)
+        'show_bank_details_on_invoice': showBankDetailsOnInvoice,
+      if (showGstDetailsOnInvoice != null)
+        'show_gst_details_on_invoice': showGstDetailsOnInvoice,
       if (isActive != null) 'is_active': isActive,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
@@ -1144,25 +2110,45 @@ class CompanySettingsTableCompanion extends UpdateCompanion<CompanySettings> {
   CompanySettingsTableCompanion copyWith({
     Value<int>? id,
     Value<String>? companyName,
-    Value<String?>? logoPath,
+    Value<String?>? legalName,
+    Value<String>? businessType,
+    Value<bool>? gstRegistered,
     Value<String?>? gstNumber,
     Value<String?>? panNumber,
-    Value<String?>? email,
+    Value<String?>? cin,
     Value<String?>? mobile,
+    Value<String?>? email,
     Value<String?>? website,
-    Value<String?>? address,
+    Value<String?>? addressLine1,
+    Value<String?>? addressLine2,
     Value<String?>? city,
     Value<String?>? state,
     Value<String?>? stateCode,
     Value<String?>? country,
     Value<String?>? pincode,
-    Value<String>? currencyCode,
-    Value<int>? financialYearStartMonth,
+    Value<String?>? logoPath,
+    Value<bool>? pricesInclusiveOfTax,
     Value<String>? invoicePrefix,
+    Value<int>? invoiceStartNumber,
     Value<String>? purchasePrefix,
     Value<String>? receiptPrefix,
+    Value<int>? financialYearStartMonth,
+    Value<String>? currencyCode,
+    Value<String>? currencySymbol,
+    Value<int>? decimalPlaces,
     Value<String>? timezone,
-    Value<bool>? pricesInclusiveOfTax,
+    Value<String?>? bankName,
+    Value<String?>? bankAccountName,
+    Value<String?>? bankAccountNumber,
+    Value<String?>? bankIfsc,
+    Value<String?>? bankBranch,
+    Value<String?>? upiId,
+    Value<String?>? invoiceFooter,
+    Value<String?>? invoiceTerms,
+    Value<String?>? invoiceThankYouMessage,
+    Value<bool>? showLogoOnInvoice,
+    Value<bool>? showBankDetailsOnInvoice,
+    Value<bool>? showGstDetailsOnInvoice,
     Value<bool>? isActive,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
@@ -1170,26 +2156,49 @@ class CompanySettingsTableCompanion extends UpdateCompanion<CompanySettings> {
     return CompanySettingsTableCompanion(
       id: id ?? this.id,
       companyName: companyName ?? this.companyName,
-      logoPath: logoPath ?? this.logoPath,
+      legalName: legalName ?? this.legalName,
+      businessType: businessType ?? this.businessType,
+      gstRegistered: gstRegistered ?? this.gstRegistered,
       gstNumber: gstNumber ?? this.gstNumber,
       panNumber: panNumber ?? this.panNumber,
-      email: email ?? this.email,
+      cin: cin ?? this.cin,
       mobile: mobile ?? this.mobile,
+      email: email ?? this.email,
       website: website ?? this.website,
-      address: address ?? this.address,
+      addressLine1: addressLine1 ?? this.addressLine1,
+      addressLine2: addressLine2 ?? this.addressLine2,
       city: city ?? this.city,
       state: state ?? this.state,
       stateCode: stateCode ?? this.stateCode,
       country: country ?? this.country,
       pincode: pincode ?? this.pincode,
-      currencyCode: currencyCode ?? this.currencyCode,
-      financialYearStartMonth:
-          financialYearStartMonth ?? this.financialYearStartMonth,
+      logoPath: logoPath ?? this.logoPath,
+      pricesInclusiveOfTax: pricesInclusiveOfTax ?? this.pricesInclusiveOfTax,
       invoicePrefix: invoicePrefix ?? this.invoicePrefix,
+      invoiceStartNumber: invoiceStartNumber ?? this.invoiceStartNumber,
       purchasePrefix: purchasePrefix ?? this.purchasePrefix,
       receiptPrefix: receiptPrefix ?? this.receiptPrefix,
+      financialYearStartMonth:
+          financialYearStartMonth ?? this.financialYearStartMonth,
+      currencyCode: currencyCode ?? this.currencyCode,
+      currencySymbol: currencySymbol ?? this.currencySymbol,
+      decimalPlaces: decimalPlaces ?? this.decimalPlaces,
       timezone: timezone ?? this.timezone,
-      pricesInclusiveOfTax: pricesInclusiveOfTax ?? this.pricesInclusiveOfTax,
+      bankName: bankName ?? this.bankName,
+      bankAccountName: bankAccountName ?? this.bankAccountName,
+      bankAccountNumber: bankAccountNumber ?? this.bankAccountNumber,
+      bankIfsc: bankIfsc ?? this.bankIfsc,
+      bankBranch: bankBranch ?? this.bankBranch,
+      upiId: upiId ?? this.upiId,
+      invoiceFooter: invoiceFooter ?? this.invoiceFooter,
+      invoiceTerms: invoiceTerms ?? this.invoiceTerms,
+      invoiceThankYouMessage:
+          invoiceThankYouMessage ?? this.invoiceThankYouMessage,
+      showLogoOnInvoice: showLogoOnInvoice ?? this.showLogoOnInvoice,
+      showBankDetailsOnInvoice:
+          showBankDetailsOnInvoice ?? this.showBankDetailsOnInvoice,
+      showGstDetailsOnInvoice:
+          showGstDetailsOnInvoice ?? this.showGstDetailsOnInvoice,
       isActive: isActive ?? this.isActive,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -1205,8 +2214,14 @@ class CompanySettingsTableCompanion extends UpdateCompanion<CompanySettings> {
     if (companyName.present) {
       map['company_name'] = Variable<String>(companyName.value);
     }
-    if (logoPath.present) {
-      map['logo_path'] = Variable<String>(logoPath.value);
+    if (legalName.present) {
+      map['legal_name'] = Variable<String>(legalName.value);
+    }
+    if (businessType.present) {
+      map['business_type'] = Variable<String>(businessType.value);
+    }
+    if (gstRegistered.present) {
+      map['gst_registered'] = Variable<bool>(gstRegistered.value);
     }
     if (gstNumber.present) {
       map['gst_number'] = Variable<String>(gstNumber.value);
@@ -1214,17 +2229,23 @@ class CompanySettingsTableCompanion extends UpdateCompanion<CompanySettings> {
     if (panNumber.present) {
       map['pan_number'] = Variable<String>(panNumber.value);
     }
-    if (email.present) {
-      map['email'] = Variable<String>(email.value);
+    if (cin.present) {
+      map['cin'] = Variable<String>(cin.value);
     }
     if (mobile.present) {
       map['mobile'] = Variable<String>(mobile.value);
     }
+    if (email.present) {
+      map['email'] = Variable<String>(email.value);
+    }
     if (website.present) {
       map['website'] = Variable<String>(website.value);
     }
-    if (address.present) {
-      map['address'] = Variable<String>(address.value);
+    if (addressLine1.present) {
+      map['address_line1'] = Variable<String>(addressLine1.value);
+    }
+    if (addressLine2.present) {
+      map['address_line2'] = Variable<String>(addressLine2.value);
     }
     if (city.present) {
       map['city'] = Variable<String>(city.value);
@@ -1241,16 +2262,19 @@ class CompanySettingsTableCompanion extends UpdateCompanion<CompanySettings> {
     if (pincode.present) {
       map['pincode'] = Variable<String>(pincode.value);
     }
-    if (currencyCode.present) {
-      map['currency_code'] = Variable<String>(currencyCode.value);
+    if (logoPath.present) {
+      map['logo_path'] = Variable<String>(logoPath.value);
     }
-    if (financialYearStartMonth.present) {
-      map['financial_year_start_month'] = Variable<int>(
-        financialYearStartMonth.value,
+    if (pricesInclusiveOfTax.present) {
+      map['prices_inclusive_of_tax'] = Variable<bool>(
+        pricesInclusiveOfTax.value,
       );
     }
     if (invoicePrefix.present) {
       map['invoice_prefix'] = Variable<String>(invoicePrefix.value);
+    }
+    if (invoiceStartNumber.present) {
+      map['invoice_start_number'] = Variable<int>(invoiceStartNumber.value);
     }
     if (purchasePrefix.present) {
       map['purchase_prefix'] = Variable<String>(purchasePrefix.value);
@@ -1258,12 +2282,63 @@ class CompanySettingsTableCompanion extends UpdateCompanion<CompanySettings> {
     if (receiptPrefix.present) {
       map['receipt_prefix'] = Variable<String>(receiptPrefix.value);
     }
+    if (financialYearStartMonth.present) {
+      map['financial_year_start_month'] = Variable<int>(
+        financialYearStartMonth.value,
+      );
+    }
+    if (currencyCode.present) {
+      map['currency_code'] = Variable<String>(currencyCode.value);
+    }
+    if (currencySymbol.present) {
+      map['currency_symbol'] = Variable<String>(currencySymbol.value);
+    }
+    if (decimalPlaces.present) {
+      map['decimal_places'] = Variable<int>(decimalPlaces.value);
+    }
     if (timezone.present) {
       map['timezone'] = Variable<String>(timezone.value);
     }
-    if (pricesInclusiveOfTax.present) {
-      map['prices_inclusive_of_tax'] = Variable<bool>(
-        pricesInclusiveOfTax.value,
+    if (bankName.present) {
+      map['bank_name'] = Variable<String>(bankName.value);
+    }
+    if (bankAccountName.present) {
+      map['bank_account_name'] = Variable<String>(bankAccountName.value);
+    }
+    if (bankAccountNumber.present) {
+      map['bank_account_number'] = Variable<String>(bankAccountNumber.value);
+    }
+    if (bankIfsc.present) {
+      map['bank_ifsc'] = Variable<String>(bankIfsc.value);
+    }
+    if (bankBranch.present) {
+      map['bank_branch'] = Variable<String>(bankBranch.value);
+    }
+    if (upiId.present) {
+      map['upi_id'] = Variable<String>(upiId.value);
+    }
+    if (invoiceFooter.present) {
+      map['invoice_footer'] = Variable<String>(invoiceFooter.value);
+    }
+    if (invoiceTerms.present) {
+      map['invoice_terms'] = Variable<String>(invoiceTerms.value);
+    }
+    if (invoiceThankYouMessage.present) {
+      map['invoice_thank_you_message'] = Variable<String>(
+        invoiceThankYouMessage.value,
+      );
+    }
+    if (showLogoOnInvoice.present) {
+      map['show_logo_on_invoice'] = Variable<bool>(showLogoOnInvoice.value);
+    }
+    if (showBankDetailsOnInvoice.present) {
+      map['show_bank_details_on_invoice'] = Variable<bool>(
+        showBankDetailsOnInvoice.value,
+      );
+    }
+    if (showGstDetailsOnInvoice.present) {
+      map['show_gst_details_on_invoice'] = Variable<bool>(
+        showGstDetailsOnInvoice.value,
       );
     }
     if (isActive.present) {
@@ -1283,25 +2358,45 @@ class CompanySettingsTableCompanion extends UpdateCompanion<CompanySettings> {
     return (StringBuffer('CompanySettingsTableCompanion(')
           ..write('id: $id, ')
           ..write('companyName: $companyName, ')
-          ..write('logoPath: $logoPath, ')
+          ..write('legalName: $legalName, ')
+          ..write('businessType: $businessType, ')
+          ..write('gstRegistered: $gstRegistered, ')
           ..write('gstNumber: $gstNumber, ')
           ..write('panNumber: $panNumber, ')
-          ..write('email: $email, ')
+          ..write('cin: $cin, ')
           ..write('mobile: $mobile, ')
+          ..write('email: $email, ')
           ..write('website: $website, ')
-          ..write('address: $address, ')
+          ..write('addressLine1: $addressLine1, ')
+          ..write('addressLine2: $addressLine2, ')
           ..write('city: $city, ')
           ..write('state: $state, ')
           ..write('stateCode: $stateCode, ')
           ..write('country: $country, ')
           ..write('pincode: $pincode, ')
-          ..write('currencyCode: $currencyCode, ')
-          ..write('financialYearStartMonth: $financialYearStartMonth, ')
+          ..write('logoPath: $logoPath, ')
+          ..write('pricesInclusiveOfTax: $pricesInclusiveOfTax, ')
           ..write('invoicePrefix: $invoicePrefix, ')
+          ..write('invoiceStartNumber: $invoiceStartNumber, ')
           ..write('purchasePrefix: $purchasePrefix, ')
           ..write('receiptPrefix: $receiptPrefix, ')
+          ..write('financialYearStartMonth: $financialYearStartMonth, ')
+          ..write('currencyCode: $currencyCode, ')
+          ..write('currencySymbol: $currencySymbol, ')
+          ..write('decimalPlaces: $decimalPlaces, ')
           ..write('timezone: $timezone, ')
-          ..write('pricesInclusiveOfTax: $pricesInclusiveOfTax, ')
+          ..write('bankName: $bankName, ')
+          ..write('bankAccountName: $bankAccountName, ')
+          ..write('bankAccountNumber: $bankAccountNumber, ')
+          ..write('bankIfsc: $bankIfsc, ')
+          ..write('bankBranch: $bankBranch, ')
+          ..write('upiId: $upiId, ')
+          ..write('invoiceFooter: $invoiceFooter, ')
+          ..write('invoiceTerms: $invoiceTerms, ')
+          ..write('invoiceThankYouMessage: $invoiceThankYouMessage, ')
+          ..write('showLogoOnInvoice: $showLogoOnInvoice, ')
+          ..write('showBankDetailsOnInvoice: $showBankDetailsOnInvoice, ')
+          ..write('showGstDetailsOnInvoice: $showGstDetailsOnInvoice, ')
           ..write('isActive: $isActive, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
@@ -5196,524 +6291,6 @@ class TaxCategoryRatesCompanion extends UpdateCompanion<TaxCategoryRate> {
   }
 }
 
-class $HsnMastersTable extends HsnMasters
-    with TableInfo<$HsnMastersTable, HsnMaster> {
-  @override
-  final GeneratedDatabase attachedDatabase;
-  final String? _alias;
-  $HsnMastersTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _idMeta = const VerificationMeta('id');
-  @override
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
-    'id',
-    aliasedName,
-    false,
-    hasAutoIncrement: true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'PRIMARY KEY AUTOINCREMENT',
-    ),
-  );
-  static const VerificationMeta _hsnCodeMeta = const VerificationMeta(
-    'hsnCode',
-  );
-  @override
-  late final GeneratedColumn<String> hsnCode = GeneratedColumn<String>(
-    'hsn_code',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _descriptionMeta = const VerificationMeta(
-    'description',
-  );
-  @override
-  late final GeneratedColumn<String> description = GeneratedColumn<String>(
-    'description',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _defaultTaxCategoryIdMeta =
-      const VerificationMeta('defaultTaxCategoryId');
-  @override
-  late final GeneratedColumn<int> defaultTaxCategoryId = GeneratedColumn<int>(
-    'default_tax_category_id',
-    aliasedName,
-    true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES tax_category (id)',
-    ),
-  );
-  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
-  @override
-  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
-    'notes',
-    aliasedName,
-    true,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-  );
-  static const VerificationMeta _isActiveMeta = const VerificationMeta(
-    'isActive',
-  );
-  @override
-  late final GeneratedColumn<bool> isActive = GeneratedColumn<bool>(
-    'is_active',
-    aliasedName,
-    false,
-    type: DriftSqlType.bool,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'CHECK ("is_active" IN (0, 1))',
-    ),
-    defaultValue: const Constant(true),
-  );
-  static const VerificationMeta _createdAtMeta = const VerificationMeta(
-    'createdAt',
-  );
-  @override
-  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
-    'created_at',
-    aliasedName,
-    false,
-    type: DriftSqlType.dateTime,
-    requiredDuringInsert: false,
-    defaultValue: currentDateAndTime,
-  );
-  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
-    'updatedAt',
-  );
-  @override
-  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
-    'updated_at',
-    aliasedName,
-    false,
-    type: DriftSqlType.dateTime,
-    requiredDuringInsert: false,
-    defaultValue: currentDateAndTime,
-  );
-  @override
-  List<GeneratedColumn> get $columns => [
-    id,
-    hsnCode,
-    description,
-    defaultTaxCategoryId,
-    notes,
-    isActive,
-    createdAt,
-    updatedAt,
-  ];
-  @override
-  String get aliasedName => _alias ?? actualTableName;
-  @override
-  String get actualTableName => $name;
-  static const String $name = 'hsn_master';
-  @override
-  VerificationContext validateIntegrity(
-    Insertable<HsnMaster> instance, {
-    bool isInserting = false,
-  }) {
-    final context = VerificationContext();
-    final data = instance.toColumns(true);
-    if (data.containsKey('id')) {
-      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
-    }
-    if (data.containsKey('hsn_code')) {
-      context.handle(
-        _hsnCodeMeta,
-        hsnCode.isAcceptableOrUnknown(data['hsn_code']!, _hsnCodeMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_hsnCodeMeta);
-    }
-    if (data.containsKey('description')) {
-      context.handle(
-        _descriptionMeta,
-        description.isAcceptableOrUnknown(
-          data['description']!,
-          _descriptionMeta,
-        ),
-      );
-    } else if (isInserting) {
-      context.missing(_descriptionMeta);
-    }
-    if (data.containsKey('default_tax_category_id')) {
-      context.handle(
-        _defaultTaxCategoryIdMeta,
-        defaultTaxCategoryId.isAcceptableOrUnknown(
-          data['default_tax_category_id']!,
-          _defaultTaxCategoryIdMeta,
-        ),
-      );
-    }
-    if (data.containsKey('notes')) {
-      context.handle(
-        _notesMeta,
-        notes.isAcceptableOrUnknown(data['notes']!, _notesMeta),
-      );
-    }
-    if (data.containsKey('is_active')) {
-      context.handle(
-        _isActiveMeta,
-        isActive.isAcceptableOrUnknown(data['is_active']!, _isActiveMeta),
-      );
-    }
-    if (data.containsKey('created_at')) {
-      context.handle(
-        _createdAtMeta,
-        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
-      );
-    }
-    if (data.containsKey('updated_at')) {
-      context.handle(
-        _updatedAtMeta,
-        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
-      );
-    }
-    return context;
-  }
-
-  @override
-  Set<GeneratedColumn> get $primaryKey => {id};
-  @override
-  HsnMaster map(Map<String, dynamic> data, {String? tablePrefix}) {
-    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return HsnMaster(
-      id: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}id'],
-      )!,
-      hsnCode: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}hsn_code'],
-      )!,
-      description: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}description'],
-      )!,
-      defaultTaxCategoryId: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}default_tax_category_id'],
-      ),
-      notes: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}notes'],
-      ),
-      isActive: attachedDatabase.typeMapping.read(
-        DriftSqlType.bool,
-        data['${effectivePrefix}is_active'],
-      )!,
-      createdAt: attachedDatabase.typeMapping.read(
-        DriftSqlType.dateTime,
-        data['${effectivePrefix}created_at'],
-      )!,
-      updatedAt: attachedDatabase.typeMapping.read(
-        DriftSqlType.dateTime,
-        data['${effectivePrefix}updated_at'],
-      )!,
-    );
-  }
-
-  @override
-  $HsnMastersTable createAlias(String alias) {
-    return $HsnMastersTable(attachedDatabase, alias);
-  }
-}
-
-class HsnMaster extends DataClass implements Insertable<HsnMaster> {
-  final int id;
-  final String hsnCode;
-  final String description;
-  final int? defaultTaxCategoryId;
-  final String? notes;
-  final bool isActive;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  const HsnMaster({
-    required this.id,
-    required this.hsnCode,
-    required this.description,
-    this.defaultTaxCategoryId,
-    this.notes,
-    required this.isActive,
-    required this.createdAt,
-    required this.updatedAt,
-  });
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
-    map['hsn_code'] = Variable<String>(hsnCode);
-    map['description'] = Variable<String>(description);
-    if (!nullToAbsent || defaultTaxCategoryId != null) {
-      map['default_tax_category_id'] = Variable<int>(defaultTaxCategoryId);
-    }
-    if (!nullToAbsent || notes != null) {
-      map['notes'] = Variable<String>(notes);
-    }
-    map['is_active'] = Variable<bool>(isActive);
-    map['created_at'] = Variable<DateTime>(createdAt);
-    map['updated_at'] = Variable<DateTime>(updatedAt);
-    return map;
-  }
-
-  HsnMastersCompanion toCompanion(bool nullToAbsent) {
-    return HsnMastersCompanion(
-      id: Value(id),
-      hsnCode: Value(hsnCode),
-      description: Value(description),
-      defaultTaxCategoryId: defaultTaxCategoryId == null && nullToAbsent
-          ? const Value.absent()
-          : Value(defaultTaxCategoryId),
-      notes: notes == null && nullToAbsent
-          ? const Value.absent()
-          : Value(notes),
-      isActive: Value(isActive),
-      createdAt: Value(createdAt),
-      updatedAt: Value(updatedAt),
-    );
-  }
-
-  factory HsnMaster.fromJson(
-    Map<String, dynamic> json, {
-    ValueSerializer? serializer,
-  }) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return HsnMaster(
-      id: serializer.fromJson<int>(json['id']),
-      hsnCode: serializer.fromJson<String>(json['hsnCode']),
-      description: serializer.fromJson<String>(json['description']),
-      defaultTaxCategoryId: serializer.fromJson<int?>(
-        json['defaultTaxCategoryId'],
-      ),
-      notes: serializer.fromJson<String?>(json['notes']),
-      isActive: serializer.fromJson<bool>(json['isActive']),
-      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
-      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
-    );
-  }
-  @override
-  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
-      'hsnCode': serializer.toJson<String>(hsnCode),
-      'description': serializer.toJson<String>(description),
-      'defaultTaxCategoryId': serializer.toJson<int?>(defaultTaxCategoryId),
-      'notes': serializer.toJson<String?>(notes),
-      'isActive': serializer.toJson<bool>(isActive),
-      'createdAt': serializer.toJson<DateTime>(createdAt),
-      'updatedAt': serializer.toJson<DateTime>(updatedAt),
-    };
-  }
-
-  HsnMaster copyWith({
-    int? id,
-    String? hsnCode,
-    String? description,
-    Value<int?> defaultTaxCategoryId = const Value.absent(),
-    Value<String?> notes = const Value.absent(),
-    bool? isActive,
-    DateTime? createdAt,
-    DateTime? updatedAt,
-  }) => HsnMaster(
-    id: id ?? this.id,
-    hsnCode: hsnCode ?? this.hsnCode,
-    description: description ?? this.description,
-    defaultTaxCategoryId: defaultTaxCategoryId.present
-        ? defaultTaxCategoryId.value
-        : this.defaultTaxCategoryId,
-    notes: notes.present ? notes.value : this.notes,
-    isActive: isActive ?? this.isActive,
-    createdAt: createdAt ?? this.createdAt,
-    updatedAt: updatedAt ?? this.updatedAt,
-  );
-  HsnMaster copyWithCompanion(HsnMastersCompanion data) {
-    return HsnMaster(
-      id: data.id.present ? data.id.value : this.id,
-      hsnCode: data.hsnCode.present ? data.hsnCode.value : this.hsnCode,
-      description: data.description.present
-          ? data.description.value
-          : this.description,
-      defaultTaxCategoryId: data.defaultTaxCategoryId.present
-          ? data.defaultTaxCategoryId.value
-          : this.defaultTaxCategoryId,
-      notes: data.notes.present ? data.notes.value : this.notes,
-      isActive: data.isActive.present ? data.isActive.value : this.isActive,
-      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
-      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
-    );
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('HsnMaster(')
-          ..write('id: $id, ')
-          ..write('hsnCode: $hsnCode, ')
-          ..write('description: $description, ')
-          ..write('defaultTaxCategoryId: $defaultTaxCategoryId, ')
-          ..write('notes: $notes, ')
-          ..write('isActive: $isActive, ')
-          ..write('createdAt: $createdAt, ')
-          ..write('updatedAt: $updatedAt')
-          ..write(')'))
-        .toString();
-  }
-
-  @override
-  int get hashCode => Object.hash(
-    id,
-    hsnCode,
-    description,
-    defaultTaxCategoryId,
-    notes,
-    isActive,
-    createdAt,
-    updatedAt,
-  );
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is HsnMaster &&
-          other.id == this.id &&
-          other.hsnCode == this.hsnCode &&
-          other.description == this.description &&
-          other.defaultTaxCategoryId == this.defaultTaxCategoryId &&
-          other.notes == this.notes &&
-          other.isActive == this.isActive &&
-          other.createdAt == this.createdAt &&
-          other.updatedAt == this.updatedAt);
-}
-
-class HsnMastersCompanion extends UpdateCompanion<HsnMaster> {
-  final Value<int> id;
-  final Value<String> hsnCode;
-  final Value<String> description;
-  final Value<int?> defaultTaxCategoryId;
-  final Value<String?> notes;
-  final Value<bool> isActive;
-  final Value<DateTime> createdAt;
-  final Value<DateTime> updatedAt;
-  const HsnMastersCompanion({
-    this.id = const Value.absent(),
-    this.hsnCode = const Value.absent(),
-    this.description = const Value.absent(),
-    this.defaultTaxCategoryId = const Value.absent(),
-    this.notes = const Value.absent(),
-    this.isActive = const Value.absent(),
-    this.createdAt = const Value.absent(),
-    this.updatedAt = const Value.absent(),
-  });
-  HsnMastersCompanion.insert({
-    this.id = const Value.absent(),
-    required String hsnCode,
-    required String description,
-    this.defaultTaxCategoryId = const Value.absent(),
-    this.notes = const Value.absent(),
-    this.isActive = const Value.absent(),
-    this.createdAt = const Value.absent(),
-    this.updatedAt = const Value.absent(),
-  }) : hsnCode = Value(hsnCode),
-       description = Value(description);
-  static Insertable<HsnMaster> custom({
-    Expression<int>? id,
-    Expression<String>? hsnCode,
-    Expression<String>? description,
-    Expression<int>? defaultTaxCategoryId,
-    Expression<String>? notes,
-    Expression<bool>? isActive,
-    Expression<DateTime>? createdAt,
-    Expression<DateTime>? updatedAt,
-  }) {
-    return RawValuesInsertable({
-      if (id != null) 'id': id,
-      if (hsnCode != null) 'hsn_code': hsnCode,
-      if (description != null) 'description': description,
-      if (defaultTaxCategoryId != null)
-        'default_tax_category_id': defaultTaxCategoryId,
-      if (notes != null) 'notes': notes,
-      if (isActive != null) 'is_active': isActive,
-      if (createdAt != null) 'created_at': createdAt,
-      if (updatedAt != null) 'updated_at': updatedAt,
-    });
-  }
-
-  HsnMastersCompanion copyWith({
-    Value<int>? id,
-    Value<String>? hsnCode,
-    Value<String>? description,
-    Value<int?>? defaultTaxCategoryId,
-    Value<String?>? notes,
-    Value<bool>? isActive,
-    Value<DateTime>? createdAt,
-    Value<DateTime>? updatedAt,
-  }) {
-    return HsnMastersCompanion(
-      id: id ?? this.id,
-      hsnCode: hsnCode ?? this.hsnCode,
-      description: description ?? this.description,
-      defaultTaxCategoryId: defaultTaxCategoryId ?? this.defaultTaxCategoryId,
-      notes: notes ?? this.notes,
-      isActive: isActive ?? this.isActive,
-      createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? this.updatedAt,
-    );
-  }
-
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    if (id.present) {
-      map['id'] = Variable<int>(id.value);
-    }
-    if (hsnCode.present) {
-      map['hsn_code'] = Variable<String>(hsnCode.value);
-    }
-    if (description.present) {
-      map['description'] = Variable<String>(description.value);
-    }
-    if (defaultTaxCategoryId.present) {
-      map['default_tax_category_id'] = Variable<int>(
-        defaultTaxCategoryId.value,
-      );
-    }
-    if (notes.present) {
-      map['notes'] = Variable<String>(notes.value);
-    }
-    if (isActive.present) {
-      map['is_active'] = Variable<bool>(isActive.value);
-    }
-    if (createdAt.present) {
-      map['created_at'] = Variable<DateTime>(createdAt.value);
-    }
-    if (updatedAt.present) {
-      map['updated_at'] = Variable<DateTime>(updatedAt.value);
-    }
-    return map;
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('HsnMastersCompanion(')
-          ..write('id: $id, ')
-          ..write('hsnCode: $hsnCode, ')
-          ..write('description: $description, ')
-          ..write('defaultTaxCategoryId: $defaultTaxCategoryId, ')
-          ..write('notes: $notes, ')
-          ..write('isActive: $isActive, ')
-          ..write('createdAt: $createdAt, ')
-          ..write('updatedAt: $updatedAt')
-          ..write(')'))
-        .toString();
-  }
-}
-
 class $CustomersTable extends Customers
     with TableInfo<$CustomersTable, Customer> {
   @override
@@ -5767,6 +6344,17 @@ class $CustomersTable extends Customers
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _panNumberMeta = const VerificationMeta(
+    'panNumber',
+  );
+  @override
+  late final GeneratedColumn<String> panNumber = GeneratedColumn<String>(
+    'pan_number',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _mobileMeta = const VerificationMeta('mobile');
   @override
   late final GeneratedColumn<String> mobile = GeneratedColumn<String>(
@@ -5796,12 +6384,23 @@ class $CustomersTable extends Customers
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _addressMeta = const VerificationMeta(
-    'address',
+  static const VerificationMeta _addressLine1Meta = const VerificationMeta(
+    'addressLine1',
   );
   @override
-  late final GeneratedColumn<String> address = GeneratedColumn<String>(
-    'address',
+  late final GeneratedColumn<String> addressLine1 = GeneratedColumn<String>(
+    'address_line1',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _addressLine2Meta = const VerificationMeta(
+    'addressLine2',
+  );
+  @override
+  late final GeneratedColumn<String> addressLine2 = GeneratedColumn<String>(
+    'address_line2',
     aliasedName,
     true,
     type: DriftSqlType.string,
@@ -5893,6 +6492,94 @@ class $CustomersTable extends Customers
     requiredDuringInsert: false,
     defaultValue: const Constant(0),
   );
+  static const VerificationMeta _paymentDueDateMeta = const VerificationMeta(
+    'paymentDueDate',
+  );
+  @override
+  late final GeneratedColumn<DateTime> paymentDueDate =
+      GeneratedColumn<DateTime>(
+        'payment_due_date',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _accountNameMeta = const VerificationMeta(
+    'accountName',
+  );
+  @override
+  late final GeneratedColumn<String> accountName = GeneratedColumn<String>(
+    'account_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _accountNumberMeta = const VerificationMeta(
+    'accountNumber',
+  );
+  @override
+  late final GeneratedColumn<String> accountNumber = GeneratedColumn<String>(
+    'account_number',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _bankNameMeta = const VerificationMeta(
+    'bankName',
+  );
+  @override
+  late final GeneratedColumn<String> bankName = GeneratedColumn<String>(
+    'bank_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _branchNameMeta = const VerificationMeta(
+    'branchName',
+  );
+  @override
+  late final GeneratedColumn<String> branchName = GeneratedColumn<String>(
+    'branch_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _ifscCodeMeta = const VerificationMeta(
+    'ifscCode',
+  );
+  @override
+  late final GeneratedColumn<String> ifscCode = GeneratedColumn<String>(
+    'ifsc_code',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _balanceTypeMeta = const VerificationMeta(
+    'balanceType',
+  );
+  @override
+  late final GeneratedColumn<String> balanceType = GeneratedColumn<String>(
+    'balance_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('DEBIT'),
+  );
+  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
+  @override
+  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
+    'notes',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _isActiveMeta = const VerificationMeta(
     'isActive',
   );
@@ -5938,10 +6625,12 @@ class $CustomersTable extends Customers
     customerCode,
     customerName,
     gstNumber,
+    panNumber,
     mobile,
     alternateMobile,
     email,
-    address,
+    addressLine1,
+    addressLine2,
     city,
     state,
     stateCode,
@@ -5950,6 +6639,14 @@ class $CustomersTable extends Customers
     creditLimit,
     openingBalance,
     outstandingBalance,
+    paymentDueDate,
+    accountName,
+    accountNumber,
+    bankName,
+    branchName,
+    ifscCode,
+    balanceType,
+    notes,
     isActive,
     createdAt,
     updatedAt,
@@ -5997,6 +6694,12 @@ class $CustomersTable extends Customers
         gstNumber.isAcceptableOrUnknown(data['gst_number']!, _gstNumberMeta),
       );
     }
+    if (data.containsKey('pan_number')) {
+      context.handle(
+        _panNumberMeta,
+        panNumber.isAcceptableOrUnknown(data['pan_number']!, _panNumberMeta),
+      );
+    }
     if (data.containsKey('mobile')) {
       context.handle(
         _mobileMeta,
@@ -6018,10 +6721,22 @@ class $CustomersTable extends Customers
         email.isAcceptableOrUnknown(data['email']!, _emailMeta),
       );
     }
-    if (data.containsKey('address')) {
+    if (data.containsKey('address_line1')) {
       context.handle(
-        _addressMeta,
-        address.isAcceptableOrUnknown(data['address']!, _addressMeta),
+        _addressLine1Meta,
+        addressLine1.isAcceptableOrUnknown(
+          data['address_line1']!,
+          _addressLine1Meta,
+        ),
+      );
+    }
+    if (data.containsKey('address_line2')) {
+      context.handle(
+        _addressLine2Meta,
+        addressLine2.isAcceptableOrUnknown(
+          data['address_line2']!,
+          _addressLine2Meta,
+        ),
       );
     }
     if (data.containsKey('city')) {
@@ -6081,6 +6796,66 @@ class $CustomersTable extends Customers
         ),
       );
     }
+    if (data.containsKey('payment_due_date')) {
+      context.handle(
+        _paymentDueDateMeta,
+        paymentDueDate.isAcceptableOrUnknown(
+          data['payment_due_date']!,
+          _paymentDueDateMeta,
+        ),
+      );
+    }
+    if (data.containsKey('account_name')) {
+      context.handle(
+        _accountNameMeta,
+        accountName.isAcceptableOrUnknown(
+          data['account_name']!,
+          _accountNameMeta,
+        ),
+      );
+    }
+    if (data.containsKey('account_number')) {
+      context.handle(
+        _accountNumberMeta,
+        accountNumber.isAcceptableOrUnknown(
+          data['account_number']!,
+          _accountNumberMeta,
+        ),
+      );
+    }
+    if (data.containsKey('bank_name')) {
+      context.handle(
+        _bankNameMeta,
+        bankName.isAcceptableOrUnknown(data['bank_name']!, _bankNameMeta),
+      );
+    }
+    if (data.containsKey('branch_name')) {
+      context.handle(
+        _branchNameMeta,
+        branchName.isAcceptableOrUnknown(data['branch_name']!, _branchNameMeta),
+      );
+    }
+    if (data.containsKey('ifsc_code')) {
+      context.handle(
+        _ifscCodeMeta,
+        ifscCode.isAcceptableOrUnknown(data['ifsc_code']!, _ifscCodeMeta),
+      );
+    }
+    if (data.containsKey('balance_type')) {
+      context.handle(
+        _balanceTypeMeta,
+        balanceType.isAcceptableOrUnknown(
+          data['balance_type']!,
+          _balanceTypeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('notes')) {
+      context.handle(
+        _notesMeta,
+        notes.isAcceptableOrUnknown(data['notes']!, _notesMeta),
+      );
+    }
     if (data.containsKey('is_active')) {
       context.handle(
         _isActiveMeta,
@@ -6124,6 +6899,10 @@ class $CustomersTable extends Customers
         DriftSqlType.string,
         data['${effectivePrefix}gst_number'],
       ),
+      panNumber: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}pan_number'],
+      ),
       mobile: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}mobile'],
@@ -6136,9 +6915,13 @@ class $CustomersTable extends Customers
         DriftSqlType.string,
         data['${effectivePrefix}email'],
       ),
-      address: attachedDatabase.typeMapping.read(
+      addressLine1: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}address'],
+        data['${effectivePrefix}address_line1'],
+      ),
+      addressLine2: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}address_line2'],
       ),
       city: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
@@ -6172,6 +6955,38 @@ class $CustomersTable extends Customers
         DriftSqlType.int,
         data['${effectivePrefix}outstanding_balance'],
       )!,
+      paymentDueDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}payment_due_date'],
+      ),
+      accountName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}account_name'],
+      ),
+      accountNumber: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}account_number'],
+      ),
+      bankName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}bank_name'],
+      ),
+      branchName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}branch_name'],
+      ),
+      ifscCode: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}ifsc_code'],
+      ),
+      balanceType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}balance_type'],
+      )!,
+      notes: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}notes'],
+      ),
       isActive: attachedDatabase.typeMapping.read(
         DriftSqlType.bool,
         data['${effectivePrefix}is_active'],
@@ -6198,10 +7013,12 @@ class Customer extends DataClass implements Insertable<Customer> {
   final String customerCode;
   final String customerName;
   final String? gstNumber;
+  final String? panNumber;
   final String? mobile;
   final String? alternateMobile;
   final String? email;
-  final String? address;
+  final String? addressLine1;
+  final String? addressLine2;
   final String? city;
   final String? state;
   final String? stateCode;
@@ -6210,6 +7027,16 @@ class Customer extends DataClass implements Insertable<Customer> {
   final int creditLimit;
   final int openingBalance;
   final int outstandingBalance;
+  final DateTime? paymentDueDate;
+  final String? accountName;
+  final String? accountNumber;
+  final String? bankName;
+  final String? branchName;
+  final String? ifscCode;
+
+  /// `DEBIT` or `CREDIT` — see the shared `BalanceType` enum.
+  final String balanceType;
+  final String? notes;
   final bool isActive;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -6218,10 +7045,12 @@ class Customer extends DataClass implements Insertable<Customer> {
     required this.customerCode,
     required this.customerName,
     this.gstNumber,
+    this.panNumber,
     this.mobile,
     this.alternateMobile,
     this.email,
-    this.address,
+    this.addressLine1,
+    this.addressLine2,
     this.city,
     this.state,
     this.stateCode,
@@ -6230,6 +7059,14 @@ class Customer extends DataClass implements Insertable<Customer> {
     required this.creditLimit,
     required this.openingBalance,
     required this.outstandingBalance,
+    this.paymentDueDate,
+    this.accountName,
+    this.accountNumber,
+    this.bankName,
+    this.branchName,
+    this.ifscCode,
+    required this.balanceType,
+    this.notes,
     required this.isActive,
     required this.createdAt,
     required this.updatedAt,
@@ -6243,6 +7080,9 @@ class Customer extends DataClass implements Insertable<Customer> {
     if (!nullToAbsent || gstNumber != null) {
       map['gst_number'] = Variable<String>(gstNumber);
     }
+    if (!nullToAbsent || panNumber != null) {
+      map['pan_number'] = Variable<String>(panNumber);
+    }
     if (!nullToAbsent || mobile != null) {
       map['mobile'] = Variable<String>(mobile);
     }
@@ -6252,8 +7092,11 @@ class Customer extends DataClass implements Insertable<Customer> {
     if (!nullToAbsent || email != null) {
       map['email'] = Variable<String>(email);
     }
-    if (!nullToAbsent || address != null) {
-      map['address'] = Variable<String>(address);
+    if (!nullToAbsent || addressLine1 != null) {
+      map['address_line1'] = Variable<String>(addressLine1);
+    }
+    if (!nullToAbsent || addressLine2 != null) {
+      map['address_line2'] = Variable<String>(addressLine2);
     }
     if (!nullToAbsent || city != null) {
       map['city'] = Variable<String>(city);
@@ -6273,6 +7116,28 @@ class Customer extends DataClass implements Insertable<Customer> {
     map['credit_limit'] = Variable<int>(creditLimit);
     map['opening_balance'] = Variable<int>(openingBalance);
     map['outstanding_balance'] = Variable<int>(outstandingBalance);
+    if (!nullToAbsent || paymentDueDate != null) {
+      map['payment_due_date'] = Variable<DateTime>(paymentDueDate);
+    }
+    if (!nullToAbsent || accountName != null) {
+      map['account_name'] = Variable<String>(accountName);
+    }
+    if (!nullToAbsent || accountNumber != null) {
+      map['account_number'] = Variable<String>(accountNumber);
+    }
+    if (!nullToAbsent || bankName != null) {
+      map['bank_name'] = Variable<String>(bankName);
+    }
+    if (!nullToAbsent || branchName != null) {
+      map['branch_name'] = Variable<String>(branchName);
+    }
+    if (!nullToAbsent || ifscCode != null) {
+      map['ifsc_code'] = Variable<String>(ifscCode);
+    }
+    map['balance_type'] = Variable<String>(balanceType);
+    if (!nullToAbsent || notes != null) {
+      map['notes'] = Variable<String>(notes);
+    }
     map['is_active'] = Variable<bool>(isActive);
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
@@ -6287,6 +7152,9 @@ class Customer extends DataClass implements Insertable<Customer> {
       gstNumber: gstNumber == null && nullToAbsent
           ? const Value.absent()
           : Value(gstNumber),
+      panNumber: panNumber == null && nullToAbsent
+          ? const Value.absent()
+          : Value(panNumber),
       mobile: mobile == null && nullToAbsent
           ? const Value.absent()
           : Value(mobile),
@@ -6296,9 +7164,12 @@ class Customer extends DataClass implements Insertable<Customer> {
       email: email == null && nullToAbsent
           ? const Value.absent()
           : Value(email),
-      address: address == null && nullToAbsent
+      addressLine1: addressLine1 == null && nullToAbsent
           ? const Value.absent()
-          : Value(address),
+          : Value(addressLine1),
+      addressLine2: addressLine2 == null && nullToAbsent
+          ? const Value.absent()
+          : Value(addressLine2),
       city: city == null && nullToAbsent ? const Value.absent() : Value(city),
       state: state == null && nullToAbsent
           ? const Value.absent()
@@ -6315,6 +7186,28 @@ class Customer extends DataClass implements Insertable<Customer> {
       creditLimit: Value(creditLimit),
       openingBalance: Value(openingBalance),
       outstandingBalance: Value(outstandingBalance),
+      paymentDueDate: paymentDueDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(paymentDueDate),
+      accountName: accountName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(accountName),
+      accountNumber: accountNumber == null && nullToAbsent
+          ? const Value.absent()
+          : Value(accountNumber),
+      bankName: bankName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(bankName),
+      branchName: branchName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(branchName),
+      ifscCode: ifscCode == null && nullToAbsent
+          ? const Value.absent()
+          : Value(ifscCode),
+      balanceType: Value(balanceType),
+      notes: notes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(notes),
       isActive: Value(isActive),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
@@ -6331,10 +7224,12 @@ class Customer extends DataClass implements Insertable<Customer> {
       customerCode: serializer.fromJson<String>(json['customerCode']),
       customerName: serializer.fromJson<String>(json['customerName']),
       gstNumber: serializer.fromJson<String?>(json['gstNumber']),
+      panNumber: serializer.fromJson<String?>(json['panNumber']),
       mobile: serializer.fromJson<String?>(json['mobile']),
       alternateMobile: serializer.fromJson<String?>(json['alternateMobile']),
       email: serializer.fromJson<String?>(json['email']),
-      address: serializer.fromJson<String?>(json['address']),
+      addressLine1: serializer.fromJson<String?>(json['addressLine1']),
+      addressLine2: serializer.fromJson<String?>(json['addressLine2']),
       city: serializer.fromJson<String?>(json['city']),
       state: serializer.fromJson<String?>(json['state']),
       stateCode: serializer.fromJson<String?>(json['stateCode']),
@@ -6343,6 +7238,14 @@ class Customer extends DataClass implements Insertable<Customer> {
       creditLimit: serializer.fromJson<int>(json['creditLimit']),
       openingBalance: serializer.fromJson<int>(json['openingBalance']),
       outstandingBalance: serializer.fromJson<int>(json['outstandingBalance']),
+      paymentDueDate: serializer.fromJson<DateTime?>(json['paymentDueDate']),
+      accountName: serializer.fromJson<String?>(json['accountName']),
+      accountNumber: serializer.fromJson<String?>(json['accountNumber']),
+      bankName: serializer.fromJson<String?>(json['bankName']),
+      branchName: serializer.fromJson<String?>(json['branchName']),
+      ifscCode: serializer.fromJson<String?>(json['ifscCode']),
+      balanceType: serializer.fromJson<String>(json['balanceType']),
+      notes: serializer.fromJson<String?>(json['notes']),
       isActive: serializer.fromJson<bool>(json['isActive']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
@@ -6356,10 +7259,12 @@ class Customer extends DataClass implements Insertable<Customer> {
       'customerCode': serializer.toJson<String>(customerCode),
       'customerName': serializer.toJson<String>(customerName),
       'gstNumber': serializer.toJson<String?>(gstNumber),
+      'panNumber': serializer.toJson<String?>(panNumber),
       'mobile': serializer.toJson<String?>(mobile),
       'alternateMobile': serializer.toJson<String?>(alternateMobile),
       'email': serializer.toJson<String?>(email),
-      'address': serializer.toJson<String?>(address),
+      'addressLine1': serializer.toJson<String?>(addressLine1),
+      'addressLine2': serializer.toJson<String?>(addressLine2),
       'city': serializer.toJson<String?>(city),
       'state': serializer.toJson<String?>(state),
       'stateCode': serializer.toJson<String?>(stateCode),
@@ -6368,6 +7273,14 @@ class Customer extends DataClass implements Insertable<Customer> {
       'creditLimit': serializer.toJson<int>(creditLimit),
       'openingBalance': serializer.toJson<int>(openingBalance),
       'outstandingBalance': serializer.toJson<int>(outstandingBalance),
+      'paymentDueDate': serializer.toJson<DateTime?>(paymentDueDate),
+      'accountName': serializer.toJson<String?>(accountName),
+      'accountNumber': serializer.toJson<String?>(accountNumber),
+      'bankName': serializer.toJson<String?>(bankName),
+      'branchName': serializer.toJson<String?>(branchName),
+      'ifscCode': serializer.toJson<String?>(ifscCode),
+      'balanceType': serializer.toJson<String>(balanceType),
+      'notes': serializer.toJson<String?>(notes),
       'isActive': serializer.toJson<bool>(isActive),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
@@ -6379,10 +7292,12 @@ class Customer extends DataClass implements Insertable<Customer> {
     String? customerCode,
     String? customerName,
     Value<String?> gstNumber = const Value.absent(),
+    Value<String?> panNumber = const Value.absent(),
     Value<String?> mobile = const Value.absent(),
     Value<String?> alternateMobile = const Value.absent(),
     Value<String?> email = const Value.absent(),
-    Value<String?> address = const Value.absent(),
+    Value<String?> addressLine1 = const Value.absent(),
+    Value<String?> addressLine2 = const Value.absent(),
     Value<String?> city = const Value.absent(),
     Value<String?> state = const Value.absent(),
     Value<String?> stateCode = const Value.absent(),
@@ -6391,6 +7306,14 @@ class Customer extends DataClass implements Insertable<Customer> {
     int? creditLimit,
     int? openingBalance,
     int? outstandingBalance,
+    Value<DateTime?> paymentDueDate = const Value.absent(),
+    Value<String?> accountName = const Value.absent(),
+    Value<String?> accountNumber = const Value.absent(),
+    Value<String?> bankName = const Value.absent(),
+    Value<String?> branchName = const Value.absent(),
+    Value<String?> ifscCode = const Value.absent(),
+    String? balanceType,
+    Value<String?> notes = const Value.absent(),
     bool? isActive,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -6399,12 +7322,14 @@ class Customer extends DataClass implements Insertable<Customer> {
     customerCode: customerCode ?? this.customerCode,
     customerName: customerName ?? this.customerName,
     gstNumber: gstNumber.present ? gstNumber.value : this.gstNumber,
+    panNumber: panNumber.present ? panNumber.value : this.panNumber,
     mobile: mobile.present ? mobile.value : this.mobile,
     alternateMobile: alternateMobile.present
         ? alternateMobile.value
         : this.alternateMobile,
     email: email.present ? email.value : this.email,
-    address: address.present ? address.value : this.address,
+    addressLine1: addressLine1.present ? addressLine1.value : this.addressLine1,
+    addressLine2: addressLine2.present ? addressLine2.value : this.addressLine2,
     city: city.present ? city.value : this.city,
     state: state.present ? state.value : this.state,
     stateCode: stateCode.present ? stateCode.value : this.stateCode,
@@ -6413,6 +7338,18 @@ class Customer extends DataClass implements Insertable<Customer> {
     creditLimit: creditLimit ?? this.creditLimit,
     openingBalance: openingBalance ?? this.openingBalance,
     outstandingBalance: outstandingBalance ?? this.outstandingBalance,
+    paymentDueDate: paymentDueDate.present
+        ? paymentDueDate.value
+        : this.paymentDueDate,
+    accountName: accountName.present ? accountName.value : this.accountName,
+    accountNumber: accountNumber.present
+        ? accountNumber.value
+        : this.accountNumber,
+    bankName: bankName.present ? bankName.value : this.bankName,
+    branchName: branchName.present ? branchName.value : this.branchName,
+    ifscCode: ifscCode.present ? ifscCode.value : this.ifscCode,
+    balanceType: balanceType ?? this.balanceType,
+    notes: notes.present ? notes.value : this.notes,
     isActive: isActive ?? this.isActive,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
@@ -6427,12 +7364,18 @@ class Customer extends DataClass implements Insertable<Customer> {
           ? data.customerName.value
           : this.customerName,
       gstNumber: data.gstNumber.present ? data.gstNumber.value : this.gstNumber,
+      panNumber: data.panNumber.present ? data.panNumber.value : this.panNumber,
       mobile: data.mobile.present ? data.mobile.value : this.mobile,
       alternateMobile: data.alternateMobile.present
           ? data.alternateMobile.value
           : this.alternateMobile,
       email: data.email.present ? data.email.value : this.email,
-      address: data.address.present ? data.address.value : this.address,
+      addressLine1: data.addressLine1.present
+          ? data.addressLine1.value
+          : this.addressLine1,
+      addressLine2: data.addressLine2.present
+          ? data.addressLine2.value
+          : this.addressLine2,
       city: data.city.present ? data.city.value : this.city,
       state: data.state.present ? data.state.value : this.state,
       stateCode: data.stateCode.present ? data.stateCode.value : this.stateCode,
@@ -6447,6 +7390,24 @@ class Customer extends DataClass implements Insertable<Customer> {
       outstandingBalance: data.outstandingBalance.present
           ? data.outstandingBalance.value
           : this.outstandingBalance,
+      paymentDueDate: data.paymentDueDate.present
+          ? data.paymentDueDate.value
+          : this.paymentDueDate,
+      accountName: data.accountName.present
+          ? data.accountName.value
+          : this.accountName,
+      accountNumber: data.accountNumber.present
+          ? data.accountNumber.value
+          : this.accountNumber,
+      bankName: data.bankName.present ? data.bankName.value : this.bankName,
+      branchName: data.branchName.present
+          ? data.branchName.value
+          : this.branchName,
+      ifscCode: data.ifscCode.present ? data.ifscCode.value : this.ifscCode,
+      balanceType: data.balanceType.present
+          ? data.balanceType.value
+          : this.balanceType,
+      notes: data.notes.present ? data.notes.value : this.notes,
       isActive: data.isActive.present ? data.isActive.value : this.isActive,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
@@ -6460,10 +7421,12 @@ class Customer extends DataClass implements Insertable<Customer> {
           ..write('customerCode: $customerCode, ')
           ..write('customerName: $customerName, ')
           ..write('gstNumber: $gstNumber, ')
+          ..write('panNumber: $panNumber, ')
           ..write('mobile: $mobile, ')
           ..write('alternateMobile: $alternateMobile, ')
           ..write('email: $email, ')
-          ..write('address: $address, ')
+          ..write('addressLine1: $addressLine1, ')
+          ..write('addressLine2: $addressLine2, ')
           ..write('city: $city, ')
           ..write('state: $state, ')
           ..write('stateCode: $stateCode, ')
@@ -6472,6 +7435,14 @@ class Customer extends DataClass implements Insertable<Customer> {
           ..write('creditLimit: $creditLimit, ')
           ..write('openingBalance: $openingBalance, ')
           ..write('outstandingBalance: $outstandingBalance, ')
+          ..write('paymentDueDate: $paymentDueDate, ')
+          ..write('accountName: $accountName, ')
+          ..write('accountNumber: $accountNumber, ')
+          ..write('bankName: $bankName, ')
+          ..write('branchName: $branchName, ')
+          ..write('ifscCode: $ifscCode, ')
+          ..write('balanceType: $balanceType, ')
+          ..write('notes: $notes, ')
           ..write('isActive: $isActive, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
@@ -6480,15 +7451,17 @@ class Customer extends DataClass implements Insertable<Customer> {
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     id,
     customerCode,
     customerName,
     gstNumber,
+    panNumber,
     mobile,
     alternateMobile,
     email,
-    address,
+    addressLine1,
+    addressLine2,
     city,
     state,
     stateCode,
@@ -6497,10 +7470,18 @@ class Customer extends DataClass implements Insertable<Customer> {
     creditLimit,
     openingBalance,
     outstandingBalance,
+    paymentDueDate,
+    accountName,
+    accountNumber,
+    bankName,
+    branchName,
+    ifscCode,
+    balanceType,
+    notes,
     isActive,
     createdAt,
     updatedAt,
-  );
+  ]);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -6509,10 +7490,12 @@ class Customer extends DataClass implements Insertable<Customer> {
           other.customerCode == this.customerCode &&
           other.customerName == this.customerName &&
           other.gstNumber == this.gstNumber &&
+          other.panNumber == this.panNumber &&
           other.mobile == this.mobile &&
           other.alternateMobile == this.alternateMobile &&
           other.email == this.email &&
-          other.address == this.address &&
+          other.addressLine1 == this.addressLine1 &&
+          other.addressLine2 == this.addressLine2 &&
           other.city == this.city &&
           other.state == this.state &&
           other.stateCode == this.stateCode &&
@@ -6521,6 +7504,14 @@ class Customer extends DataClass implements Insertable<Customer> {
           other.creditLimit == this.creditLimit &&
           other.openingBalance == this.openingBalance &&
           other.outstandingBalance == this.outstandingBalance &&
+          other.paymentDueDate == this.paymentDueDate &&
+          other.accountName == this.accountName &&
+          other.accountNumber == this.accountNumber &&
+          other.bankName == this.bankName &&
+          other.branchName == this.branchName &&
+          other.ifscCode == this.ifscCode &&
+          other.balanceType == this.balanceType &&
+          other.notes == this.notes &&
           other.isActive == this.isActive &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
@@ -6531,10 +7522,12 @@ class CustomersCompanion extends UpdateCompanion<Customer> {
   final Value<String> customerCode;
   final Value<String> customerName;
   final Value<String?> gstNumber;
+  final Value<String?> panNumber;
   final Value<String?> mobile;
   final Value<String?> alternateMobile;
   final Value<String?> email;
-  final Value<String?> address;
+  final Value<String?> addressLine1;
+  final Value<String?> addressLine2;
   final Value<String?> city;
   final Value<String?> state;
   final Value<String?> stateCode;
@@ -6543,6 +7536,14 @@ class CustomersCompanion extends UpdateCompanion<Customer> {
   final Value<int> creditLimit;
   final Value<int> openingBalance;
   final Value<int> outstandingBalance;
+  final Value<DateTime?> paymentDueDate;
+  final Value<String?> accountName;
+  final Value<String?> accountNumber;
+  final Value<String?> bankName;
+  final Value<String?> branchName;
+  final Value<String?> ifscCode;
+  final Value<String> balanceType;
+  final Value<String?> notes;
   final Value<bool> isActive;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
@@ -6551,10 +7552,12 @@ class CustomersCompanion extends UpdateCompanion<Customer> {
     this.customerCode = const Value.absent(),
     this.customerName = const Value.absent(),
     this.gstNumber = const Value.absent(),
+    this.panNumber = const Value.absent(),
     this.mobile = const Value.absent(),
     this.alternateMobile = const Value.absent(),
     this.email = const Value.absent(),
-    this.address = const Value.absent(),
+    this.addressLine1 = const Value.absent(),
+    this.addressLine2 = const Value.absent(),
     this.city = const Value.absent(),
     this.state = const Value.absent(),
     this.stateCode = const Value.absent(),
@@ -6563,6 +7566,14 @@ class CustomersCompanion extends UpdateCompanion<Customer> {
     this.creditLimit = const Value.absent(),
     this.openingBalance = const Value.absent(),
     this.outstandingBalance = const Value.absent(),
+    this.paymentDueDate = const Value.absent(),
+    this.accountName = const Value.absent(),
+    this.accountNumber = const Value.absent(),
+    this.bankName = const Value.absent(),
+    this.branchName = const Value.absent(),
+    this.ifscCode = const Value.absent(),
+    this.balanceType = const Value.absent(),
+    this.notes = const Value.absent(),
     this.isActive = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
@@ -6572,10 +7583,12 @@ class CustomersCompanion extends UpdateCompanion<Customer> {
     required String customerCode,
     required String customerName,
     this.gstNumber = const Value.absent(),
+    this.panNumber = const Value.absent(),
     this.mobile = const Value.absent(),
     this.alternateMobile = const Value.absent(),
     this.email = const Value.absent(),
-    this.address = const Value.absent(),
+    this.addressLine1 = const Value.absent(),
+    this.addressLine2 = const Value.absent(),
     this.city = const Value.absent(),
     this.state = const Value.absent(),
     this.stateCode = const Value.absent(),
@@ -6584,6 +7597,14 @@ class CustomersCompanion extends UpdateCompanion<Customer> {
     this.creditLimit = const Value.absent(),
     this.openingBalance = const Value.absent(),
     this.outstandingBalance = const Value.absent(),
+    this.paymentDueDate = const Value.absent(),
+    this.accountName = const Value.absent(),
+    this.accountNumber = const Value.absent(),
+    this.bankName = const Value.absent(),
+    this.branchName = const Value.absent(),
+    this.ifscCode = const Value.absent(),
+    this.balanceType = const Value.absent(),
+    this.notes = const Value.absent(),
     this.isActive = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
@@ -6594,10 +7615,12 @@ class CustomersCompanion extends UpdateCompanion<Customer> {
     Expression<String>? customerCode,
     Expression<String>? customerName,
     Expression<String>? gstNumber,
+    Expression<String>? panNumber,
     Expression<String>? mobile,
     Expression<String>? alternateMobile,
     Expression<String>? email,
-    Expression<String>? address,
+    Expression<String>? addressLine1,
+    Expression<String>? addressLine2,
     Expression<String>? city,
     Expression<String>? state,
     Expression<String>? stateCode,
@@ -6606,6 +7629,14 @@ class CustomersCompanion extends UpdateCompanion<Customer> {
     Expression<int>? creditLimit,
     Expression<int>? openingBalance,
     Expression<int>? outstandingBalance,
+    Expression<DateTime>? paymentDueDate,
+    Expression<String>? accountName,
+    Expression<String>? accountNumber,
+    Expression<String>? bankName,
+    Expression<String>? branchName,
+    Expression<String>? ifscCode,
+    Expression<String>? balanceType,
+    Expression<String>? notes,
     Expression<bool>? isActive,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
@@ -6615,10 +7646,12 @@ class CustomersCompanion extends UpdateCompanion<Customer> {
       if (customerCode != null) 'customer_code': customerCode,
       if (customerName != null) 'customer_name': customerName,
       if (gstNumber != null) 'gst_number': gstNumber,
+      if (panNumber != null) 'pan_number': panNumber,
       if (mobile != null) 'mobile': mobile,
       if (alternateMobile != null) 'alternate_mobile': alternateMobile,
       if (email != null) 'email': email,
-      if (address != null) 'address': address,
+      if (addressLine1 != null) 'address_line1': addressLine1,
+      if (addressLine2 != null) 'address_line2': addressLine2,
       if (city != null) 'city': city,
       if (state != null) 'state': state,
       if (stateCode != null) 'state_code': stateCode,
@@ -6627,6 +7660,14 @@ class CustomersCompanion extends UpdateCompanion<Customer> {
       if (creditLimit != null) 'credit_limit': creditLimit,
       if (openingBalance != null) 'opening_balance': openingBalance,
       if (outstandingBalance != null) 'outstanding_balance': outstandingBalance,
+      if (paymentDueDate != null) 'payment_due_date': paymentDueDate,
+      if (accountName != null) 'account_name': accountName,
+      if (accountNumber != null) 'account_number': accountNumber,
+      if (bankName != null) 'bank_name': bankName,
+      if (branchName != null) 'branch_name': branchName,
+      if (ifscCode != null) 'ifsc_code': ifscCode,
+      if (balanceType != null) 'balance_type': balanceType,
+      if (notes != null) 'notes': notes,
       if (isActive != null) 'is_active': isActive,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
@@ -6638,10 +7679,12 @@ class CustomersCompanion extends UpdateCompanion<Customer> {
     Value<String>? customerCode,
     Value<String>? customerName,
     Value<String?>? gstNumber,
+    Value<String?>? panNumber,
     Value<String?>? mobile,
     Value<String?>? alternateMobile,
     Value<String?>? email,
-    Value<String?>? address,
+    Value<String?>? addressLine1,
+    Value<String?>? addressLine2,
     Value<String?>? city,
     Value<String?>? state,
     Value<String?>? stateCode,
@@ -6650,6 +7693,14 @@ class CustomersCompanion extends UpdateCompanion<Customer> {
     Value<int>? creditLimit,
     Value<int>? openingBalance,
     Value<int>? outstandingBalance,
+    Value<DateTime?>? paymentDueDate,
+    Value<String?>? accountName,
+    Value<String?>? accountNumber,
+    Value<String?>? bankName,
+    Value<String?>? branchName,
+    Value<String?>? ifscCode,
+    Value<String>? balanceType,
+    Value<String?>? notes,
     Value<bool>? isActive,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
@@ -6659,10 +7710,12 @@ class CustomersCompanion extends UpdateCompanion<Customer> {
       customerCode: customerCode ?? this.customerCode,
       customerName: customerName ?? this.customerName,
       gstNumber: gstNumber ?? this.gstNumber,
+      panNumber: panNumber ?? this.panNumber,
       mobile: mobile ?? this.mobile,
       alternateMobile: alternateMobile ?? this.alternateMobile,
       email: email ?? this.email,
-      address: address ?? this.address,
+      addressLine1: addressLine1 ?? this.addressLine1,
+      addressLine2: addressLine2 ?? this.addressLine2,
       city: city ?? this.city,
       state: state ?? this.state,
       stateCode: stateCode ?? this.stateCode,
@@ -6671,6 +7724,14 @@ class CustomersCompanion extends UpdateCompanion<Customer> {
       creditLimit: creditLimit ?? this.creditLimit,
       openingBalance: openingBalance ?? this.openingBalance,
       outstandingBalance: outstandingBalance ?? this.outstandingBalance,
+      paymentDueDate: paymentDueDate ?? this.paymentDueDate,
+      accountName: accountName ?? this.accountName,
+      accountNumber: accountNumber ?? this.accountNumber,
+      bankName: bankName ?? this.bankName,
+      branchName: branchName ?? this.branchName,
+      ifscCode: ifscCode ?? this.ifscCode,
+      balanceType: balanceType ?? this.balanceType,
+      notes: notes ?? this.notes,
       isActive: isActive ?? this.isActive,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -6692,6 +7753,9 @@ class CustomersCompanion extends UpdateCompanion<Customer> {
     if (gstNumber.present) {
       map['gst_number'] = Variable<String>(gstNumber.value);
     }
+    if (panNumber.present) {
+      map['pan_number'] = Variable<String>(panNumber.value);
+    }
     if (mobile.present) {
       map['mobile'] = Variable<String>(mobile.value);
     }
@@ -6701,8 +7765,11 @@ class CustomersCompanion extends UpdateCompanion<Customer> {
     if (email.present) {
       map['email'] = Variable<String>(email.value);
     }
-    if (address.present) {
-      map['address'] = Variable<String>(address.value);
+    if (addressLine1.present) {
+      map['address_line1'] = Variable<String>(addressLine1.value);
+    }
+    if (addressLine2.present) {
+      map['address_line2'] = Variable<String>(addressLine2.value);
     }
     if (city.present) {
       map['city'] = Variable<String>(city.value);
@@ -6728,6 +7795,30 @@ class CustomersCompanion extends UpdateCompanion<Customer> {
     if (outstandingBalance.present) {
       map['outstanding_balance'] = Variable<int>(outstandingBalance.value);
     }
+    if (paymentDueDate.present) {
+      map['payment_due_date'] = Variable<DateTime>(paymentDueDate.value);
+    }
+    if (accountName.present) {
+      map['account_name'] = Variable<String>(accountName.value);
+    }
+    if (accountNumber.present) {
+      map['account_number'] = Variable<String>(accountNumber.value);
+    }
+    if (bankName.present) {
+      map['bank_name'] = Variable<String>(bankName.value);
+    }
+    if (branchName.present) {
+      map['branch_name'] = Variable<String>(branchName.value);
+    }
+    if (ifscCode.present) {
+      map['ifsc_code'] = Variable<String>(ifscCode.value);
+    }
+    if (balanceType.present) {
+      map['balance_type'] = Variable<String>(balanceType.value);
+    }
+    if (notes.present) {
+      map['notes'] = Variable<String>(notes.value);
+    }
     if (isActive.present) {
       map['is_active'] = Variable<bool>(isActive.value);
     }
@@ -6747,10 +7838,12 @@ class CustomersCompanion extends UpdateCompanion<Customer> {
           ..write('customerCode: $customerCode, ')
           ..write('customerName: $customerName, ')
           ..write('gstNumber: $gstNumber, ')
+          ..write('panNumber: $panNumber, ')
           ..write('mobile: $mobile, ')
           ..write('alternateMobile: $alternateMobile, ')
           ..write('email: $email, ')
-          ..write('address: $address, ')
+          ..write('addressLine1: $addressLine1, ')
+          ..write('addressLine2: $addressLine2, ')
           ..write('city: $city, ')
           ..write('state: $state, ')
           ..write('stateCode: $stateCode, ')
@@ -6759,6 +7852,14 @@ class CustomersCompanion extends UpdateCompanion<Customer> {
           ..write('creditLimit: $creditLimit, ')
           ..write('openingBalance: $openingBalance, ')
           ..write('outstandingBalance: $outstandingBalance, ')
+          ..write('paymentDueDate: $paymentDueDate, ')
+          ..write('accountName: $accountName, ')
+          ..write('accountNumber: $accountNumber, ')
+          ..write('bankName: $bankName, ')
+          ..write('branchName: $branchName, ')
+          ..write('ifscCode: $ifscCode, ')
+          ..write('balanceType: $balanceType, ')
+          ..write('notes: $notes, ')
           ..write('isActive: $isActive, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
@@ -6809,12 +7910,34 @@ class $SuppliersTable extends Suppliers
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _contactPersonMeta = const VerificationMeta(
+    'contactPerson',
+  );
+  @override
+  late final GeneratedColumn<String> contactPerson = GeneratedColumn<String>(
+    'contact_person',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   static const VerificationMeta _gstNumberMeta = const VerificationMeta(
     'gstNumber',
   );
   @override
   late final GeneratedColumn<String> gstNumber = GeneratedColumn<String>(
     'gst_number',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _panNumberMeta = const VerificationMeta(
+    'panNumber',
+  );
+  @override
+  late final GeneratedColumn<String> panNumber = GeneratedColumn<String>(
+    'pan_number',
     aliasedName,
     true,
     type: DriftSqlType.string,
@@ -6849,12 +7972,23 @@ class $SuppliersTable extends Suppliers
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _addressMeta = const VerificationMeta(
-    'address',
+  static const VerificationMeta _addressLine1Meta = const VerificationMeta(
+    'addressLine1',
   );
   @override
-  late final GeneratedColumn<String> address = GeneratedColumn<String>(
-    'address',
+  late final GeneratedColumn<String> addressLine1 = GeneratedColumn<String>(
+    'address_line1',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _addressLine2Meta = const VerificationMeta(
+    'addressLine2',
+  );
+  @override
+  late final GeneratedColumn<String> addressLine2 = GeneratedColumn<String>(
+    'address_line2',
     aliasedName,
     true,
     type: DriftSqlType.string,
@@ -6911,6 +8045,18 @@ class $SuppliersTable extends Suppliers
     type: DriftSqlType.string,
     requiredDuringInsert: false,
   );
+  static const VerificationMeta _creditLimitMeta = const VerificationMeta(
+    'creditLimit',
+  );
+  @override
+  late final GeneratedColumn<int> creditLimit = GeneratedColumn<int>(
+    'credit_limit',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
   static const VerificationMeta _openingBalanceMeta = const VerificationMeta(
     'openingBalance',
   );
@@ -6933,6 +8079,105 @@ class $SuppliersTable extends Suppliers
     type: DriftSqlType.int,
     requiredDuringInsert: false,
     defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _paymentDueDateMeta = const VerificationMeta(
+    'paymentDueDate',
+  );
+  @override
+  late final GeneratedColumn<DateTime> paymentDueDate =
+      GeneratedColumn<DateTime>(
+        'payment_due_date',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _accountNameMeta = const VerificationMeta(
+    'accountName',
+  );
+  @override
+  late final GeneratedColumn<String> accountName = GeneratedColumn<String>(
+    'account_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _accountNumberMeta = const VerificationMeta(
+    'accountNumber',
+  );
+  @override
+  late final GeneratedColumn<String> accountNumber = GeneratedColumn<String>(
+    'account_number',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _bankNameMeta = const VerificationMeta(
+    'bankName',
+  );
+  @override
+  late final GeneratedColumn<String> bankName = GeneratedColumn<String>(
+    'bank_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _branchNameMeta = const VerificationMeta(
+    'branchName',
+  );
+  @override
+  late final GeneratedColumn<String> branchName = GeneratedColumn<String>(
+    'branch_name',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _ifscCodeMeta = const VerificationMeta(
+    'ifscCode',
+  );
+  @override
+  late final GeneratedColumn<String> ifscCode = GeneratedColumn<String>(
+    'ifsc_code',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _paymentTermsMeta = const VerificationMeta(
+    'paymentTerms',
+  );
+  @override
+  late final GeneratedColumn<String> paymentTerms = GeneratedColumn<String>(
+    'payment_terms',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _balanceTypeMeta = const VerificationMeta(
+    'balanceType',
+  );
+  @override
+  late final GeneratedColumn<String> balanceType = GeneratedColumn<String>(
+    'balance_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('DEBIT'),
+  );
+  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
+  @override
+  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
+    'notes',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
   );
   static const VerificationMeta _isActiveMeta = const VerificationMeta(
     'isActive',
@@ -6978,18 +8223,31 @@ class $SuppliersTable extends Suppliers
     id,
     supplierCode,
     supplierName,
+    contactPerson,
     gstNumber,
+    panNumber,
     mobile,
     alternateMobile,
     email,
-    address,
+    addressLine1,
+    addressLine2,
     city,
     state,
     stateCode,
     country,
     pincode,
+    creditLimit,
     openingBalance,
     outstandingBalance,
+    paymentDueDate,
+    accountName,
+    accountNumber,
+    bankName,
+    branchName,
+    ifscCode,
+    paymentTerms,
+    balanceType,
+    notes,
     isActive,
     createdAt,
     updatedAt,
@@ -7031,10 +8289,25 @@ class $SuppliersTable extends Suppliers
     } else if (isInserting) {
       context.missing(_supplierNameMeta);
     }
+    if (data.containsKey('contact_person')) {
+      context.handle(
+        _contactPersonMeta,
+        contactPerson.isAcceptableOrUnknown(
+          data['contact_person']!,
+          _contactPersonMeta,
+        ),
+      );
+    }
     if (data.containsKey('gst_number')) {
       context.handle(
         _gstNumberMeta,
         gstNumber.isAcceptableOrUnknown(data['gst_number']!, _gstNumberMeta),
+      );
+    }
+    if (data.containsKey('pan_number')) {
+      context.handle(
+        _panNumberMeta,
+        panNumber.isAcceptableOrUnknown(data['pan_number']!, _panNumberMeta),
       );
     }
     if (data.containsKey('mobile')) {
@@ -7058,10 +8331,22 @@ class $SuppliersTable extends Suppliers
         email.isAcceptableOrUnknown(data['email']!, _emailMeta),
       );
     }
-    if (data.containsKey('address')) {
+    if (data.containsKey('address_line1')) {
       context.handle(
-        _addressMeta,
-        address.isAcceptableOrUnknown(data['address']!, _addressMeta),
+        _addressLine1Meta,
+        addressLine1.isAcceptableOrUnknown(
+          data['address_line1']!,
+          _addressLine1Meta,
+        ),
+      );
+    }
+    if (data.containsKey('address_line2')) {
+      context.handle(
+        _addressLine2Meta,
+        addressLine2.isAcceptableOrUnknown(
+          data['address_line2']!,
+          _addressLine2Meta,
+        ),
       );
     }
     if (data.containsKey('city')) {
@@ -7094,6 +8379,15 @@ class $SuppliersTable extends Suppliers
         pincode.isAcceptableOrUnknown(data['pincode']!, _pincodeMeta),
       );
     }
+    if (data.containsKey('credit_limit')) {
+      context.handle(
+        _creditLimitMeta,
+        creditLimit.isAcceptableOrUnknown(
+          data['credit_limit']!,
+          _creditLimitMeta,
+        ),
+      );
+    }
     if (data.containsKey('opening_balance')) {
       context.handle(
         _openingBalanceMeta,
@@ -7110,6 +8404,75 @@ class $SuppliersTable extends Suppliers
           data['outstanding_balance']!,
           _outstandingBalanceMeta,
         ),
+      );
+    }
+    if (data.containsKey('payment_due_date')) {
+      context.handle(
+        _paymentDueDateMeta,
+        paymentDueDate.isAcceptableOrUnknown(
+          data['payment_due_date']!,
+          _paymentDueDateMeta,
+        ),
+      );
+    }
+    if (data.containsKey('account_name')) {
+      context.handle(
+        _accountNameMeta,
+        accountName.isAcceptableOrUnknown(
+          data['account_name']!,
+          _accountNameMeta,
+        ),
+      );
+    }
+    if (data.containsKey('account_number')) {
+      context.handle(
+        _accountNumberMeta,
+        accountNumber.isAcceptableOrUnknown(
+          data['account_number']!,
+          _accountNumberMeta,
+        ),
+      );
+    }
+    if (data.containsKey('bank_name')) {
+      context.handle(
+        _bankNameMeta,
+        bankName.isAcceptableOrUnknown(data['bank_name']!, _bankNameMeta),
+      );
+    }
+    if (data.containsKey('branch_name')) {
+      context.handle(
+        _branchNameMeta,
+        branchName.isAcceptableOrUnknown(data['branch_name']!, _branchNameMeta),
+      );
+    }
+    if (data.containsKey('ifsc_code')) {
+      context.handle(
+        _ifscCodeMeta,
+        ifscCode.isAcceptableOrUnknown(data['ifsc_code']!, _ifscCodeMeta),
+      );
+    }
+    if (data.containsKey('payment_terms')) {
+      context.handle(
+        _paymentTermsMeta,
+        paymentTerms.isAcceptableOrUnknown(
+          data['payment_terms']!,
+          _paymentTermsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('balance_type')) {
+      context.handle(
+        _balanceTypeMeta,
+        balanceType.isAcceptableOrUnknown(
+          data['balance_type']!,
+          _balanceTypeMeta,
+        ),
+      );
+    }
+    if (data.containsKey('notes')) {
+      context.handle(
+        _notesMeta,
+        notes.isAcceptableOrUnknown(data['notes']!, _notesMeta),
       );
     }
     if (data.containsKey('is_active')) {
@@ -7151,9 +8514,17 @@ class $SuppliersTable extends Suppliers
         DriftSqlType.string,
         data['${effectivePrefix}supplier_name'],
       )!,
+      contactPerson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}contact_person'],
+      ),
       gstNumber: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}gst_number'],
+      ),
+      panNumber: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}pan_number'],
       ),
       mobile: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
@@ -7167,9 +8538,13 @@ class $SuppliersTable extends Suppliers
         DriftSqlType.string,
         data['${effectivePrefix}email'],
       ),
-      address: attachedDatabase.typeMapping.read(
+      addressLine1: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}address'],
+        data['${effectivePrefix}address_line1'],
+      ),
+      addressLine2: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}address_line2'],
       ),
       city: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
@@ -7191,6 +8566,10 @@ class $SuppliersTable extends Suppliers
         DriftSqlType.string,
         data['${effectivePrefix}pincode'],
       ),
+      creditLimit: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}credit_limit'],
+      )!,
       openingBalance: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}opening_balance'],
@@ -7199,6 +8578,42 @@ class $SuppliersTable extends Suppliers
         DriftSqlType.int,
         data['${effectivePrefix}outstanding_balance'],
       )!,
+      paymentDueDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}payment_due_date'],
+      ),
+      accountName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}account_name'],
+      ),
+      accountNumber: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}account_number'],
+      ),
+      bankName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}bank_name'],
+      ),
+      branchName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}branch_name'],
+      ),
+      ifscCode: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}ifsc_code'],
+      ),
+      paymentTerms: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}payment_terms'],
+      ),
+      balanceType: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}balance_type'],
+      )!,
+      notes: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}notes'],
+      ),
       isActive: attachedDatabase.typeMapping.read(
         DriftSqlType.bool,
         data['${effectivePrefix}is_active'],
@@ -7224,18 +8639,35 @@ class Supplier extends DataClass implements Insertable<Supplier> {
   final int id;
   final String supplierCode;
   final String supplierName;
+  final String? contactPerson;
   final String? gstNumber;
+  final String? panNumber;
   final String? mobile;
   final String? alternateMobile;
   final String? email;
-  final String? address;
+  final String? addressLine1;
+  final String? addressLine2;
   final String? city;
   final String? state;
   final String? stateCode;
   final String? country;
   final String? pincode;
+  final int creditLimit;
   final int openingBalance;
   final int outstandingBalance;
+  final DateTime? paymentDueDate;
+  final String? accountName;
+  final String? accountNumber;
+  final String? bankName;
+  final String? branchName;
+  final String? ifscCode;
+
+  /// Payment terms such as `Net 30` or `Cash on Delivery`.
+  final String? paymentTerms;
+
+  /// `DEBIT` or `CREDIT` — see the shared `BalanceType` enum.
+  final String balanceType;
+  final String? notes;
   final bool isActive;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -7243,18 +8675,31 @@ class Supplier extends DataClass implements Insertable<Supplier> {
     required this.id,
     required this.supplierCode,
     required this.supplierName,
+    this.contactPerson,
     this.gstNumber,
+    this.panNumber,
     this.mobile,
     this.alternateMobile,
     this.email,
-    this.address,
+    this.addressLine1,
+    this.addressLine2,
     this.city,
     this.state,
     this.stateCode,
     this.country,
     this.pincode,
+    required this.creditLimit,
     required this.openingBalance,
     required this.outstandingBalance,
+    this.paymentDueDate,
+    this.accountName,
+    this.accountNumber,
+    this.bankName,
+    this.branchName,
+    this.ifscCode,
+    this.paymentTerms,
+    required this.balanceType,
+    this.notes,
     required this.isActive,
     required this.createdAt,
     required this.updatedAt,
@@ -7265,8 +8710,14 @@ class Supplier extends DataClass implements Insertable<Supplier> {
     map['id'] = Variable<int>(id);
     map['supplier_code'] = Variable<String>(supplierCode);
     map['supplier_name'] = Variable<String>(supplierName);
+    if (!nullToAbsent || contactPerson != null) {
+      map['contact_person'] = Variable<String>(contactPerson);
+    }
     if (!nullToAbsent || gstNumber != null) {
       map['gst_number'] = Variable<String>(gstNumber);
+    }
+    if (!nullToAbsent || panNumber != null) {
+      map['pan_number'] = Variable<String>(panNumber);
     }
     if (!nullToAbsent || mobile != null) {
       map['mobile'] = Variable<String>(mobile);
@@ -7277,8 +8728,11 @@ class Supplier extends DataClass implements Insertable<Supplier> {
     if (!nullToAbsent || email != null) {
       map['email'] = Variable<String>(email);
     }
-    if (!nullToAbsent || address != null) {
-      map['address'] = Variable<String>(address);
+    if (!nullToAbsent || addressLine1 != null) {
+      map['address_line1'] = Variable<String>(addressLine1);
+    }
+    if (!nullToAbsent || addressLine2 != null) {
+      map['address_line2'] = Variable<String>(addressLine2);
     }
     if (!nullToAbsent || city != null) {
       map['city'] = Variable<String>(city);
@@ -7295,8 +8749,34 @@ class Supplier extends DataClass implements Insertable<Supplier> {
     if (!nullToAbsent || pincode != null) {
       map['pincode'] = Variable<String>(pincode);
     }
+    map['credit_limit'] = Variable<int>(creditLimit);
     map['opening_balance'] = Variable<int>(openingBalance);
     map['outstanding_balance'] = Variable<int>(outstandingBalance);
+    if (!nullToAbsent || paymentDueDate != null) {
+      map['payment_due_date'] = Variable<DateTime>(paymentDueDate);
+    }
+    if (!nullToAbsent || accountName != null) {
+      map['account_name'] = Variable<String>(accountName);
+    }
+    if (!nullToAbsent || accountNumber != null) {
+      map['account_number'] = Variable<String>(accountNumber);
+    }
+    if (!nullToAbsent || bankName != null) {
+      map['bank_name'] = Variable<String>(bankName);
+    }
+    if (!nullToAbsent || branchName != null) {
+      map['branch_name'] = Variable<String>(branchName);
+    }
+    if (!nullToAbsent || ifscCode != null) {
+      map['ifsc_code'] = Variable<String>(ifscCode);
+    }
+    if (!nullToAbsent || paymentTerms != null) {
+      map['payment_terms'] = Variable<String>(paymentTerms);
+    }
+    map['balance_type'] = Variable<String>(balanceType);
+    if (!nullToAbsent || notes != null) {
+      map['notes'] = Variable<String>(notes);
+    }
     map['is_active'] = Variable<bool>(isActive);
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
@@ -7308,9 +8788,15 @@ class Supplier extends DataClass implements Insertable<Supplier> {
       id: Value(id),
       supplierCode: Value(supplierCode),
       supplierName: Value(supplierName),
+      contactPerson: contactPerson == null && nullToAbsent
+          ? const Value.absent()
+          : Value(contactPerson),
       gstNumber: gstNumber == null && nullToAbsent
           ? const Value.absent()
           : Value(gstNumber),
+      panNumber: panNumber == null && nullToAbsent
+          ? const Value.absent()
+          : Value(panNumber),
       mobile: mobile == null && nullToAbsent
           ? const Value.absent()
           : Value(mobile),
@@ -7320,9 +8806,12 @@ class Supplier extends DataClass implements Insertable<Supplier> {
       email: email == null && nullToAbsent
           ? const Value.absent()
           : Value(email),
-      address: address == null && nullToAbsent
+      addressLine1: addressLine1 == null && nullToAbsent
           ? const Value.absent()
-          : Value(address),
+          : Value(addressLine1),
+      addressLine2: addressLine2 == null && nullToAbsent
+          ? const Value.absent()
+          : Value(addressLine2),
       city: city == null && nullToAbsent ? const Value.absent() : Value(city),
       state: state == null && nullToAbsent
           ? const Value.absent()
@@ -7336,8 +8825,34 @@ class Supplier extends DataClass implements Insertable<Supplier> {
       pincode: pincode == null && nullToAbsent
           ? const Value.absent()
           : Value(pincode),
+      creditLimit: Value(creditLimit),
       openingBalance: Value(openingBalance),
       outstandingBalance: Value(outstandingBalance),
+      paymentDueDate: paymentDueDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(paymentDueDate),
+      accountName: accountName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(accountName),
+      accountNumber: accountNumber == null && nullToAbsent
+          ? const Value.absent()
+          : Value(accountNumber),
+      bankName: bankName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(bankName),
+      branchName: branchName == null && nullToAbsent
+          ? const Value.absent()
+          : Value(branchName),
+      ifscCode: ifscCode == null && nullToAbsent
+          ? const Value.absent()
+          : Value(ifscCode),
+      paymentTerms: paymentTerms == null && nullToAbsent
+          ? const Value.absent()
+          : Value(paymentTerms),
+      balanceType: Value(balanceType),
+      notes: notes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(notes),
       isActive: Value(isActive),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
@@ -7353,18 +8868,31 @@ class Supplier extends DataClass implements Insertable<Supplier> {
       id: serializer.fromJson<int>(json['id']),
       supplierCode: serializer.fromJson<String>(json['supplierCode']),
       supplierName: serializer.fromJson<String>(json['supplierName']),
+      contactPerson: serializer.fromJson<String?>(json['contactPerson']),
       gstNumber: serializer.fromJson<String?>(json['gstNumber']),
+      panNumber: serializer.fromJson<String?>(json['panNumber']),
       mobile: serializer.fromJson<String?>(json['mobile']),
       alternateMobile: serializer.fromJson<String?>(json['alternateMobile']),
       email: serializer.fromJson<String?>(json['email']),
-      address: serializer.fromJson<String?>(json['address']),
+      addressLine1: serializer.fromJson<String?>(json['addressLine1']),
+      addressLine2: serializer.fromJson<String?>(json['addressLine2']),
       city: serializer.fromJson<String?>(json['city']),
       state: serializer.fromJson<String?>(json['state']),
       stateCode: serializer.fromJson<String?>(json['stateCode']),
       country: serializer.fromJson<String?>(json['country']),
       pincode: serializer.fromJson<String?>(json['pincode']),
+      creditLimit: serializer.fromJson<int>(json['creditLimit']),
       openingBalance: serializer.fromJson<int>(json['openingBalance']),
       outstandingBalance: serializer.fromJson<int>(json['outstandingBalance']),
+      paymentDueDate: serializer.fromJson<DateTime?>(json['paymentDueDate']),
+      accountName: serializer.fromJson<String?>(json['accountName']),
+      accountNumber: serializer.fromJson<String?>(json['accountNumber']),
+      bankName: serializer.fromJson<String?>(json['bankName']),
+      branchName: serializer.fromJson<String?>(json['branchName']),
+      ifscCode: serializer.fromJson<String?>(json['ifscCode']),
+      paymentTerms: serializer.fromJson<String?>(json['paymentTerms']),
+      balanceType: serializer.fromJson<String>(json['balanceType']),
+      notes: serializer.fromJson<String?>(json['notes']),
       isActive: serializer.fromJson<bool>(json['isActive']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
@@ -7377,18 +8905,31 @@ class Supplier extends DataClass implements Insertable<Supplier> {
       'id': serializer.toJson<int>(id),
       'supplierCode': serializer.toJson<String>(supplierCode),
       'supplierName': serializer.toJson<String>(supplierName),
+      'contactPerson': serializer.toJson<String?>(contactPerson),
       'gstNumber': serializer.toJson<String?>(gstNumber),
+      'panNumber': serializer.toJson<String?>(panNumber),
       'mobile': serializer.toJson<String?>(mobile),
       'alternateMobile': serializer.toJson<String?>(alternateMobile),
       'email': serializer.toJson<String?>(email),
-      'address': serializer.toJson<String?>(address),
+      'addressLine1': serializer.toJson<String?>(addressLine1),
+      'addressLine2': serializer.toJson<String?>(addressLine2),
       'city': serializer.toJson<String?>(city),
       'state': serializer.toJson<String?>(state),
       'stateCode': serializer.toJson<String?>(stateCode),
       'country': serializer.toJson<String?>(country),
       'pincode': serializer.toJson<String?>(pincode),
+      'creditLimit': serializer.toJson<int>(creditLimit),
       'openingBalance': serializer.toJson<int>(openingBalance),
       'outstandingBalance': serializer.toJson<int>(outstandingBalance),
+      'paymentDueDate': serializer.toJson<DateTime?>(paymentDueDate),
+      'accountName': serializer.toJson<String?>(accountName),
+      'accountNumber': serializer.toJson<String?>(accountNumber),
+      'bankName': serializer.toJson<String?>(bankName),
+      'branchName': serializer.toJson<String?>(branchName),
+      'ifscCode': serializer.toJson<String?>(ifscCode),
+      'paymentTerms': serializer.toJson<String?>(paymentTerms),
+      'balanceType': serializer.toJson<String>(balanceType),
+      'notes': serializer.toJson<String?>(notes),
       'isActive': serializer.toJson<bool>(isActive),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
@@ -7399,18 +8940,31 @@ class Supplier extends DataClass implements Insertable<Supplier> {
     int? id,
     String? supplierCode,
     String? supplierName,
+    Value<String?> contactPerson = const Value.absent(),
     Value<String?> gstNumber = const Value.absent(),
+    Value<String?> panNumber = const Value.absent(),
     Value<String?> mobile = const Value.absent(),
     Value<String?> alternateMobile = const Value.absent(),
     Value<String?> email = const Value.absent(),
-    Value<String?> address = const Value.absent(),
+    Value<String?> addressLine1 = const Value.absent(),
+    Value<String?> addressLine2 = const Value.absent(),
     Value<String?> city = const Value.absent(),
     Value<String?> state = const Value.absent(),
     Value<String?> stateCode = const Value.absent(),
     Value<String?> country = const Value.absent(),
     Value<String?> pincode = const Value.absent(),
+    int? creditLimit,
     int? openingBalance,
     int? outstandingBalance,
+    Value<DateTime?> paymentDueDate = const Value.absent(),
+    Value<String?> accountName = const Value.absent(),
+    Value<String?> accountNumber = const Value.absent(),
+    Value<String?> bankName = const Value.absent(),
+    Value<String?> branchName = const Value.absent(),
+    Value<String?> ifscCode = const Value.absent(),
+    Value<String?> paymentTerms = const Value.absent(),
+    String? balanceType,
+    Value<String?> notes = const Value.absent(),
     bool? isActive,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -7418,20 +8972,39 @@ class Supplier extends DataClass implements Insertable<Supplier> {
     id: id ?? this.id,
     supplierCode: supplierCode ?? this.supplierCode,
     supplierName: supplierName ?? this.supplierName,
+    contactPerson: contactPerson.present
+        ? contactPerson.value
+        : this.contactPerson,
     gstNumber: gstNumber.present ? gstNumber.value : this.gstNumber,
+    panNumber: panNumber.present ? panNumber.value : this.panNumber,
     mobile: mobile.present ? mobile.value : this.mobile,
     alternateMobile: alternateMobile.present
         ? alternateMobile.value
         : this.alternateMobile,
     email: email.present ? email.value : this.email,
-    address: address.present ? address.value : this.address,
+    addressLine1: addressLine1.present ? addressLine1.value : this.addressLine1,
+    addressLine2: addressLine2.present ? addressLine2.value : this.addressLine2,
     city: city.present ? city.value : this.city,
     state: state.present ? state.value : this.state,
     stateCode: stateCode.present ? stateCode.value : this.stateCode,
     country: country.present ? country.value : this.country,
     pincode: pincode.present ? pincode.value : this.pincode,
+    creditLimit: creditLimit ?? this.creditLimit,
     openingBalance: openingBalance ?? this.openingBalance,
     outstandingBalance: outstandingBalance ?? this.outstandingBalance,
+    paymentDueDate: paymentDueDate.present
+        ? paymentDueDate.value
+        : this.paymentDueDate,
+    accountName: accountName.present ? accountName.value : this.accountName,
+    accountNumber: accountNumber.present
+        ? accountNumber.value
+        : this.accountNumber,
+    bankName: bankName.present ? bankName.value : this.bankName,
+    branchName: branchName.present ? branchName.value : this.branchName,
+    ifscCode: ifscCode.present ? ifscCode.value : this.ifscCode,
+    paymentTerms: paymentTerms.present ? paymentTerms.value : this.paymentTerms,
+    balanceType: balanceType ?? this.balanceType,
+    notes: notes.present ? notes.value : this.notes,
     isActive: isActive ?? this.isActive,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
@@ -7445,24 +9018,57 @@ class Supplier extends DataClass implements Insertable<Supplier> {
       supplierName: data.supplierName.present
           ? data.supplierName.value
           : this.supplierName,
+      contactPerson: data.contactPerson.present
+          ? data.contactPerson.value
+          : this.contactPerson,
       gstNumber: data.gstNumber.present ? data.gstNumber.value : this.gstNumber,
+      panNumber: data.panNumber.present ? data.panNumber.value : this.panNumber,
       mobile: data.mobile.present ? data.mobile.value : this.mobile,
       alternateMobile: data.alternateMobile.present
           ? data.alternateMobile.value
           : this.alternateMobile,
       email: data.email.present ? data.email.value : this.email,
-      address: data.address.present ? data.address.value : this.address,
+      addressLine1: data.addressLine1.present
+          ? data.addressLine1.value
+          : this.addressLine1,
+      addressLine2: data.addressLine2.present
+          ? data.addressLine2.value
+          : this.addressLine2,
       city: data.city.present ? data.city.value : this.city,
       state: data.state.present ? data.state.value : this.state,
       stateCode: data.stateCode.present ? data.stateCode.value : this.stateCode,
       country: data.country.present ? data.country.value : this.country,
       pincode: data.pincode.present ? data.pincode.value : this.pincode,
+      creditLimit: data.creditLimit.present
+          ? data.creditLimit.value
+          : this.creditLimit,
       openingBalance: data.openingBalance.present
           ? data.openingBalance.value
           : this.openingBalance,
       outstandingBalance: data.outstandingBalance.present
           ? data.outstandingBalance.value
           : this.outstandingBalance,
+      paymentDueDate: data.paymentDueDate.present
+          ? data.paymentDueDate.value
+          : this.paymentDueDate,
+      accountName: data.accountName.present
+          ? data.accountName.value
+          : this.accountName,
+      accountNumber: data.accountNumber.present
+          ? data.accountNumber.value
+          : this.accountNumber,
+      bankName: data.bankName.present ? data.bankName.value : this.bankName,
+      branchName: data.branchName.present
+          ? data.branchName.value
+          : this.branchName,
+      ifscCode: data.ifscCode.present ? data.ifscCode.value : this.ifscCode,
+      paymentTerms: data.paymentTerms.present
+          ? data.paymentTerms.value
+          : this.paymentTerms,
+      balanceType: data.balanceType.present
+          ? data.balanceType.value
+          : this.balanceType,
+      notes: data.notes.present ? data.notes.value : this.notes,
       isActive: data.isActive.present ? data.isActive.value : this.isActive,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
@@ -7475,18 +9081,31 @@ class Supplier extends DataClass implements Insertable<Supplier> {
           ..write('id: $id, ')
           ..write('supplierCode: $supplierCode, ')
           ..write('supplierName: $supplierName, ')
+          ..write('contactPerson: $contactPerson, ')
           ..write('gstNumber: $gstNumber, ')
+          ..write('panNumber: $panNumber, ')
           ..write('mobile: $mobile, ')
           ..write('alternateMobile: $alternateMobile, ')
           ..write('email: $email, ')
-          ..write('address: $address, ')
+          ..write('addressLine1: $addressLine1, ')
+          ..write('addressLine2: $addressLine2, ')
           ..write('city: $city, ')
           ..write('state: $state, ')
           ..write('stateCode: $stateCode, ')
           ..write('country: $country, ')
           ..write('pincode: $pincode, ')
+          ..write('creditLimit: $creditLimit, ')
           ..write('openingBalance: $openingBalance, ')
           ..write('outstandingBalance: $outstandingBalance, ')
+          ..write('paymentDueDate: $paymentDueDate, ')
+          ..write('accountName: $accountName, ')
+          ..write('accountNumber: $accountNumber, ')
+          ..write('bankName: $bankName, ')
+          ..write('branchName: $branchName, ')
+          ..write('ifscCode: $ifscCode, ')
+          ..write('paymentTerms: $paymentTerms, ')
+          ..write('balanceType: $balanceType, ')
+          ..write('notes: $notes, ')
           ..write('isActive: $isActive, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
@@ -7495,26 +9114,39 @@ class Supplier extends DataClass implements Insertable<Supplier> {
   }
 
   @override
-  int get hashCode => Object.hash(
+  int get hashCode => Object.hashAll([
     id,
     supplierCode,
     supplierName,
+    contactPerson,
     gstNumber,
+    panNumber,
     mobile,
     alternateMobile,
     email,
-    address,
+    addressLine1,
+    addressLine2,
     city,
     state,
     stateCode,
     country,
     pincode,
+    creditLimit,
     openingBalance,
     outstandingBalance,
+    paymentDueDate,
+    accountName,
+    accountNumber,
+    bankName,
+    branchName,
+    ifscCode,
+    paymentTerms,
+    balanceType,
+    notes,
     isActive,
     createdAt,
     updatedAt,
-  );
+  ]);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -7522,18 +9154,31 @@ class Supplier extends DataClass implements Insertable<Supplier> {
           other.id == this.id &&
           other.supplierCode == this.supplierCode &&
           other.supplierName == this.supplierName &&
+          other.contactPerson == this.contactPerson &&
           other.gstNumber == this.gstNumber &&
+          other.panNumber == this.panNumber &&
           other.mobile == this.mobile &&
           other.alternateMobile == this.alternateMobile &&
           other.email == this.email &&
-          other.address == this.address &&
+          other.addressLine1 == this.addressLine1 &&
+          other.addressLine2 == this.addressLine2 &&
           other.city == this.city &&
           other.state == this.state &&
           other.stateCode == this.stateCode &&
           other.country == this.country &&
           other.pincode == this.pincode &&
+          other.creditLimit == this.creditLimit &&
           other.openingBalance == this.openingBalance &&
           other.outstandingBalance == this.outstandingBalance &&
+          other.paymentDueDate == this.paymentDueDate &&
+          other.accountName == this.accountName &&
+          other.accountNumber == this.accountNumber &&
+          other.bankName == this.bankName &&
+          other.branchName == this.branchName &&
+          other.ifscCode == this.ifscCode &&
+          other.paymentTerms == this.paymentTerms &&
+          other.balanceType == this.balanceType &&
+          other.notes == this.notes &&
           other.isActive == this.isActive &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
@@ -7543,18 +9188,31 @@ class SuppliersCompanion extends UpdateCompanion<Supplier> {
   final Value<int> id;
   final Value<String> supplierCode;
   final Value<String> supplierName;
+  final Value<String?> contactPerson;
   final Value<String?> gstNumber;
+  final Value<String?> panNumber;
   final Value<String?> mobile;
   final Value<String?> alternateMobile;
   final Value<String?> email;
-  final Value<String?> address;
+  final Value<String?> addressLine1;
+  final Value<String?> addressLine2;
   final Value<String?> city;
   final Value<String?> state;
   final Value<String?> stateCode;
   final Value<String?> country;
   final Value<String?> pincode;
+  final Value<int> creditLimit;
   final Value<int> openingBalance;
   final Value<int> outstandingBalance;
+  final Value<DateTime?> paymentDueDate;
+  final Value<String?> accountName;
+  final Value<String?> accountNumber;
+  final Value<String?> bankName;
+  final Value<String?> branchName;
+  final Value<String?> ifscCode;
+  final Value<String?> paymentTerms;
+  final Value<String> balanceType;
+  final Value<String?> notes;
   final Value<bool> isActive;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
@@ -7562,18 +9220,31 @@ class SuppliersCompanion extends UpdateCompanion<Supplier> {
     this.id = const Value.absent(),
     this.supplierCode = const Value.absent(),
     this.supplierName = const Value.absent(),
+    this.contactPerson = const Value.absent(),
     this.gstNumber = const Value.absent(),
+    this.panNumber = const Value.absent(),
     this.mobile = const Value.absent(),
     this.alternateMobile = const Value.absent(),
     this.email = const Value.absent(),
-    this.address = const Value.absent(),
+    this.addressLine1 = const Value.absent(),
+    this.addressLine2 = const Value.absent(),
     this.city = const Value.absent(),
     this.state = const Value.absent(),
     this.stateCode = const Value.absent(),
     this.country = const Value.absent(),
     this.pincode = const Value.absent(),
+    this.creditLimit = const Value.absent(),
     this.openingBalance = const Value.absent(),
     this.outstandingBalance = const Value.absent(),
+    this.paymentDueDate = const Value.absent(),
+    this.accountName = const Value.absent(),
+    this.accountNumber = const Value.absent(),
+    this.bankName = const Value.absent(),
+    this.branchName = const Value.absent(),
+    this.ifscCode = const Value.absent(),
+    this.paymentTerms = const Value.absent(),
+    this.balanceType = const Value.absent(),
+    this.notes = const Value.absent(),
     this.isActive = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
@@ -7582,18 +9253,31 @@ class SuppliersCompanion extends UpdateCompanion<Supplier> {
     this.id = const Value.absent(),
     required String supplierCode,
     required String supplierName,
+    this.contactPerson = const Value.absent(),
     this.gstNumber = const Value.absent(),
+    this.panNumber = const Value.absent(),
     this.mobile = const Value.absent(),
     this.alternateMobile = const Value.absent(),
     this.email = const Value.absent(),
-    this.address = const Value.absent(),
+    this.addressLine1 = const Value.absent(),
+    this.addressLine2 = const Value.absent(),
     this.city = const Value.absent(),
     this.state = const Value.absent(),
     this.stateCode = const Value.absent(),
     this.country = const Value.absent(),
     this.pincode = const Value.absent(),
+    this.creditLimit = const Value.absent(),
     this.openingBalance = const Value.absent(),
     this.outstandingBalance = const Value.absent(),
+    this.paymentDueDate = const Value.absent(),
+    this.accountName = const Value.absent(),
+    this.accountNumber = const Value.absent(),
+    this.bankName = const Value.absent(),
+    this.branchName = const Value.absent(),
+    this.ifscCode = const Value.absent(),
+    this.paymentTerms = const Value.absent(),
+    this.balanceType = const Value.absent(),
+    this.notes = const Value.absent(),
     this.isActive = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
@@ -7603,18 +9287,31 @@ class SuppliersCompanion extends UpdateCompanion<Supplier> {
     Expression<int>? id,
     Expression<String>? supplierCode,
     Expression<String>? supplierName,
+    Expression<String>? contactPerson,
     Expression<String>? gstNumber,
+    Expression<String>? panNumber,
     Expression<String>? mobile,
     Expression<String>? alternateMobile,
     Expression<String>? email,
-    Expression<String>? address,
+    Expression<String>? addressLine1,
+    Expression<String>? addressLine2,
     Expression<String>? city,
     Expression<String>? state,
     Expression<String>? stateCode,
     Expression<String>? country,
     Expression<String>? pincode,
+    Expression<int>? creditLimit,
     Expression<int>? openingBalance,
     Expression<int>? outstandingBalance,
+    Expression<DateTime>? paymentDueDate,
+    Expression<String>? accountName,
+    Expression<String>? accountNumber,
+    Expression<String>? bankName,
+    Expression<String>? branchName,
+    Expression<String>? ifscCode,
+    Expression<String>? paymentTerms,
+    Expression<String>? balanceType,
+    Expression<String>? notes,
     Expression<bool>? isActive,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
@@ -7623,18 +9320,31 @@ class SuppliersCompanion extends UpdateCompanion<Supplier> {
       if (id != null) 'id': id,
       if (supplierCode != null) 'supplier_code': supplierCode,
       if (supplierName != null) 'supplier_name': supplierName,
+      if (contactPerson != null) 'contact_person': contactPerson,
       if (gstNumber != null) 'gst_number': gstNumber,
+      if (panNumber != null) 'pan_number': panNumber,
       if (mobile != null) 'mobile': mobile,
       if (alternateMobile != null) 'alternate_mobile': alternateMobile,
       if (email != null) 'email': email,
-      if (address != null) 'address': address,
+      if (addressLine1 != null) 'address_line1': addressLine1,
+      if (addressLine2 != null) 'address_line2': addressLine2,
       if (city != null) 'city': city,
       if (state != null) 'state': state,
       if (stateCode != null) 'state_code': stateCode,
       if (country != null) 'country': country,
       if (pincode != null) 'pincode': pincode,
+      if (creditLimit != null) 'credit_limit': creditLimit,
       if (openingBalance != null) 'opening_balance': openingBalance,
       if (outstandingBalance != null) 'outstanding_balance': outstandingBalance,
+      if (paymentDueDate != null) 'payment_due_date': paymentDueDate,
+      if (accountName != null) 'account_name': accountName,
+      if (accountNumber != null) 'account_number': accountNumber,
+      if (bankName != null) 'bank_name': bankName,
+      if (branchName != null) 'branch_name': branchName,
+      if (ifscCode != null) 'ifsc_code': ifscCode,
+      if (paymentTerms != null) 'payment_terms': paymentTerms,
+      if (balanceType != null) 'balance_type': balanceType,
+      if (notes != null) 'notes': notes,
       if (isActive != null) 'is_active': isActive,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
@@ -7645,18 +9355,31 @@ class SuppliersCompanion extends UpdateCompanion<Supplier> {
     Value<int>? id,
     Value<String>? supplierCode,
     Value<String>? supplierName,
+    Value<String?>? contactPerson,
     Value<String?>? gstNumber,
+    Value<String?>? panNumber,
     Value<String?>? mobile,
     Value<String?>? alternateMobile,
     Value<String?>? email,
-    Value<String?>? address,
+    Value<String?>? addressLine1,
+    Value<String?>? addressLine2,
     Value<String?>? city,
     Value<String?>? state,
     Value<String?>? stateCode,
     Value<String?>? country,
     Value<String?>? pincode,
+    Value<int>? creditLimit,
     Value<int>? openingBalance,
     Value<int>? outstandingBalance,
+    Value<DateTime?>? paymentDueDate,
+    Value<String?>? accountName,
+    Value<String?>? accountNumber,
+    Value<String?>? bankName,
+    Value<String?>? branchName,
+    Value<String?>? ifscCode,
+    Value<String?>? paymentTerms,
+    Value<String>? balanceType,
+    Value<String?>? notes,
     Value<bool>? isActive,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
@@ -7665,18 +9388,31 @@ class SuppliersCompanion extends UpdateCompanion<Supplier> {
       id: id ?? this.id,
       supplierCode: supplierCode ?? this.supplierCode,
       supplierName: supplierName ?? this.supplierName,
+      contactPerson: contactPerson ?? this.contactPerson,
       gstNumber: gstNumber ?? this.gstNumber,
+      panNumber: panNumber ?? this.panNumber,
       mobile: mobile ?? this.mobile,
       alternateMobile: alternateMobile ?? this.alternateMobile,
       email: email ?? this.email,
-      address: address ?? this.address,
+      addressLine1: addressLine1 ?? this.addressLine1,
+      addressLine2: addressLine2 ?? this.addressLine2,
       city: city ?? this.city,
       state: state ?? this.state,
       stateCode: stateCode ?? this.stateCode,
       country: country ?? this.country,
       pincode: pincode ?? this.pincode,
+      creditLimit: creditLimit ?? this.creditLimit,
       openingBalance: openingBalance ?? this.openingBalance,
       outstandingBalance: outstandingBalance ?? this.outstandingBalance,
+      paymentDueDate: paymentDueDate ?? this.paymentDueDate,
+      accountName: accountName ?? this.accountName,
+      accountNumber: accountNumber ?? this.accountNumber,
+      bankName: bankName ?? this.bankName,
+      branchName: branchName ?? this.branchName,
+      ifscCode: ifscCode ?? this.ifscCode,
+      paymentTerms: paymentTerms ?? this.paymentTerms,
+      balanceType: balanceType ?? this.balanceType,
+      notes: notes ?? this.notes,
       isActive: isActive ?? this.isActive,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -7695,8 +9431,14 @@ class SuppliersCompanion extends UpdateCompanion<Supplier> {
     if (supplierName.present) {
       map['supplier_name'] = Variable<String>(supplierName.value);
     }
+    if (contactPerson.present) {
+      map['contact_person'] = Variable<String>(contactPerson.value);
+    }
     if (gstNumber.present) {
       map['gst_number'] = Variable<String>(gstNumber.value);
+    }
+    if (panNumber.present) {
+      map['pan_number'] = Variable<String>(panNumber.value);
     }
     if (mobile.present) {
       map['mobile'] = Variable<String>(mobile.value);
@@ -7707,8 +9449,11 @@ class SuppliersCompanion extends UpdateCompanion<Supplier> {
     if (email.present) {
       map['email'] = Variable<String>(email.value);
     }
-    if (address.present) {
-      map['address'] = Variable<String>(address.value);
+    if (addressLine1.present) {
+      map['address_line1'] = Variable<String>(addressLine1.value);
+    }
+    if (addressLine2.present) {
+      map['address_line2'] = Variable<String>(addressLine2.value);
     }
     if (city.present) {
       map['city'] = Variable<String>(city.value);
@@ -7725,11 +9470,41 @@ class SuppliersCompanion extends UpdateCompanion<Supplier> {
     if (pincode.present) {
       map['pincode'] = Variable<String>(pincode.value);
     }
+    if (creditLimit.present) {
+      map['credit_limit'] = Variable<int>(creditLimit.value);
+    }
     if (openingBalance.present) {
       map['opening_balance'] = Variable<int>(openingBalance.value);
     }
     if (outstandingBalance.present) {
       map['outstanding_balance'] = Variable<int>(outstandingBalance.value);
+    }
+    if (paymentDueDate.present) {
+      map['payment_due_date'] = Variable<DateTime>(paymentDueDate.value);
+    }
+    if (accountName.present) {
+      map['account_name'] = Variable<String>(accountName.value);
+    }
+    if (accountNumber.present) {
+      map['account_number'] = Variable<String>(accountNumber.value);
+    }
+    if (bankName.present) {
+      map['bank_name'] = Variable<String>(bankName.value);
+    }
+    if (branchName.present) {
+      map['branch_name'] = Variable<String>(branchName.value);
+    }
+    if (ifscCode.present) {
+      map['ifsc_code'] = Variable<String>(ifscCode.value);
+    }
+    if (paymentTerms.present) {
+      map['payment_terms'] = Variable<String>(paymentTerms.value);
+    }
+    if (balanceType.present) {
+      map['balance_type'] = Variable<String>(balanceType.value);
+    }
+    if (notes.present) {
+      map['notes'] = Variable<String>(notes.value);
     }
     if (isActive.present) {
       map['is_active'] = Variable<bool>(isActive.value);
@@ -7749,18 +9524,31 @@ class SuppliersCompanion extends UpdateCompanion<Supplier> {
           ..write('id: $id, ')
           ..write('supplierCode: $supplierCode, ')
           ..write('supplierName: $supplierName, ')
+          ..write('contactPerson: $contactPerson, ')
           ..write('gstNumber: $gstNumber, ')
+          ..write('panNumber: $panNumber, ')
           ..write('mobile: $mobile, ')
           ..write('alternateMobile: $alternateMobile, ')
           ..write('email: $email, ')
-          ..write('address: $address, ')
+          ..write('addressLine1: $addressLine1, ')
+          ..write('addressLine2: $addressLine2, ')
           ..write('city: $city, ')
           ..write('state: $state, ')
           ..write('stateCode: $stateCode, ')
           ..write('country: $country, ')
           ..write('pincode: $pincode, ')
+          ..write('creditLimit: $creditLimit, ')
           ..write('openingBalance: $openingBalance, ')
           ..write('outstandingBalance: $outstandingBalance, ')
+          ..write('paymentDueDate: $paymentDueDate, ')
+          ..write('accountName: $accountName, ')
+          ..write('accountNumber: $accountNumber, ')
+          ..write('bankName: $bankName, ')
+          ..write('branchName: $branchName, ')
+          ..write('ifscCode: $ifscCode, ')
+          ..write('paymentTerms: $paymentTerms, ')
+          ..write('balanceType: $balanceType, ')
+          ..write('notes: $notes, ')
           ..write('isActive: $isActive, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
@@ -8625,18 +10413,6 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
     requiredDuringInsert: false,
     defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
   );
-  static const VerificationMeta _hsnIdMeta = const VerificationMeta('hsnId');
-  @override
-  late final GeneratedColumn<int> hsnId = GeneratedColumn<int>(
-    'hsn_id',
-    aliasedName,
-    true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES hsn_master (id)',
-    ),
-  );
   static const VerificationMeta _categoryIdMeta = const VerificationMeta(
     'categoryId',
   );
@@ -8979,7 +10755,6 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
     productCode,
     productName,
     barcode,
-    hsnId,
     categoryId,
     subCategoryId,
     brandId,
@@ -9049,12 +10824,6 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
       context.handle(
         _barcodeMeta,
         barcode.isAcceptableOrUnknown(data['barcode']!, _barcodeMeta),
-      );
-    }
-    if (data.containsKey('hsn_id')) {
-      context.handle(
-        _hsnIdMeta,
-        hsnId.isAcceptableOrUnknown(data['hsn_id']!, _hsnIdMeta),
       );
     }
     if (data.containsKey('category_id')) {
@@ -9304,10 +11073,6 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
         DriftSqlType.string,
         data['${effectivePrefix}barcode'],
       ),
-      hsnId: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}hsn_id'],
-      ),
       categoryId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}category_id'],
@@ -9430,7 +11195,6 @@ class Product extends DataClass implements Insertable<Product> {
   final String productCode;
   final String productName;
   final String? barcode;
-  final int? hsnId;
   final int categoryId;
 
   /// Belongs to `category_id`; enforced by the composite foreign key in
@@ -9466,7 +11230,6 @@ class Product extends DataClass implements Insertable<Product> {
     required this.productCode,
     required this.productName,
     this.barcode,
-    this.hsnId,
     required this.categoryId,
     this.subCategoryId,
     required this.brandId,
@@ -9503,9 +11266,6 @@ class Product extends DataClass implements Insertable<Product> {
     map['product_name'] = Variable<String>(productName);
     if (!nullToAbsent || barcode != null) {
       map['barcode'] = Variable<String>(barcode);
-    }
-    if (!nullToAbsent || hsnId != null) {
-      map['hsn_id'] = Variable<int>(hsnId);
     }
     map['category_id'] = Variable<int>(categoryId);
     if (!nullToAbsent || subCategoryId != null) {
@@ -9559,9 +11319,6 @@ class Product extends DataClass implements Insertable<Product> {
       barcode: barcode == null && nullToAbsent
           ? const Value.absent()
           : Value(barcode),
-      hsnId: hsnId == null && nullToAbsent
-          ? const Value.absent()
-          : Value(hsnId),
       categoryId: Value(categoryId),
       subCategoryId: subCategoryId == null && nullToAbsent
           ? const Value.absent()
@@ -9616,7 +11373,6 @@ class Product extends DataClass implements Insertable<Product> {
       productCode: serializer.fromJson<String>(json['productCode']),
       productName: serializer.fromJson<String>(json['productName']),
       barcode: serializer.fromJson<String?>(json['barcode']),
-      hsnId: serializer.fromJson<int?>(json['hsnId']),
       categoryId: serializer.fromJson<int>(json['categoryId']),
       subCategoryId: serializer.fromJson<int?>(json['subCategoryId']),
       brandId: serializer.fromJson<int>(json['brandId']),
@@ -9654,7 +11410,6 @@ class Product extends DataClass implements Insertable<Product> {
       'productCode': serializer.toJson<String>(productCode),
       'productName': serializer.toJson<String>(productName),
       'barcode': serializer.toJson<String?>(barcode),
-      'hsnId': serializer.toJson<int?>(hsnId),
       'categoryId': serializer.toJson<int>(categoryId),
       'subCategoryId': serializer.toJson<int?>(subCategoryId),
       'brandId': serializer.toJson<int>(brandId),
@@ -9690,7 +11445,6 @@ class Product extends DataClass implements Insertable<Product> {
     String? productCode,
     String? productName,
     Value<String?> barcode = const Value.absent(),
-    Value<int?> hsnId = const Value.absent(),
     int? categoryId,
     Value<int?> subCategoryId = const Value.absent(),
     int? brandId,
@@ -9723,7 +11477,6 @@ class Product extends DataClass implements Insertable<Product> {
     productCode: productCode ?? this.productCode,
     productName: productName ?? this.productName,
     barcode: barcode.present ? barcode.value : this.barcode,
-    hsnId: hsnId.present ? hsnId.value : this.hsnId,
     categoryId: categoryId ?? this.categoryId,
     subCategoryId: subCategoryId.present
         ? subCategoryId.value
@@ -9766,7 +11519,6 @@ class Product extends DataClass implements Insertable<Product> {
           ? data.productName.value
           : this.productName,
       barcode: data.barcode.present ? data.barcode.value : this.barcode,
-      hsnId: data.hsnId.present ? data.hsnId.value : this.hsnId,
       categoryId: data.categoryId.present
           ? data.categoryId.value
           : this.categoryId,
@@ -9838,7 +11590,6 @@ class Product extends DataClass implements Insertable<Product> {
           ..write('productCode: $productCode, ')
           ..write('productName: $productName, ')
           ..write('barcode: $barcode, ')
-          ..write('hsnId: $hsnId, ')
           ..write('categoryId: $categoryId, ')
           ..write('subCategoryId: $subCategoryId, ')
           ..write('brandId: $brandId, ')
@@ -9876,7 +11627,6 @@ class Product extends DataClass implements Insertable<Product> {
     productCode,
     productName,
     barcode,
-    hsnId,
     categoryId,
     subCategoryId,
     brandId,
@@ -9913,7 +11663,6 @@ class Product extends DataClass implements Insertable<Product> {
           other.productCode == this.productCode &&
           other.productName == this.productName &&
           other.barcode == this.barcode &&
-          other.hsnId == this.hsnId &&
           other.categoryId == this.categoryId &&
           other.subCategoryId == this.subCategoryId &&
           other.brandId == this.brandId &&
@@ -9948,7 +11697,6 @@ class ProductsCompanion extends UpdateCompanion<Product> {
   final Value<String> productCode;
   final Value<String> productName;
   final Value<String?> barcode;
-  final Value<int?> hsnId;
   final Value<int> categoryId;
   final Value<int?> subCategoryId;
   final Value<int> brandId;
@@ -9981,7 +11729,6 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     this.productCode = const Value.absent(),
     this.productName = const Value.absent(),
     this.barcode = const Value.absent(),
-    this.hsnId = const Value.absent(),
     this.categoryId = const Value.absent(),
     this.subCategoryId = const Value.absent(),
     this.brandId = const Value.absent(),
@@ -10015,7 +11762,6 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     required String productCode,
     required String productName,
     this.barcode = const Value.absent(),
-    this.hsnId = const Value.absent(),
     required int categoryId,
     this.subCategoryId = const Value.absent(),
     required int brandId,
@@ -10056,7 +11802,6 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     Expression<String>? productCode,
     Expression<String>? productName,
     Expression<String>? barcode,
-    Expression<int>? hsnId,
     Expression<int>? categoryId,
     Expression<int>? subCategoryId,
     Expression<int>? brandId,
@@ -10090,7 +11835,6 @@ class ProductsCompanion extends UpdateCompanion<Product> {
       if (productCode != null) 'product_code': productCode,
       if (productName != null) 'product_name': productName,
       if (barcode != null) 'barcode': barcode,
-      if (hsnId != null) 'hsn_id': hsnId,
       if (categoryId != null) 'category_id': categoryId,
       if (subCategoryId != null) 'sub_category_id': subCategoryId,
       if (brandId != null) 'brand_id': brandId,
@@ -10127,7 +11871,6 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     Value<String>? productCode,
     Value<String>? productName,
     Value<String?>? barcode,
-    Value<int?>? hsnId,
     Value<int>? categoryId,
     Value<int?>? subCategoryId,
     Value<int>? brandId,
@@ -10161,7 +11904,6 @@ class ProductsCompanion extends UpdateCompanion<Product> {
       productCode: productCode ?? this.productCode,
       productName: productName ?? this.productName,
       barcode: barcode ?? this.barcode,
-      hsnId: hsnId ?? this.hsnId,
       categoryId: categoryId ?? this.categoryId,
       subCategoryId: subCategoryId ?? this.subCategoryId,
       brandId: brandId ?? this.brandId,
@@ -10206,9 +11948,6 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     }
     if (barcode.present) {
       map['barcode'] = Variable<String>(barcode.value);
-    }
-    if (hsnId.present) {
-      map['hsn_id'] = Variable<int>(hsnId.value);
     }
     if (categoryId.present) {
       map['category_id'] = Variable<int>(categoryId.value);
@@ -10301,7 +12040,6 @@ class ProductsCompanion extends UpdateCompanion<Product> {
           ..write('productCode: $productCode, ')
           ..write('productName: $productName, ')
           ..write('barcode: $barcode, ')
-          ..write('hsnId: $hsnId, ')
           ..write('categoryId: $categoryId, ')
           ..write('subCategoryId: $subCategoryId, ')
           ..write('brandId: $brandId, ')
@@ -11526,7 +13264,6 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $TaxCategoryRatesTable taxCategoryRates = $TaxCategoryRatesTable(
     this,
   );
-  late final $HsnMastersTable hsnMasters = $HsnMastersTable(this);
   late final $CustomersTable customers = $CustomersTable(this);
   late final $SuppliersTable suppliers = $SuppliersTable(this);
   late final $WarehousesTable warehouses = $WarehousesTable(this);
@@ -11553,10 +13290,6 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final Index idxRateTaxType = Index(
     'idx_rate_tax_type',
     'CREATE INDEX idx_rate_tax_type ON tax_category_rate (tax_type_id)',
-  );
-  late final Index idxHsnDefaultTaxCategory = Index(
-    'idx_hsn_default_tax_category',
-    'CREATE INDEX idx_hsn_default_tax_category ON hsn_master (default_tax_category_id)',
   );
   late final Index idxCustomerName = Index(
     'idx_customer_name',
@@ -11590,10 +13323,6 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     'idx_product_brand',
     'CREATE INDEX idx_product_brand ON product (brand_id)',
   );
-  late final Index idxProductHsn = Index(
-    'idx_product_hsn',
-    'CREATE INDEX idx_product_hsn ON product (hsn_id)',
-  );
   late final Index idxProductDefaultWarehouse = Index(
     'idx_product_default_warehouse',
     'CREATE INDEX idx_product_default_warehouse ON product (default_warehouse_id)',
@@ -11616,7 +13345,6 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     taxCategories,
     taxTypes,
     taxCategoryRates,
-    hsnMasters,
     customers,
     suppliers,
     warehouses,
@@ -11628,7 +13356,6 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     idxUomToUnit,
     idxRateTaxCategory,
     idxRateTaxType,
-    idxHsnDefaultTaxCategory,
     idxCustomerName,
     idxCustomerActiveName,
     idxSupplierName,
@@ -11637,7 +13364,6 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     idxProductCategory,
     idxProductCategorySubCategory,
     idxProductBrand,
-    idxProductHsn,
     idxProductDefaultWarehouse,
     idxProductActive,
   ];
@@ -11647,25 +13373,45 @@ typedef $$CompanySettingsTableTableCreateCompanionBuilder =
     CompanySettingsTableCompanion Function({
       Value<int> id,
       required String companyName,
-      Value<String?> logoPath,
+      Value<String?> legalName,
+      Value<String> businessType,
+      Value<bool> gstRegistered,
       Value<String?> gstNumber,
       Value<String?> panNumber,
-      Value<String?> email,
+      Value<String?> cin,
       Value<String?> mobile,
+      Value<String?> email,
       Value<String?> website,
-      Value<String?> address,
+      Value<String?> addressLine1,
+      Value<String?> addressLine2,
       Value<String?> city,
       Value<String?> state,
       Value<String?> stateCode,
       Value<String?> country,
       Value<String?> pincode,
-      Value<String> currencyCode,
-      Value<int> financialYearStartMonth,
+      Value<String?> logoPath,
+      Value<bool> pricesInclusiveOfTax,
       Value<String> invoicePrefix,
+      Value<int> invoiceStartNumber,
       Value<String> purchasePrefix,
       Value<String> receiptPrefix,
+      Value<int> financialYearStartMonth,
+      Value<String> currencyCode,
+      Value<String> currencySymbol,
+      Value<int> decimalPlaces,
       Value<String> timezone,
-      Value<bool> pricesInclusiveOfTax,
+      Value<String?> bankName,
+      Value<String?> bankAccountName,
+      Value<String?> bankAccountNumber,
+      Value<String?> bankIfsc,
+      Value<String?> bankBranch,
+      Value<String?> upiId,
+      Value<String?> invoiceFooter,
+      Value<String?> invoiceTerms,
+      Value<String?> invoiceThankYouMessage,
+      Value<bool> showLogoOnInvoice,
+      Value<bool> showBankDetailsOnInvoice,
+      Value<bool> showGstDetailsOnInvoice,
       Value<bool> isActive,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
@@ -11674,25 +13420,45 @@ typedef $$CompanySettingsTableTableUpdateCompanionBuilder =
     CompanySettingsTableCompanion Function({
       Value<int> id,
       Value<String> companyName,
-      Value<String?> logoPath,
+      Value<String?> legalName,
+      Value<String> businessType,
+      Value<bool> gstRegistered,
       Value<String?> gstNumber,
       Value<String?> panNumber,
-      Value<String?> email,
+      Value<String?> cin,
       Value<String?> mobile,
+      Value<String?> email,
       Value<String?> website,
-      Value<String?> address,
+      Value<String?> addressLine1,
+      Value<String?> addressLine2,
       Value<String?> city,
       Value<String?> state,
       Value<String?> stateCode,
       Value<String?> country,
       Value<String?> pincode,
-      Value<String> currencyCode,
-      Value<int> financialYearStartMonth,
+      Value<String?> logoPath,
+      Value<bool> pricesInclusiveOfTax,
       Value<String> invoicePrefix,
+      Value<int> invoiceStartNumber,
       Value<String> purchasePrefix,
       Value<String> receiptPrefix,
+      Value<int> financialYearStartMonth,
+      Value<String> currencyCode,
+      Value<String> currencySymbol,
+      Value<int> decimalPlaces,
       Value<String> timezone,
-      Value<bool> pricesInclusiveOfTax,
+      Value<String?> bankName,
+      Value<String?> bankAccountName,
+      Value<String?> bankAccountNumber,
+      Value<String?> bankIfsc,
+      Value<String?> bankBranch,
+      Value<String?> upiId,
+      Value<String?> invoiceFooter,
+      Value<String?> invoiceTerms,
+      Value<String?> invoiceThankYouMessage,
+      Value<bool> showLogoOnInvoice,
+      Value<bool> showBankDetailsOnInvoice,
+      Value<bool> showGstDetailsOnInvoice,
       Value<bool> isActive,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
@@ -11717,8 +13483,18 @@ class $$CompanySettingsTableTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get logoPath => $composableBuilder(
-    column: $table.logoPath,
+  ColumnFilters<String> get legalName => $composableBuilder(
+    column: $table.legalName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get businessType => $composableBuilder(
+    column: $table.businessType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get gstRegistered => $composableBuilder(
+    column: $table.gstRegistered,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -11732,8 +13508,8 @@ class $$CompanySettingsTableTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get email => $composableBuilder(
-    column: $table.email,
+  ColumnFilters<String> get cin => $composableBuilder(
+    column: $table.cin,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -11742,13 +13518,23 @@ class $$CompanySettingsTableTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<String> get email => $composableBuilder(
+    column: $table.email,
+    builder: (column) => ColumnFilters(column),
+  );
+
   ColumnFilters<String> get website => $composableBuilder(
     column: $table.website,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get address => $composableBuilder(
-    column: $table.address,
+  ColumnFilters<String> get addressLine1 => $composableBuilder(
+    column: $table.addressLine1,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get addressLine2 => $composableBuilder(
+    column: $table.addressLine2,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -11777,18 +13563,23 @@ class $$CompanySettingsTableTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get currencyCode => $composableBuilder(
-    column: $table.currencyCode,
+  ColumnFilters<String> get logoPath => $composableBuilder(
+    column: $table.logoPath,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<int> get financialYearStartMonth => $composableBuilder(
-    column: $table.financialYearStartMonth,
+  ColumnFilters<bool> get pricesInclusiveOfTax => $composableBuilder(
+    column: $table.pricesInclusiveOfTax,
     builder: (column) => ColumnFilters(column),
   );
 
   ColumnFilters<String> get invoicePrefix => $composableBuilder(
     column: $table.invoicePrefix,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get invoiceStartNumber => $composableBuilder(
+    column: $table.invoiceStartNumber,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -11802,13 +13593,88 @@ class $$CompanySettingsTableTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<int> get financialYearStartMonth => $composableBuilder(
+    column: $table.financialYearStartMonth,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get currencyCode => $composableBuilder(
+    column: $table.currencyCode,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get currencySymbol => $composableBuilder(
+    column: $table.currencySymbol,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get decimalPlaces => $composableBuilder(
+    column: $table.decimalPlaces,
+    builder: (column) => ColumnFilters(column),
+  );
+
   ColumnFilters<String> get timezone => $composableBuilder(
     column: $table.timezone,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<bool> get pricesInclusiveOfTax => $composableBuilder(
-    column: $table.pricesInclusiveOfTax,
+  ColumnFilters<String> get bankName => $composableBuilder(
+    column: $table.bankName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get bankAccountName => $composableBuilder(
+    column: $table.bankAccountName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get bankAccountNumber => $composableBuilder(
+    column: $table.bankAccountNumber,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get bankIfsc => $composableBuilder(
+    column: $table.bankIfsc,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get bankBranch => $composableBuilder(
+    column: $table.bankBranch,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get upiId => $composableBuilder(
+    column: $table.upiId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get invoiceFooter => $composableBuilder(
+    column: $table.invoiceFooter,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get invoiceTerms => $composableBuilder(
+    column: $table.invoiceTerms,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get invoiceThankYouMessage => $composableBuilder(
+    column: $table.invoiceThankYouMessage,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get showLogoOnInvoice => $composableBuilder(
+    column: $table.showLogoOnInvoice,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get showBankDetailsOnInvoice => $composableBuilder(
+    column: $table.showBankDetailsOnInvoice,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get showGstDetailsOnInvoice => $composableBuilder(
+    column: $table.showGstDetailsOnInvoice,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -11847,8 +13713,18 @@ class $$CompanySettingsTableTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get logoPath => $composableBuilder(
-    column: $table.logoPath,
+  ColumnOrderings<String> get legalName => $composableBuilder(
+    column: $table.legalName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get businessType => $composableBuilder(
+    column: $table.businessType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get gstRegistered => $composableBuilder(
+    column: $table.gstRegistered,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -11862,8 +13738,8 @@ class $$CompanySettingsTableTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get email => $composableBuilder(
-    column: $table.email,
+  ColumnOrderings<String> get cin => $composableBuilder(
+    column: $table.cin,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -11872,13 +13748,23 @@ class $$CompanySettingsTableTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get email => $composableBuilder(
+    column: $table.email,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get website => $composableBuilder(
     column: $table.website,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get address => $composableBuilder(
-    column: $table.address,
+  ColumnOrderings<String> get addressLine1 => $composableBuilder(
+    column: $table.addressLine1,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get addressLine2 => $composableBuilder(
+    column: $table.addressLine2,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -11907,18 +13793,23 @@ class $$CompanySettingsTableTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get currencyCode => $composableBuilder(
-    column: $table.currencyCode,
+  ColumnOrderings<String> get logoPath => $composableBuilder(
+    column: $table.logoPath,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<int> get financialYearStartMonth => $composableBuilder(
-    column: $table.financialYearStartMonth,
+  ColumnOrderings<bool> get pricesInclusiveOfTax => $composableBuilder(
+    column: $table.pricesInclusiveOfTax,
     builder: (column) => ColumnOrderings(column),
   );
 
   ColumnOrderings<String> get invoicePrefix => $composableBuilder(
     column: $table.invoicePrefix,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get invoiceStartNumber => $composableBuilder(
+    column: $table.invoiceStartNumber,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -11932,13 +13823,88 @@ class $$CompanySettingsTableTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get financialYearStartMonth => $composableBuilder(
+    column: $table.financialYearStartMonth,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get currencyCode => $composableBuilder(
+    column: $table.currencyCode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get currencySymbol => $composableBuilder(
+    column: $table.currencySymbol,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get decimalPlaces => $composableBuilder(
+    column: $table.decimalPlaces,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get timezone => $composableBuilder(
     column: $table.timezone,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<bool> get pricesInclusiveOfTax => $composableBuilder(
-    column: $table.pricesInclusiveOfTax,
+  ColumnOrderings<String> get bankName => $composableBuilder(
+    column: $table.bankName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get bankAccountName => $composableBuilder(
+    column: $table.bankAccountName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get bankAccountNumber => $composableBuilder(
+    column: $table.bankAccountNumber,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get bankIfsc => $composableBuilder(
+    column: $table.bankIfsc,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get bankBranch => $composableBuilder(
+    column: $table.bankBranch,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get upiId => $composableBuilder(
+    column: $table.upiId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get invoiceFooter => $composableBuilder(
+    column: $table.invoiceFooter,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get invoiceTerms => $composableBuilder(
+    column: $table.invoiceTerms,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get invoiceThankYouMessage => $composableBuilder(
+    column: $table.invoiceThankYouMessage,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get showLogoOnInvoice => $composableBuilder(
+    column: $table.showLogoOnInvoice,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get showBankDetailsOnInvoice => $composableBuilder(
+    column: $table.showBankDetailsOnInvoice,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get showGstDetailsOnInvoice => $composableBuilder(
+    column: $table.showGstDetailsOnInvoice,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -11975,8 +13941,18 @@ class $$CompanySettingsTableTableAnnotationComposer
     builder: (column) => column,
   );
 
-  GeneratedColumn<String> get logoPath =>
-      $composableBuilder(column: $table.logoPath, builder: (column) => column);
+  GeneratedColumn<String> get legalName =>
+      $composableBuilder(column: $table.legalName, builder: (column) => column);
+
+  GeneratedColumn<String> get businessType => $composableBuilder(
+    column: $table.businessType,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get gstRegistered => $composableBuilder(
+    column: $table.gstRegistered,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<String> get gstNumber =>
       $composableBuilder(column: $table.gstNumber, builder: (column) => column);
@@ -11984,17 +13960,27 @@ class $$CompanySettingsTableTableAnnotationComposer
   GeneratedColumn<String> get panNumber =>
       $composableBuilder(column: $table.panNumber, builder: (column) => column);
 
-  GeneratedColumn<String> get email =>
-      $composableBuilder(column: $table.email, builder: (column) => column);
+  GeneratedColumn<String> get cin =>
+      $composableBuilder(column: $table.cin, builder: (column) => column);
 
   GeneratedColumn<String> get mobile =>
       $composableBuilder(column: $table.mobile, builder: (column) => column);
 
+  GeneratedColumn<String> get email =>
+      $composableBuilder(column: $table.email, builder: (column) => column);
+
   GeneratedColumn<String> get website =>
       $composableBuilder(column: $table.website, builder: (column) => column);
 
-  GeneratedColumn<String> get address =>
-      $composableBuilder(column: $table.address, builder: (column) => column);
+  GeneratedColumn<String> get addressLine1 => $composableBuilder(
+    column: $table.addressLine1,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get addressLine2 => $composableBuilder(
+    column: $table.addressLine2,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<String> get city =>
       $composableBuilder(column: $table.city, builder: (column) => column);
@@ -12011,18 +13997,21 @@ class $$CompanySettingsTableTableAnnotationComposer
   GeneratedColumn<String> get pincode =>
       $composableBuilder(column: $table.pincode, builder: (column) => column);
 
-  GeneratedColumn<String> get currencyCode => $composableBuilder(
-    column: $table.currencyCode,
-    builder: (column) => column,
-  );
+  GeneratedColumn<String> get logoPath =>
+      $composableBuilder(column: $table.logoPath, builder: (column) => column);
 
-  GeneratedColumn<int> get financialYearStartMonth => $composableBuilder(
-    column: $table.financialYearStartMonth,
+  GeneratedColumn<bool> get pricesInclusiveOfTax => $composableBuilder(
+    column: $table.pricesInclusiveOfTax,
     builder: (column) => column,
   );
 
   GeneratedColumn<String> get invoicePrefix => $composableBuilder(
     column: $table.invoicePrefix,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get invoiceStartNumber => $composableBuilder(
+    column: $table.invoiceStartNumber,
     builder: (column) => column,
   );
 
@@ -12036,11 +14025,80 @@ class $$CompanySettingsTableTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<int> get financialYearStartMonth => $composableBuilder(
+    column: $table.financialYearStartMonth,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get currencyCode => $composableBuilder(
+    column: $table.currencyCode,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get currencySymbol => $composableBuilder(
+    column: $table.currencySymbol,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get decimalPlaces => $composableBuilder(
+    column: $table.decimalPlaces,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<String> get timezone =>
       $composableBuilder(column: $table.timezone, builder: (column) => column);
 
-  GeneratedColumn<bool> get pricesInclusiveOfTax => $composableBuilder(
-    column: $table.pricesInclusiveOfTax,
+  GeneratedColumn<String> get bankName =>
+      $composableBuilder(column: $table.bankName, builder: (column) => column);
+
+  GeneratedColumn<String> get bankAccountName => $composableBuilder(
+    column: $table.bankAccountName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get bankAccountNumber => $composableBuilder(
+    column: $table.bankAccountNumber,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get bankIfsc =>
+      $composableBuilder(column: $table.bankIfsc, builder: (column) => column);
+
+  GeneratedColumn<String> get bankBranch => $composableBuilder(
+    column: $table.bankBranch,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get upiId =>
+      $composableBuilder(column: $table.upiId, builder: (column) => column);
+
+  GeneratedColumn<String> get invoiceFooter => $composableBuilder(
+    column: $table.invoiceFooter,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get invoiceTerms => $composableBuilder(
+    column: $table.invoiceTerms,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get invoiceThankYouMessage => $composableBuilder(
+    column: $table.invoiceThankYouMessage,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get showLogoOnInvoice => $composableBuilder(
+    column: $table.showLogoOnInvoice,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get showBankDetailsOnInvoice => $composableBuilder(
+    column: $table.showBankDetailsOnInvoice,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get showGstDetailsOnInvoice => $composableBuilder(
+    column: $table.showGstDetailsOnInvoice,
     builder: (column) => column,
   );
 
@@ -12099,50 +14157,90 @@ class $$CompanySettingsTableTableTableManager
               ({
                 Value<int> id = const Value.absent(),
                 Value<String> companyName = const Value.absent(),
-                Value<String?> logoPath = const Value.absent(),
+                Value<String?> legalName = const Value.absent(),
+                Value<String> businessType = const Value.absent(),
+                Value<bool> gstRegistered = const Value.absent(),
                 Value<String?> gstNumber = const Value.absent(),
                 Value<String?> panNumber = const Value.absent(),
-                Value<String?> email = const Value.absent(),
+                Value<String?> cin = const Value.absent(),
                 Value<String?> mobile = const Value.absent(),
+                Value<String?> email = const Value.absent(),
                 Value<String?> website = const Value.absent(),
-                Value<String?> address = const Value.absent(),
+                Value<String?> addressLine1 = const Value.absent(),
+                Value<String?> addressLine2 = const Value.absent(),
                 Value<String?> city = const Value.absent(),
                 Value<String?> state = const Value.absent(),
                 Value<String?> stateCode = const Value.absent(),
                 Value<String?> country = const Value.absent(),
                 Value<String?> pincode = const Value.absent(),
-                Value<String> currencyCode = const Value.absent(),
-                Value<int> financialYearStartMonth = const Value.absent(),
+                Value<String?> logoPath = const Value.absent(),
+                Value<bool> pricesInclusiveOfTax = const Value.absent(),
                 Value<String> invoicePrefix = const Value.absent(),
+                Value<int> invoiceStartNumber = const Value.absent(),
                 Value<String> purchasePrefix = const Value.absent(),
                 Value<String> receiptPrefix = const Value.absent(),
+                Value<int> financialYearStartMonth = const Value.absent(),
+                Value<String> currencyCode = const Value.absent(),
+                Value<String> currencySymbol = const Value.absent(),
+                Value<int> decimalPlaces = const Value.absent(),
                 Value<String> timezone = const Value.absent(),
-                Value<bool> pricesInclusiveOfTax = const Value.absent(),
+                Value<String?> bankName = const Value.absent(),
+                Value<String?> bankAccountName = const Value.absent(),
+                Value<String?> bankAccountNumber = const Value.absent(),
+                Value<String?> bankIfsc = const Value.absent(),
+                Value<String?> bankBranch = const Value.absent(),
+                Value<String?> upiId = const Value.absent(),
+                Value<String?> invoiceFooter = const Value.absent(),
+                Value<String?> invoiceTerms = const Value.absent(),
+                Value<String?> invoiceThankYouMessage = const Value.absent(),
+                Value<bool> showLogoOnInvoice = const Value.absent(),
+                Value<bool> showBankDetailsOnInvoice = const Value.absent(),
+                Value<bool> showGstDetailsOnInvoice = const Value.absent(),
                 Value<bool> isActive = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
               }) => CompanySettingsTableCompanion(
                 id: id,
                 companyName: companyName,
-                logoPath: logoPath,
+                legalName: legalName,
+                businessType: businessType,
+                gstRegistered: gstRegistered,
                 gstNumber: gstNumber,
                 panNumber: panNumber,
-                email: email,
+                cin: cin,
                 mobile: mobile,
+                email: email,
                 website: website,
-                address: address,
+                addressLine1: addressLine1,
+                addressLine2: addressLine2,
                 city: city,
                 state: state,
                 stateCode: stateCode,
                 country: country,
                 pincode: pincode,
-                currencyCode: currencyCode,
-                financialYearStartMonth: financialYearStartMonth,
+                logoPath: logoPath,
+                pricesInclusiveOfTax: pricesInclusiveOfTax,
                 invoicePrefix: invoicePrefix,
+                invoiceStartNumber: invoiceStartNumber,
                 purchasePrefix: purchasePrefix,
                 receiptPrefix: receiptPrefix,
+                financialYearStartMonth: financialYearStartMonth,
+                currencyCode: currencyCode,
+                currencySymbol: currencySymbol,
+                decimalPlaces: decimalPlaces,
                 timezone: timezone,
-                pricesInclusiveOfTax: pricesInclusiveOfTax,
+                bankName: bankName,
+                bankAccountName: bankAccountName,
+                bankAccountNumber: bankAccountNumber,
+                bankIfsc: bankIfsc,
+                bankBranch: bankBranch,
+                upiId: upiId,
+                invoiceFooter: invoiceFooter,
+                invoiceTerms: invoiceTerms,
+                invoiceThankYouMessage: invoiceThankYouMessage,
+                showLogoOnInvoice: showLogoOnInvoice,
+                showBankDetailsOnInvoice: showBankDetailsOnInvoice,
+                showGstDetailsOnInvoice: showGstDetailsOnInvoice,
                 isActive: isActive,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
@@ -12151,50 +14249,90 @@ class $$CompanySettingsTableTableTableManager
               ({
                 Value<int> id = const Value.absent(),
                 required String companyName,
-                Value<String?> logoPath = const Value.absent(),
+                Value<String?> legalName = const Value.absent(),
+                Value<String> businessType = const Value.absent(),
+                Value<bool> gstRegistered = const Value.absent(),
                 Value<String?> gstNumber = const Value.absent(),
                 Value<String?> panNumber = const Value.absent(),
-                Value<String?> email = const Value.absent(),
+                Value<String?> cin = const Value.absent(),
                 Value<String?> mobile = const Value.absent(),
+                Value<String?> email = const Value.absent(),
                 Value<String?> website = const Value.absent(),
-                Value<String?> address = const Value.absent(),
+                Value<String?> addressLine1 = const Value.absent(),
+                Value<String?> addressLine2 = const Value.absent(),
                 Value<String?> city = const Value.absent(),
                 Value<String?> state = const Value.absent(),
                 Value<String?> stateCode = const Value.absent(),
                 Value<String?> country = const Value.absent(),
                 Value<String?> pincode = const Value.absent(),
-                Value<String> currencyCode = const Value.absent(),
-                Value<int> financialYearStartMonth = const Value.absent(),
+                Value<String?> logoPath = const Value.absent(),
+                Value<bool> pricesInclusiveOfTax = const Value.absent(),
                 Value<String> invoicePrefix = const Value.absent(),
+                Value<int> invoiceStartNumber = const Value.absent(),
                 Value<String> purchasePrefix = const Value.absent(),
                 Value<String> receiptPrefix = const Value.absent(),
+                Value<int> financialYearStartMonth = const Value.absent(),
+                Value<String> currencyCode = const Value.absent(),
+                Value<String> currencySymbol = const Value.absent(),
+                Value<int> decimalPlaces = const Value.absent(),
                 Value<String> timezone = const Value.absent(),
-                Value<bool> pricesInclusiveOfTax = const Value.absent(),
+                Value<String?> bankName = const Value.absent(),
+                Value<String?> bankAccountName = const Value.absent(),
+                Value<String?> bankAccountNumber = const Value.absent(),
+                Value<String?> bankIfsc = const Value.absent(),
+                Value<String?> bankBranch = const Value.absent(),
+                Value<String?> upiId = const Value.absent(),
+                Value<String?> invoiceFooter = const Value.absent(),
+                Value<String?> invoiceTerms = const Value.absent(),
+                Value<String?> invoiceThankYouMessage = const Value.absent(),
+                Value<bool> showLogoOnInvoice = const Value.absent(),
+                Value<bool> showBankDetailsOnInvoice = const Value.absent(),
+                Value<bool> showGstDetailsOnInvoice = const Value.absent(),
                 Value<bool> isActive = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
               }) => CompanySettingsTableCompanion.insert(
                 id: id,
                 companyName: companyName,
-                logoPath: logoPath,
+                legalName: legalName,
+                businessType: businessType,
+                gstRegistered: gstRegistered,
                 gstNumber: gstNumber,
                 panNumber: panNumber,
-                email: email,
+                cin: cin,
                 mobile: mobile,
+                email: email,
                 website: website,
-                address: address,
+                addressLine1: addressLine1,
+                addressLine2: addressLine2,
                 city: city,
                 state: state,
                 stateCode: stateCode,
                 country: country,
                 pincode: pincode,
-                currencyCode: currencyCode,
-                financialYearStartMonth: financialYearStartMonth,
+                logoPath: logoPath,
+                pricesInclusiveOfTax: pricesInclusiveOfTax,
                 invoicePrefix: invoicePrefix,
+                invoiceStartNumber: invoiceStartNumber,
                 purchasePrefix: purchasePrefix,
                 receiptPrefix: receiptPrefix,
+                financialYearStartMonth: financialYearStartMonth,
+                currencyCode: currencyCode,
+                currencySymbol: currencySymbol,
+                decimalPlaces: decimalPlaces,
                 timezone: timezone,
-                pricesInclusiveOfTax: pricesInclusiveOfTax,
+                bankName: bankName,
+                bankAccountName: bankAccountName,
+                bankAccountNumber: bankAccountNumber,
+                bankIfsc: bankIfsc,
+                bankBranch: bankBranch,
+                upiId: upiId,
+                invoiceFooter: invoiceFooter,
+                invoiceTerms: invoiceTerms,
+                invoiceThankYouMessage: invoiceThankYouMessage,
+                showLogoOnInvoice: showLogoOnInvoice,
+                showBankDetailsOnInvoice: showBankDetailsOnInvoice,
+                showGstDetailsOnInvoice: showGstDetailsOnInvoice,
                 isActive: isActive,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
@@ -14782,23 +16920,6 @@ final class $$TaxCategoriesTableReferences
     );
   }
 
-  static MultiTypedResultKey<$HsnMastersTable, List<HsnMaster>>
-  _hsnMastersRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
-    db.hsnMasters,
-    aliasName: 'tax_category__id__hsn_master__default_tax_category_id',
-  );
-
-  $$HsnMastersTableProcessedTableManager get hsnMastersRefs {
-    final manager = $$HsnMastersTableTableManager($_db, $_db.hsnMasters).filter(
-      (f) => f.defaultTaxCategoryId.id.sqlEquals($_itemColumn<int>('id')!),
-    );
-
-    final cache = $_typedResult.readTableOrNull(_hsnMastersRefsTable($_db));
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
-
   static MultiTypedResultKey<$ProductsTable, List<Product>> _productsRefsTable(
     _$AppDatabase db,
   ) => MultiTypedResultKey.fromTable(
@@ -14879,31 +17000,6 @@ class $$TaxCategoriesTableFilterComposer
           }) => $$TaxCategoryRatesTableFilterComposer(
             $db: $db,
             $table: $db.taxCategoryRates,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-
-  Expression<bool> hsnMastersRefs(
-    Expression<bool> Function($$HsnMastersTableFilterComposer f) f,
-  ) {
-    final $$HsnMastersTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.hsnMasters,
-      getReferencedColumn: (t) => t.defaultTaxCategoryId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$HsnMastersTableFilterComposer(
-            $db: $db,
-            $table: $db.hsnMasters,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -15045,31 +17141,6 @@ class $$TaxCategoriesTableAnnotationComposer
     return f(composer);
   }
 
-  Expression<T> hsnMastersRefs<T extends Object>(
-    Expression<T> Function($$HsnMastersTableAnnotationComposer a) f,
-  ) {
-    final $$HsnMastersTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.hsnMasters,
-      getReferencedColumn: (t) => t.defaultTaxCategoryId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$HsnMastersTableAnnotationComposer(
-            $db: $db,
-            $table: $db.hsnMasters,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-
   Expression<T> productsRefs<T extends Object>(
     Expression<T> Function($$ProductsTableAnnotationComposer a) f,
   ) {
@@ -15109,11 +17180,7 @@ class $$TaxCategoriesTableTableManager
           $$TaxCategoriesTableUpdateCompanionBuilder,
           (TaxCategory, $$TaxCategoriesTableReferences),
           TaxCategory,
-          PrefetchHooks Function({
-            bool taxCategoryRatesRefs,
-            bool hsnMastersRefs,
-            bool productsRefs,
-          })
+          PrefetchHooks Function({bool taxCategoryRatesRefs, bool productsRefs})
         > {
   $$TaxCategoriesTableTableManager(_$AppDatabase db, $TaxCategoriesTable table)
     : super(
@@ -15171,16 +17238,11 @@ class $$TaxCategoriesTableTableManager
               )
               .toList(),
           prefetchHooksCallback:
-              ({
-                taxCategoryRatesRefs = false,
-                hsnMastersRefs = false,
-                productsRefs = false,
-              }) {
+              ({taxCategoryRatesRefs = false, productsRefs = false}) {
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [
                     if (taxCategoryRatesRefs) db.taxCategoryRates,
-                    if (hsnMastersRefs) db.hsnMasters,
                     if (productsRefs) db.products,
                   ],
                   addJoins: null,
@@ -15204,27 +17266,6 @@ class $$TaxCategoriesTableTableManager
                           referencedItemsForCurrentItem:
                               (item, referencedItems) => referencedItems.where(
                                 (e) => e.taxCategoryId == item.id,
-                              ),
-                          typedResults: items,
-                        ),
-                      if (hsnMastersRefs)
-                        await $_getPrefetchedData<
-                          TaxCategory,
-                          $TaxCategoriesTable,
-                          HsnMaster
-                        >(
-                          currentTable: table,
-                          referencedTable: $$TaxCategoriesTableReferences
-                              ._hsnMastersRefsTable(db),
-                          managerFromTypedResult: (p0) =>
-                              $$TaxCategoriesTableReferences(
-                                db,
-                                table,
-                                p0,
-                              ).hsnMastersRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.defaultTaxCategoryId == item.id,
                               ),
                           typedResults: items,
                         ),
@@ -15269,11 +17310,7 @@ typedef $$TaxCategoriesTableProcessedTableManager =
       $$TaxCategoriesTableUpdateCompanionBuilder,
       (TaxCategory, $$TaxCategoriesTableReferences),
       TaxCategory,
-      PrefetchHooks Function({
-        bool taxCategoryRatesRefs,
-        bool hsnMastersRefs,
-        bool productsRefs,
-      })
+      PrefetchHooks Function({bool taxCategoryRatesRefs, bool productsRefs})
     >;
 typedef $$TaxTypesTableCreateCompanionBuilder =
     TaxTypesCompanion Function({
@@ -16161,482 +18198,18 @@ typedef $$TaxCategoryRatesTableProcessedTableManager =
       TaxCategoryRate,
       PrefetchHooks Function({bool taxCategoryId, bool taxTypeId})
     >;
-typedef $$HsnMastersTableCreateCompanionBuilder =
-    HsnMastersCompanion Function({
-      Value<int> id,
-      required String hsnCode,
-      required String description,
-      Value<int?> defaultTaxCategoryId,
-      Value<String?> notes,
-      Value<bool> isActive,
-      Value<DateTime> createdAt,
-      Value<DateTime> updatedAt,
-    });
-typedef $$HsnMastersTableUpdateCompanionBuilder =
-    HsnMastersCompanion Function({
-      Value<int> id,
-      Value<String> hsnCode,
-      Value<String> description,
-      Value<int?> defaultTaxCategoryId,
-      Value<String?> notes,
-      Value<bool> isActive,
-      Value<DateTime> createdAt,
-      Value<DateTime> updatedAt,
-    });
-
-final class $$HsnMastersTableReferences
-    extends BaseReferences<_$AppDatabase, $HsnMastersTable, HsnMaster> {
-  $$HsnMastersTableReferences(super.$_db, super.$_table, super.$_typedResult);
-
-  static $TaxCategoriesTable _defaultTaxCategoryIdTable(_$AppDatabase db) => db
-      .taxCategories
-      .createAlias('hsn_master__default_tax_category_id__tax_category__id');
-
-  $$TaxCategoriesTableProcessedTableManager? get defaultTaxCategoryId {
-    final $_column = $_itemColumn<int>('default_tax_category_id');
-    if ($_column == null) return null;
-    final manager = $$TaxCategoriesTableTableManager(
-      $_db,
-      $_db.taxCategories,
-    ).filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(
-      _defaultTaxCategoryIdTable($_db),
-    );
-    if (item == null) return manager;
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: [item]),
-    );
-  }
-
-  static MultiTypedResultKey<$ProductsTable, List<Product>> _productsRefsTable(
-    _$AppDatabase db,
-  ) => MultiTypedResultKey.fromTable(
-    db.products,
-    aliasName: 'hsn_master__id__product__hsn_id',
-  );
-
-  $$ProductsTableProcessedTableManager get productsRefs {
-    final manager = $$ProductsTableTableManager(
-      $_db,
-      $_db.products,
-    ).filter((f) => f.hsnId.id.sqlEquals($_itemColumn<int>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(_productsRefsTable($_db));
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
-}
-
-class $$HsnMastersTableFilterComposer
-    extends Composer<_$AppDatabase, $HsnMastersTable> {
-  $$HsnMastersTableFilterComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  ColumnFilters<int> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get hsnCode => $composableBuilder(
-    column: $table.hsnCode,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get description => $composableBuilder(
-    column: $table.description,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get notes => $composableBuilder(
-    column: $table.notes,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<bool> get isActive => $composableBuilder(
-    column: $table.isActive,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<DateTime> get createdAt => $composableBuilder(
-    column: $table.createdAt,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
-    column: $table.updatedAt,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  $$TaxCategoriesTableFilterComposer get defaultTaxCategoryId {
-    final $$TaxCategoriesTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.defaultTaxCategoryId,
-      referencedTable: $db.taxCategories,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$TaxCategoriesTableFilterComposer(
-            $db: $db,
-            $table: $db.taxCategories,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-
-  Expression<bool> productsRefs(
-    Expression<bool> Function($$ProductsTableFilterComposer f) f,
-  ) {
-    final $$ProductsTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.products,
-      getReferencedColumn: (t) => t.hsnId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$ProductsTableFilterComposer(
-            $db: $db,
-            $table: $db.products,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-}
-
-class $$HsnMastersTableOrderingComposer
-    extends Composer<_$AppDatabase, $HsnMastersTable> {
-  $$HsnMastersTableOrderingComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  ColumnOrderings<int> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get hsnCode => $composableBuilder(
-    column: $table.hsnCode,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get description => $composableBuilder(
-    column: $table.description,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get notes => $composableBuilder(
-    column: $table.notes,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<bool> get isActive => $composableBuilder(
-    column: $table.isActive,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
-    column: $table.createdAt,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
-    column: $table.updatedAt,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  $$TaxCategoriesTableOrderingComposer get defaultTaxCategoryId {
-    final $$TaxCategoriesTableOrderingComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.defaultTaxCategoryId,
-      referencedTable: $db.taxCategories,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$TaxCategoriesTableOrderingComposer(
-            $db: $db,
-            $table: $db.taxCategories,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-}
-
-class $$HsnMastersTableAnnotationComposer
-    extends Composer<_$AppDatabase, $HsnMastersTable> {
-  $$HsnMastersTableAnnotationComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  GeneratedColumn<int> get id =>
-      $composableBuilder(column: $table.id, builder: (column) => column);
-
-  GeneratedColumn<String> get hsnCode =>
-      $composableBuilder(column: $table.hsnCode, builder: (column) => column);
-
-  GeneratedColumn<String> get description => $composableBuilder(
-    column: $table.description,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<String> get notes =>
-      $composableBuilder(column: $table.notes, builder: (column) => column);
-
-  GeneratedColumn<bool> get isActive =>
-      $composableBuilder(column: $table.isActive, builder: (column) => column);
-
-  GeneratedColumn<DateTime> get createdAt =>
-      $composableBuilder(column: $table.createdAt, builder: (column) => column);
-
-  GeneratedColumn<DateTime> get updatedAt =>
-      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
-
-  $$TaxCategoriesTableAnnotationComposer get defaultTaxCategoryId {
-    final $$TaxCategoriesTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.defaultTaxCategoryId,
-      referencedTable: $db.taxCategories,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$TaxCategoriesTableAnnotationComposer(
-            $db: $db,
-            $table: $db.taxCategories,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-
-  Expression<T> productsRefs<T extends Object>(
-    Expression<T> Function($$ProductsTableAnnotationComposer a) f,
-  ) {
-    final $$ProductsTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.products,
-      getReferencedColumn: (t) => t.hsnId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$ProductsTableAnnotationComposer(
-            $db: $db,
-            $table: $db.products,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-}
-
-class $$HsnMastersTableTableManager
-    extends
-        RootTableManager<
-          _$AppDatabase,
-          $HsnMastersTable,
-          HsnMaster,
-          $$HsnMastersTableFilterComposer,
-          $$HsnMastersTableOrderingComposer,
-          $$HsnMastersTableAnnotationComposer,
-          $$HsnMastersTableCreateCompanionBuilder,
-          $$HsnMastersTableUpdateCompanionBuilder,
-          (HsnMaster, $$HsnMastersTableReferences),
-          HsnMaster,
-          PrefetchHooks Function({bool defaultTaxCategoryId, bool productsRefs})
-        > {
-  $$HsnMastersTableTableManager(_$AppDatabase db, $HsnMastersTable table)
-    : super(
-        TableManagerState(
-          db: db,
-          table: table,
-          createFilteringComposer: () =>
-              $$HsnMastersTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$HsnMastersTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () =>
-              $$HsnMastersTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback:
-              ({
-                Value<int> id = const Value.absent(),
-                Value<String> hsnCode = const Value.absent(),
-                Value<String> description = const Value.absent(),
-                Value<int?> defaultTaxCategoryId = const Value.absent(),
-                Value<String?> notes = const Value.absent(),
-                Value<bool> isActive = const Value.absent(),
-                Value<DateTime> createdAt = const Value.absent(),
-                Value<DateTime> updatedAt = const Value.absent(),
-              }) => HsnMastersCompanion(
-                id: id,
-                hsnCode: hsnCode,
-                description: description,
-                defaultTaxCategoryId: defaultTaxCategoryId,
-                notes: notes,
-                isActive: isActive,
-                createdAt: createdAt,
-                updatedAt: updatedAt,
-              ),
-          createCompanionCallback:
-              ({
-                Value<int> id = const Value.absent(),
-                required String hsnCode,
-                required String description,
-                Value<int?> defaultTaxCategoryId = const Value.absent(),
-                Value<String?> notes = const Value.absent(),
-                Value<bool> isActive = const Value.absent(),
-                Value<DateTime> createdAt = const Value.absent(),
-                Value<DateTime> updatedAt = const Value.absent(),
-              }) => HsnMastersCompanion.insert(
-                id: id,
-                hsnCode: hsnCode,
-                description: description,
-                defaultTaxCategoryId: defaultTaxCategoryId,
-                notes: notes,
-                isActive: isActive,
-                createdAt: createdAt,
-                updatedAt: updatedAt,
-              ),
-          withReferenceMapper: (p0) => p0
-              .map(
-                (e) => (
-                  e.readTable(table),
-                  $$HsnMastersTableReferences(db, table, e),
-                ),
-              )
-              .toList(),
-          prefetchHooksCallback:
-              ({defaultTaxCategoryId = false, productsRefs = false}) {
-                return PrefetchHooks(
-                  db: db,
-                  explicitlyWatchedTables: [if (productsRefs) db.products],
-                  addJoins:
-                      <
-                        T extends TableManagerState<
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic
-                        >
-                      >(state) {
-                        if (defaultTaxCategoryId) {
-                          state =
-                              state.withJoin(
-                                    currentTable: table,
-                                    currentColumn: table.defaultTaxCategoryId,
-                                    referencedTable: $$HsnMastersTableReferences
-                                        ._defaultTaxCategoryIdTable(db),
-                                    referencedColumn:
-                                        $$HsnMastersTableReferences
-                                            ._defaultTaxCategoryIdTable(db)
-                                            .id,
-                                  )
-                                  as T;
-                        }
-
-                        return state;
-                      },
-                  getPrefetchedDataCallback: (items) async {
-                    return [
-                      if (productsRefs)
-                        await $_getPrefetchedData<
-                          HsnMaster,
-                          $HsnMastersTable,
-                          Product
-                        >(
-                          currentTable: table,
-                          referencedTable: $$HsnMastersTableReferences
-                              ._productsRefsTable(db),
-                          managerFromTypedResult: (p0) =>
-                              $$HsnMastersTableReferences(
-                                db,
-                                table,
-                                p0,
-                              ).productsRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.hsnId == item.id,
-                              ),
-                          typedResults: items,
-                        ),
-                    ];
-                  },
-                );
-              },
-        ),
-      );
-}
-
-typedef $$HsnMastersTableProcessedTableManager =
-    ProcessedTableManager<
-      _$AppDatabase,
-      $HsnMastersTable,
-      HsnMaster,
-      $$HsnMastersTableFilterComposer,
-      $$HsnMastersTableOrderingComposer,
-      $$HsnMastersTableAnnotationComposer,
-      $$HsnMastersTableCreateCompanionBuilder,
-      $$HsnMastersTableUpdateCompanionBuilder,
-      (HsnMaster, $$HsnMastersTableReferences),
-      HsnMaster,
-      PrefetchHooks Function({bool defaultTaxCategoryId, bool productsRefs})
-    >;
 typedef $$CustomersTableCreateCompanionBuilder =
     CustomersCompanion Function({
       Value<int> id,
       required String customerCode,
       required String customerName,
       Value<String?> gstNumber,
+      Value<String?> panNumber,
       Value<String?> mobile,
       Value<String?> alternateMobile,
       Value<String?> email,
-      Value<String?> address,
+      Value<String?> addressLine1,
+      Value<String?> addressLine2,
       Value<String?> city,
       Value<String?> state,
       Value<String?> stateCode,
@@ -16645,6 +18218,14 @@ typedef $$CustomersTableCreateCompanionBuilder =
       Value<int> creditLimit,
       Value<int> openingBalance,
       Value<int> outstandingBalance,
+      Value<DateTime?> paymentDueDate,
+      Value<String?> accountName,
+      Value<String?> accountNumber,
+      Value<String?> bankName,
+      Value<String?> branchName,
+      Value<String?> ifscCode,
+      Value<String> balanceType,
+      Value<String?> notes,
       Value<bool> isActive,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
@@ -16655,10 +18236,12 @@ typedef $$CustomersTableUpdateCompanionBuilder =
       Value<String> customerCode,
       Value<String> customerName,
       Value<String?> gstNumber,
+      Value<String?> panNumber,
       Value<String?> mobile,
       Value<String?> alternateMobile,
       Value<String?> email,
-      Value<String?> address,
+      Value<String?> addressLine1,
+      Value<String?> addressLine2,
       Value<String?> city,
       Value<String?> state,
       Value<String?> stateCode,
@@ -16667,6 +18250,14 @@ typedef $$CustomersTableUpdateCompanionBuilder =
       Value<int> creditLimit,
       Value<int> openingBalance,
       Value<int> outstandingBalance,
+      Value<DateTime?> paymentDueDate,
+      Value<String?> accountName,
+      Value<String?> accountNumber,
+      Value<String?> bankName,
+      Value<String?> branchName,
+      Value<String?> ifscCode,
+      Value<String> balanceType,
+      Value<String?> notes,
       Value<bool> isActive,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
@@ -16701,6 +18292,11 @@ class $$CustomersTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<String> get panNumber => $composableBuilder(
+    column: $table.panNumber,
+    builder: (column) => ColumnFilters(column),
+  );
+
   ColumnFilters<String> get mobile => $composableBuilder(
     column: $table.mobile,
     builder: (column) => ColumnFilters(column),
@@ -16716,8 +18312,13 @@ class $$CustomersTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get address => $composableBuilder(
-    column: $table.address,
+  ColumnFilters<String> get addressLine1 => $composableBuilder(
+    column: $table.addressLine1,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get addressLine2 => $composableBuilder(
+    column: $table.addressLine2,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -16758,6 +18359,46 @@ class $$CustomersTableFilterComposer
 
   ColumnFilters<int> get outstandingBalance => $composableBuilder(
     column: $table.outstandingBalance,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get paymentDueDate => $composableBuilder(
+    column: $table.paymentDueDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get accountName => $composableBuilder(
+    column: $table.accountName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get accountNumber => $composableBuilder(
+    column: $table.accountNumber,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get bankName => $composableBuilder(
+    column: $table.bankName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get branchName => $composableBuilder(
+    column: $table.branchName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get ifscCode => $composableBuilder(
+    column: $table.ifscCode,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get balanceType => $composableBuilder(
+    column: $table.balanceType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get notes => $composableBuilder(
+    column: $table.notes,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -16806,6 +18447,11 @@ class $$CustomersTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get panNumber => $composableBuilder(
+    column: $table.panNumber,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get mobile => $composableBuilder(
     column: $table.mobile,
     builder: (column) => ColumnOrderings(column),
@@ -16821,8 +18467,13 @@ class $$CustomersTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get address => $composableBuilder(
-    column: $table.address,
+  ColumnOrderings<String> get addressLine1 => $composableBuilder(
+    column: $table.addressLine1,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get addressLine2 => $composableBuilder(
+    column: $table.addressLine2,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -16863,6 +18514,46 @@ class $$CustomersTableOrderingComposer
 
   ColumnOrderings<int> get outstandingBalance => $composableBuilder(
     column: $table.outstandingBalance,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get paymentDueDate => $composableBuilder(
+    column: $table.paymentDueDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get accountName => $composableBuilder(
+    column: $table.accountName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get accountNumber => $composableBuilder(
+    column: $table.accountNumber,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get bankName => $composableBuilder(
+    column: $table.bankName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get branchName => $composableBuilder(
+    column: $table.branchName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get ifscCode => $composableBuilder(
+    column: $table.ifscCode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get balanceType => $composableBuilder(
+    column: $table.balanceType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get notes => $composableBuilder(
+    column: $table.notes,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -16907,6 +18598,9 @@ class $$CustomersTableAnnotationComposer
   GeneratedColumn<String> get gstNumber =>
       $composableBuilder(column: $table.gstNumber, builder: (column) => column);
 
+  GeneratedColumn<String> get panNumber =>
+      $composableBuilder(column: $table.panNumber, builder: (column) => column);
+
   GeneratedColumn<String> get mobile =>
       $composableBuilder(column: $table.mobile, builder: (column) => column);
 
@@ -16918,8 +18612,15 @@ class $$CustomersTableAnnotationComposer
   GeneratedColumn<String> get email =>
       $composableBuilder(column: $table.email, builder: (column) => column);
 
-  GeneratedColumn<String> get address =>
-      $composableBuilder(column: $table.address, builder: (column) => column);
+  GeneratedColumn<String> get addressLine1 => $composableBuilder(
+    column: $table.addressLine1,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get addressLine2 => $composableBuilder(
+    column: $table.addressLine2,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<String> get city =>
       $composableBuilder(column: $table.city, builder: (column) => column);
@@ -16950,6 +18651,40 @@ class $$CustomersTableAnnotationComposer
     column: $table.outstandingBalance,
     builder: (column) => column,
   );
+
+  GeneratedColumn<DateTime> get paymentDueDate => $composableBuilder(
+    column: $table.paymentDueDate,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get accountName => $composableBuilder(
+    column: $table.accountName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get accountNumber => $composableBuilder(
+    column: $table.accountNumber,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get bankName =>
+      $composableBuilder(column: $table.bankName, builder: (column) => column);
+
+  GeneratedColumn<String> get branchName => $composableBuilder(
+    column: $table.branchName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get ifscCode =>
+      $composableBuilder(column: $table.ifscCode, builder: (column) => column);
+
+  GeneratedColumn<String> get balanceType => $composableBuilder(
+    column: $table.balanceType,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get notes =>
+      $composableBuilder(column: $table.notes, builder: (column) => column);
 
   GeneratedColumn<bool> get isActive =>
       $composableBuilder(column: $table.isActive, builder: (column) => column);
@@ -16993,10 +18728,12 @@ class $$CustomersTableTableManager
                 Value<String> customerCode = const Value.absent(),
                 Value<String> customerName = const Value.absent(),
                 Value<String?> gstNumber = const Value.absent(),
+                Value<String?> panNumber = const Value.absent(),
                 Value<String?> mobile = const Value.absent(),
                 Value<String?> alternateMobile = const Value.absent(),
                 Value<String?> email = const Value.absent(),
-                Value<String?> address = const Value.absent(),
+                Value<String?> addressLine1 = const Value.absent(),
+                Value<String?> addressLine2 = const Value.absent(),
                 Value<String?> city = const Value.absent(),
                 Value<String?> state = const Value.absent(),
                 Value<String?> stateCode = const Value.absent(),
@@ -17005,6 +18742,14 @@ class $$CustomersTableTableManager
                 Value<int> creditLimit = const Value.absent(),
                 Value<int> openingBalance = const Value.absent(),
                 Value<int> outstandingBalance = const Value.absent(),
+                Value<DateTime?> paymentDueDate = const Value.absent(),
+                Value<String?> accountName = const Value.absent(),
+                Value<String?> accountNumber = const Value.absent(),
+                Value<String?> bankName = const Value.absent(),
+                Value<String?> branchName = const Value.absent(),
+                Value<String?> ifscCode = const Value.absent(),
+                Value<String> balanceType = const Value.absent(),
+                Value<String?> notes = const Value.absent(),
                 Value<bool> isActive = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
@@ -17013,10 +18758,12 @@ class $$CustomersTableTableManager
                 customerCode: customerCode,
                 customerName: customerName,
                 gstNumber: gstNumber,
+                panNumber: panNumber,
                 mobile: mobile,
                 alternateMobile: alternateMobile,
                 email: email,
-                address: address,
+                addressLine1: addressLine1,
+                addressLine2: addressLine2,
                 city: city,
                 state: state,
                 stateCode: stateCode,
@@ -17025,6 +18772,14 @@ class $$CustomersTableTableManager
                 creditLimit: creditLimit,
                 openingBalance: openingBalance,
                 outstandingBalance: outstandingBalance,
+                paymentDueDate: paymentDueDate,
+                accountName: accountName,
+                accountNumber: accountNumber,
+                bankName: bankName,
+                branchName: branchName,
+                ifscCode: ifscCode,
+                balanceType: balanceType,
+                notes: notes,
                 isActive: isActive,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
@@ -17035,10 +18790,12 @@ class $$CustomersTableTableManager
                 required String customerCode,
                 required String customerName,
                 Value<String?> gstNumber = const Value.absent(),
+                Value<String?> panNumber = const Value.absent(),
                 Value<String?> mobile = const Value.absent(),
                 Value<String?> alternateMobile = const Value.absent(),
                 Value<String?> email = const Value.absent(),
-                Value<String?> address = const Value.absent(),
+                Value<String?> addressLine1 = const Value.absent(),
+                Value<String?> addressLine2 = const Value.absent(),
                 Value<String?> city = const Value.absent(),
                 Value<String?> state = const Value.absent(),
                 Value<String?> stateCode = const Value.absent(),
@@ -17047,6 +18804,14 @@ class $$CustomersTableTableManager
                 Value<int> creditLimit = const Value.absent(),
                 Value<int> openingBalance = const Value.absent(),
                 Value<int> outstandingBalance = const Value.absent(),
+                Value<DateTime?> paymentDueDate = const Value.absent(),
+                Value<String?> accountName = const Value.absent(),
+                Value<String?> accountNumber = const Value.absent(),
+                Value<String?> bankName = const Value.absent(),
+                Value<String?> branchName = const Value.absent(),
+                Value<String?> ifscCode = const Value.absent(),
+                Value<String> balanceType = const Value.absent(),
+                Value<String?> notes = const Value.absent(),
                 Value<bool> isActive = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
@@ -17055,10 +18820,12 @@ class $$CustomersTableTableManager
                 customerCode: customerCode,
                 customerName: customerName,
                 gstNumber: gstNumber,
+                panNumber: panNumber,
                 mobile: mobile,
                 alternateMobile: alternateMobile,
                 email: email,
-                address: address,
+                addressLine1: addressLine1,
+                addressLine2: addressLine2,
                 city: city,
                 state: state,
                 stateCode: stateCode,
@@ -17067,6 +18834,14 @@ class $$CustomersTableTableManager
                 creditLimit: creditLimit,
                 openingBalance: openingBalance,
                 outstandingBalance: outstandingBalance,
+                paymentDueDate: paymentDueDate,
+                accountName: accountName,
+                accountNumber: accountNumber,
+                bankName: bankName,
+                branchName: branchName,
+                ifscCode: ifscCode,
+                balanceType: balanceType,
+                notes: notes,
                 isActive: isActive,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
@@ -17098,18 +18873,31 @@ typedef $$SuppliersTableCreateCompanionBuilder =
       Value<int> id,
       required String supplierCode,
       required String supplierName,
+      Value<String?> contactPerson,
       Value<String?> gstNumber,
+      Value<String?> panNumber,
       Value<String?> mobile,
       Value<String?> alternateMobile,
       Value<String?> email,
-      Value<String?> address,
+      Value<String?> addressLine1,
+      Value<String?> addressLine2,
       Value<String?> city,
       Value<String?> state,
       Value<String?> stateCode,
       Value<String?> country,
       Value<String?> pincode,
+      Value<int> creditLimit,
       Value<int> openingBalance,
       Value<int> outstandingBalance,
+      Value<DateTime?> paymentDueDate,
+      Value<String?> accountName,
+      Value<String?> accountNumber,
+      Value<String?> bankName,
+      Value<String?> branchName,
+      Value<String?> ifscCode,
+      Value<String?> paymentTerms,
+      Value<String> balanceType,
+      Value<String?> notes,
       Value<bool> isActive,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
@@ -17119,18 +18907,31 @@ typedef $$SuppliersTableUpdateCompanionBuilder =
       Value<int> id,
       Value<String> supplierCode,
       Value<String> supplierName,
+      Value<String?> contactPerson,
       Value<String?> gstNumber,
+      Value<String?> panNumber,
       Value<String?> mobile,
       Value<String?> alternateMobile,
       Value<String?> email,
-      Value<String?> address,
+      Value<String?> addressLine1,
+      Value<String?> addressLine2,
       Value<String?> city,
       Value<String?> state,
       Value<String?> stateCode,
       Value<String?> country,
       Value<String?> pincode,
+      Value<int> creditLimit,
       Value<int> openingBalance,
       Value<int> outstandingBalance,
+      Value<DateTime?> paymentDueDate,
+      Value<String?> accountName,
+      Value<String?> accountNumber,
+      Value<String?> bankName,
+      Value<String?> branchName,
+      Value<String?> ifscCode,
+      Value<String?> paymentTerms,
+      Value<String> balanceType,
+      Value<String?> notes,
       Value<bool> isActive,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
@@ -17160,8 +18961,18 @@ class $$SuppliersTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<String> get contactPerson => $composableBuilder(
+    column: $table.contactPerson,
+    builder: (column) => ColumnFilters(column),
+  );
+
   ColumnFilters<String> get gstNumber => $composableBuilder(
     column: $table.gstNumber,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get panNumber => $composableBuilder(
+    column: $table.panNumber,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -17180,8 +18991,13 @@ class $$SuppliersTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get address => $composableBuilder(
-    column: $table.address,
+  ColumnFilters<String> get addressLine1 => $composableBuilder(
+    column: $table.addressLine1,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get addressLine2 => $composableBuilder(
+    column: $table.addressLine2,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -17210,6 +19026,11 @@ class $$SuppliersTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
+  ColumnFilters<int> get creditLimit => $composableBuilder(
+    column: $table.creditLimit,
+    builder: (column) => ColumnFilters(column),
+  );
+
   ColumnFilters<int> get openingBalance => $composableBuilder(
     column: $table.openingBalance,
     builder: (column) => ColumnFilters(column),
@@ -17217,6 +19038,51 @@ class $$SuppliersTableFilterComposer
 
   ColumnFilters<int> get outstandingBalance => $composableBuilder(
     column: $table.outstandingBalance,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get paymentDueDate => $composableBuilder(
+    column: $table.paymentDueDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get accountName => $composableBuilder(
+    column: $table.accountName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get accountNumber => $composableBuilder(
+    column: $table.accountNumber,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get bankName => $composableBuilder(
+    column: $table.bankName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get branchName => $composableBuilder(
+    column: $table.branchName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get ifscCode => $composableBuilder(
+    column: $table.ifscCode,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get paymentTerms => $composableBuilder(
+    column: $table.paymentTerms,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get balanceType => $composableBuilder(
+    column: $table.balanceType,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get notes => $composableBuilder(
+    column: $table.notes,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -17260,8 +19126,18 @@ class $$SuppliersTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<String> get contactPerson => $composableBuilder(
+    column: $table.contactPerson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<String> get gstNumber => $composableBuilder(
     column: $table.gstNumber,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get panNumber => $composableBuilder(
+    column: $table.panNumber,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -17280,8 +19156,13 @@ class $$SuppliersTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get address => $composableBuilder(
-    column: $table.address,
+  ColumnOrderings<String> get addressLine1 => $composableBuilder(
+    column: $table.addressLine1,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get addressLine2 => $composableBuilder(
+    column: $table.addressLine2,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -17310,6 +19191,11 @@ class $$SuppliersTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<int> get creditLimit => $composableBuilder(
+    column: $table.creditLimit,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   ColumnOrderings<int> get openingBalance => $composableBuilder(
     column: $table.openingBalance,
     builder: (column) => ColumnOrderings(column),
@@ -17317,6 +19203,51 @@ class $$SuppliersTableOrderingComposer
 
   ColumnOrderings<int> get outstandingBalance => $composableBuilder(
     column: $table.outstandingBalance,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get paymentDueDate => $composableBuilder(
+    column: $table.paymentDueDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get accountName => $composableBuilder(
+    column: $table.accountName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get accountNumber => $composableBuilder(
+    column: $table.accountNumber,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get bankName => $composableBuilder(
+    column: $table.bankName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get branchName => $composableBuilder(
+    column: $table.branchName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get ifscCode => $composableBuilder(
+    column: $table.ifscCode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get paymentTerms => $composableBuilder(
+    column: $table.paymentTerms,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get balanceType => $composableBuilder(
+    column: $table.balanceType,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get notes => $composableBuilder(
+    column: $table.notes,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -17358,8 +19289,16 @@ class $$SuppliersTableAnnotationComposer
     builder: (column) => column,
   );
 
+  GeneratedColumn<String> get contactPerson => $composableBuilder(
+    column: $table.contactPerson,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<String> get gstNumber =>
       $composableBuilder(column: $table.gstNumber, builder: (column) => column);
+
+  GeneratedColumn<String> get panNumber =>
+      $composableBuilder(column: $table.panNumber, builder: (column) => column);
 
   GeneratedColumn<String> get mobile =>
       $composableBuilder(column: $table.mobile, builder: (column) => column);
@@ -17372,8 +19311,15 @@ class $$SuppliersTableAnnotationComposer
   GeneratedColumn<String> get email =>
       $composableBuilder(column: $table.email, builder: (column) => column);
 
-  GeneratedColumn<String> get address =>
-      $composableBuilder(column: $table.address, builder: (column) => column);
+  GeneratedColumn<String> get addressLine1 => $composableBuilder(
+    column: $table.addressLine1,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get addressLine2 => $composableBuilder(
+    column: $table.addressLine2,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<String> get city =>
       $composableBuilder(column: $table.city, builder: (column) => column);
@@ -17390,6 +19336,11 @@ class $$SuppliersTableAnnotationComposer
   GeneratedColumn<String> get pincode =>
       $composableBuilder(column: $table.pincode, builder: (column) => column);
 
+  GeneratedColumn<int> get creditLimit => $composableBuilder(
+    column: $table.creditLimit,
+    builder: (column) => column,
+  );
+
   GeneratedColumn<int> get openingBalance => $composableBuilder(
     column: $table.openingBalance,
     builder: (column) => column,
@@ -17399,6 +19350,45 @@ class $$SuppliersTableAnnotationComposer
     column: $table.outstandingBalance,
     builder: (column) => column,
   );
+
+  GeneratedColumn<DateTime> get paymentDueDate => $composableBuilder(
+    column: $table.paymentDueDate,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get accountName => $composableBuilder(
+    column: $table.accountName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get accountNumber => $composableBuilder(
+    column: $table.accountNumber,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get bankName =>
+      $composableBuilder(column: $table.bankName, builder: (column) => column);
+
+  GeneratedColumn<String> get branchName => $composableBuilder(
+    column: $table.branchName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get ifscCode =>
+      $composableBuilder(column: $table.ifscCode, builder: (column) => column);
+
+  GeneratedColumn<String> get paymentTerms => $composableBuilder(
+    column: $table.paymentTerms,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get balanceType => $composableBuilder(
+    column: $table.balanceType,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get notes =>
+      $composableBuilder(column: $table.notes, builder: (column) => column);
 
   GeneratedColumn<bool> get isActive =>
       $composableBuilder(column: $table.isActive, builder: (column) => column);
@@ -17441,18 +19431,31 @@ class $$SuppliersTableTableManager
                 Value<int> id = const Value.absent(),
                 Value<String> supplierCode = const Value.absent(),
                 Value<String> supplierName = const Value.absent(),
+                Value<String?> contactPerson = const Value.absent(),
                 Value<String?> gstNumber = const Value.absent(),
+                Value<String?> panNumber = const Value.absent(),
                 Value<String?> mobile = const Value.absent(),
                 Value<String?> alternateMobile = const Value.absent(),
                 Value<String?> email = const Value.absent(),
-                Value<String?> address = const Value.absent(),
+                Value<String?> addressLine1 = const Value.absent(),
+                Value<String?> addressLine2 = const Value.absent(),
                 Value<String?> city = const Value.absent(),
                 Value<String?> state = const Value.absent(),
                 Value<String?> stateCode = const Value.absent(),
                 Value<String?> country = const Value.absent(),
                 Value<String?> pincode = const Value.absent(),
+                Value<int> creditLimit = const Value.absent(),
                 Value<int> openingBalance = const Value.absent(),
                 Value<int> outstandingBalance = const Value.absent(),
+                Value<DateTime?> paymentDueDate = const Value.absent(),
+                Value<String?> accountName = const Value.absent(),
+                Value<String?> accountNumber = const Value.absent(),
+                Value<String?> bankName = const Value.absent(),
+                Value<String?> branchName = const Value.absent(),
+                Value<String?> ifscCode = const Value.absent(),
+                Value<String?> paymentTerms = const Value.absent(),
+                Value<String> balanceType = const Value.absent(),
+                Value<String?> notes = const Value.absent(),
                 Value<bool> isActive = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
@@ -17460,18 +19463,31 @@ class $$SuppliersTableTableManager
                 id: id,
                 supplierCode: supplierCode,
                 supplierName: supplierName,
+                contactPerson: contactPerson,
                 gstNumber: gstNumber,
+                panNumber: panNumber,
                 mobile: mobile,
                 alternateMobile: alternateMobile,
                 email: email,
-                address: address,
+                addressLine1: addressLine1,
+                addressLine2: addressLine2,
                 city: city,
                 state: state,
                 stateCode: stateCode,
                 country: country,
                 pincode: pincode,
+                creditLimit: creditLimit,
                 openingBalance: openingBalance,
                 outstandingBalance: outstandingBalance,
+                paymentDueDate: paymentDueDate,
+                accountName: accountName,
+                accountNumber: accountNumber,
+                bankName: bankName,
+                branchName: branchName,
+                ifscCode: ifscCode,
+                paymentTerms: paymentTerms,
+                balanceType: balanceType,
+                notes: notes,
                 isActive: isActive,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
@@ -17481,18 +19497,31 @@ class $$SuppliersTableTableManager
                 Value<int> id = const Value.absent(),
                 required String supplierCode,
                 required String supplierName,
+                Value<String?> contactPerson = const Value.absent(),
                 Value<String?> gstNumber = const Value.absent(),
+                Value<String?> panNumber = const Value.absent(),
                 Value<String?> mobile = const Value.absent(),
                 Value<String?> alternateMobile = const Value.absent(),
                 Value<String?> email = const Value.absent(),
-                Value<String?> address = const Value.absent(),
+                Value<String?> addressLine1 = const Value.absent(),
+                Value<String?> addressLine2 = const Value.absent(),
                 Value<String?> city = const Value.absent(),
                 Value<String?> state = const Value.absent(),
                 Value<String?> stateCode = const Value.absent(),
                 Value<String?> country = const Value.absent(),
                 Value<String?> pincode = const Value.absent(),
+                Value<int> creditLimit = const Value.absent(),
                 Value<int> openingBalance = const Value.absent(),
                 Value<int> outstandingBalance = const Value.absent(),
+                Value<DateTime?> paymentDueDate = const Value.absent(),
+                Value<String?> accountName = const Value.absent(),
+                Value<String?> accountNumber = const Value.absent(),
+                Value<String?> bankName = const Value.absent(),
+                Value<String?> branchName = const Value.absent(),
+                Value<String?> ifscCode = const Value.absent(),
+                Value<String?> paymentTerms = const Value.absent(),
+                Value<String> balanceType = const Value.absent(),
+                Value<String?> notes = const Value.absent(),
                 Value<bool> isActive = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
@@ -17500,18 +19529,31 @@ class $$SuppliersTableTableManager
                 id: id,
                 supplierCode: supplierCode,
                 supplierName: supplierName,
+                contactPerson: contactPerson,
                 gstNumber: gstNumber,
+                panNumber: panNumber,
                 mobile: mobile,
                 alternateMobile: alternateMobile,
                 email: email,
-                address: address,
+                addressLine1: addressLine1,
+                addressLine2: addressLine2,
                 city: city,
                 state: state,
                 stateCode: stateCode,
                 country: country,
                 pincode: pincode,
+                creditLimit: creditLimit,
                 openingBalance: openingBalance,
                 outstandingBalance: outstandingBalance,
+                paymentDueDate: paymentDueDate,
+                accountName: accountName,
+                accountNumber: accountNumber,
+                bankName: bankName,
+                branchName: branchName,
+                ifscCode: ifscCode,
+                paymentTerms: paymentTerms,
+                balanceType: balanceType,
+                notes: notes,
                 isActive: isActive,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
@@ -18018,7 +20060,6 @@ typedef $$ProductsTableCreateCompanionBuilder =
       required String productCode,
       required String productName,
       Value<String?> barcode,
-      Value<int?> hsnId,
       required int categoryId,
       Value<int?> subCategoryId,
       required int brandId,
@@ -18053,7 +20094,6 @@ typedef $$ProductsTableUpdateCompanionBuilder =
       Value<String> productCode,
       Value<String> productName,
       Value<String?> barcode,
-      Value<int?> hsnId,
       Value<int> categoryId,
       Value<int?> subCategoryId,
       Value<int> brandId,
@@ -18086,23 +20126,6 @@ typedef $$ProductsTableUpdateCompanionBuilder =
 final class $$ProductsTableReferences
     extends BaseReferences<_$AppDatabase, $ProductsTable, Product> {
   $$ProductsTableReferences(super.$_db, super.$_table, super.$_typedResult);
-
-  static $HsnMastersTable _hsnIdTable(_$AppDatabase db) =>
-      db.hsnMasters.createAlias('product__hsn_id__hsn_master__id');
-
-  $$HsnMastersTableProcessedTableManager? get hsnId {
-    final $_column = $_itemColumn<int>('hsn_id');
-    if ($_column == null) return null;
-    final manager = $$HsnMastersTableTableManager(
-      $_db,
-      $_db.hsnMasters,
-    ).filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_hsnIdTable($_db));
-    if (item == null) return manager;
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: [item]),
-    );
-  }
 
   static $CategoriesTable _categoryIdTable(_$AppDatabase db) =>
       db.categories.createAlias('product__category_id__category__id');
@@ -18383,29 +20406,6 @@ class $$ProductsTableFilterComposer
     column: $table.updatedAt,
     builder: (column) => ColumnFilters(column),
   );
-
-  $$HsnMastersTableFilterComposer get hsnId {
-    final $$HsnMastersTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.hsnId,
-      referencedTable: $db.hsnMasters,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$HsnMastersTableFilterComposer(
-            $db: $db,
-            $table: $db.hsnMasters,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
 
   $$CategoriesTableFilterComposer get categoryId {
     final $$CategoriesTableFilterComposer composer = $composerBuilder(
@@ -18741,29 +20741,6 @@ class $$ProductsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  $$HsnMastersTableOrderingComposer get hsnId {
-    final $$HsnMastersTableOrderingComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.hsnId,
-      referencedTable: $db.hsnMasters,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$HsnMastersTableOrderingComposer(
-            $db: $db,
-            $table: $db.hsnMasters,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-
   $$CategoriesTableOrderingComposer get categoryId {
     final $$CategoriesTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -19053,29 +21030,6 @@ class $$ProductsTableAnnotationComposer
   GeneratedColumn<DateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
 
-  $$HsnMastersTableAnnotationComposer get hsnId {
-    final $$HsnMastersTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.hsnId,
-      referencedTable: $db.hsnMasters,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$HsnMastersTableAnnotationComposer(
-            $db: $db,
-            $table: $db.hsnMasters,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-
   $$CategoriesTableAnnotationComposer get categoryId {
     final $$CategoriesTableAnnotationComposer composer = $composerBuilder(
       composer: this,
@@ -19300,7 +21254,6 @@ class $$ProductsTableTableManager
           (Product, $$ProductsTableReferences),
           Product,
           PrefetchHooks Function({
-            bool hsnId,
             bool categoryId,
             bool brandId,
             bool purchaseUnitId,
@@ -19329,7 +21282,6 @@ class $$ProductsTableTableManager
                 Value<String> productCode = const Value.absent(),
                 Value<String> productName = const Value.absent(),
                 Value<String?> barcode = const Value.absent(),
-                Value<int?> hsnId = const Value.absent(),
                 Value<int> categoryId = const Value.absent(),
                 Value<int?> subCategoryId = const Value.absent(),
                 Value<int> brandId = const Value.absent(),
@@ -19362,7 +21314,6 @@ class $$ProductsTableTableManager
                 productCode: productCode,
                 productName: productName,
                 barcode: barcode,
-                hsnId: hsnId,
                 categoryId: categoryId,
                 subCategoryId: subCategoryId,
                 brandId: brandId,
@@ -19397,7 +21348,6 @@ class $$ProductsTableTableManager
                 required String productCode,
                 required String productName,
                 Value<String?> barcode = const Value.absent(),
-                Value<int?> hsnId = const Value.absent(),
                 required int categoryId,
                 Value<int?> subCategoryId = const Value.absent(),
                 required int brandId,
@@ -19430,7 +21380,6 @@ class $$ProductsTableTableManager
                 productCode: productCode,
                 productName: productName,
                 barcode: barcode,
-                hsnId: hsnId,
                 categoryId: categoryId,
                 subCategoryId: subCategoryId,
                 brandId: brandId,
@@ -19469,7 +21418,6 @@ class $$ProductsTableTableManager
               .toList(),
           prefetchHooksCallback:
               ({
-                hsnId = false,
                 categoryId = false,
                 brandId = false,
                 purchaseUnitId = false,
@@ -19501,19 +21449,6 @@ class $$ProductsTableTableManager
                           dynamic
                         >
                       >(state) {
-                        if (hsnId) {
-                          state =
-                              state.withJoin(
-                                    currentTable: table,
-                                    currentColumn: table.hsnId,
-                                    referencedTable: $$ProductsTableReferences
-                                        ._hsnIdTable(db),
-                                    referencedColumn: $$ProductsTableReferences
-                                        ._hsnIdTable(db)
-                                        .id,
-                                  )
-                                  as T;
-                        }
                         if (categoryId) {
                           state =
                               state.withJoin(
@@ -19665,7 +21600,6 @@ typedef $$ProductsTableProcessedTableManager =
       (Product, $$ProductsTableReferences),
       Product,
       PrefetchHooks Function({
-        bool hsnId,
         bool categoryId,
         bool brandId,
         bool purchaseUnitId,
@@ -20585,8 +22519,6 @@ class $AppDatabaseManager {
       $$TaxTypesTableTableManager(_db, _db.taxTypes);
   $$TaxCategoryRatesTableTableManager get taxCategoryRates =>
       $$TaxCategoryRatesTableTableManager(_db, _db.taxCategoryRates);
-  $$HsnMastersTableTableManager get hsnMasters =>
-      $$HsnMastersTableTableManager(_db, _db.hsnMasters);
   $$CustomersTableTableManager get customers =>
       $$CustomersTableTableManager(_db, _db.customers);
   $$SuppliersTableTableManager get suppliers =>

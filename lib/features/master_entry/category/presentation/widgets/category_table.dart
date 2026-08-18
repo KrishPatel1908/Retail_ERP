@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../../app/theme/app_theme.dart';
 import '../../../../../shared/widgets/app_data_table.dart';
+import '../../../../../shared/widgets/description_preview.dart';
 import '../../domain/entities/category.dart';
 import 'category_status_badge.dart';
 
@@ -104,12 +105,8 @@ class _CategoryTableState extends State<CategoryTable> {
         flex: 4,
         minWidth: 200,
         cellBuilder: (context, category) {
-          return Text(
-            category.description != null && category.description!.isNotEmpty
-                ? category.description!
-                : '—',
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
+          return DescriptionPreview(
+            description: category.description,
             style: mutedStyle,
           );
         },

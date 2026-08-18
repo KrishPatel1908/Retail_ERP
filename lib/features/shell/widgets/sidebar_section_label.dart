@@ -22,7 +22,7 @@ class SidebarSectionLabel extends StatelessWidget {
 
     if (!expanded) {
       return Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 10),
         child: Divider(color: colorScheme.outlineVariant),
       );
     }

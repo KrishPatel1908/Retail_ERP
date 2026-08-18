@@ -10,7 +10,7 @@ abstract final class AppConstants {
 
   // Layout breakpoints and dimensions (desktop-first).
   static const double sidebarExpandedWidth = 264;
-  static const double sidebarCollapsedWidth = 72;
+  static const double sidebarCollapsedWidth = 88;
 
   /// Below this window width the sidebar is forced into its collapsed state.
   static const double autoCollapseSidebarBelowWidth = 760;

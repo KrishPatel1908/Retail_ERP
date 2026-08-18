@@ -45,17 +45,17 @@ void main() {
 
     await tester.tap(find.text('Master Entry'));
     await tester.pumpAndSettle();
-    expect(find.text('Product'), findsOneWidget);
+    expect(find.text('Product Master'), findsOneWidget);
 
     // The deepest child sits below the fold in the test viewport.
-    await tester.ensureVisible(find.text('Product'));
+    await tester.ensureVisible(find.text('Product Master'));
     await tester.pumpAndSettle();
 
-    await tester.tap(find.text('Product'));
+    await tester.tap(find.text('Product Master'));
     await tester.pumpAndSettle();
 
     // Sidebar + content area + status bar.
-    expect(find.text('Product'), findsNWidgets(3));
+    expect(find.text('Product Master'), findsNWidgets(3));
   });
 
   testWidgets('sidebar can be collapsed and expanded', (tester) async {
