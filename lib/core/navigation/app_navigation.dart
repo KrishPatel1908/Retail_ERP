@@ -14,6 +14,7 @@ const List<NavSection> appNavigation = [
       children: [
         NavItem('Company Settings', AppPage.companySettings),
         NavItem('Product Master', AppPage.product),
+        NavItem('Product Tracking', AppPage.productTracking),
         NavItem('Category', AppPage.category),
         NavItem('Sub Category', AppPage.subCategory),
         NavItem('Brand', AppPage.brand),

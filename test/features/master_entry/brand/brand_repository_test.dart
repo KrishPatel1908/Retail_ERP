@@ -1,6 +1,6 @@
 import 'dart:io';
 
-import 'package:drift/drift.dart' show driftRuntimeOptions;
+import 'package:drift/drift.dart' show Value, driftRuntimeOptions;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path/path.dart' as p;
@@ -115,21 +115,16 @@ void main() {
           ),
         );
         final units = await database.select(database.units).get();
-        final taxCategories = await database.select(database.taxCategories).get();
 
         final unitId = units.first.id;
-        final taxCatId = taxCategories.first.id;
 
         await database.into(database.products).insert(
           db.ProductsCompanion.insert(
             productCode: 'P-100',
             productName: 'iPhone 15',
-            categoryId: categoryId,
-            brandId: brand.id,
-            purchaseUnitId: unitId,
-            salesUnitId: unitId,
-            stockUnitId: unitId,
-            taxCategoryId: taxCatId,
+            categoryId: Value(categoryId),
+            brandId: Value(brand.id),
+            unitId: unitId,
           ),
         );
 
@@ -150,10 +145,8 @@ void main() {
         ),
       );
       final units = await database.select(database.units).get();
-      final taxCategories = await database.select(database.taxCategories).get();
 
       final unitId = units.first.id;
-      final taxCatId = taxCategories.first.id;
 
       // Initially product count is 0
       var brands = await repository.getAllBrands();
@@ -165,12 +158,9 @@ void main() {
         db.ProductsCompanion.insert(
           productCode: 'P-101',
           productName: 'Galaxy S24',
-          categoryId: categoryId,
-          brandId: brand.id,
-          purchaseUnitId: unitId,
-          salesUnitId: unitId,
-          stockUnitId: unitId,
-          taxCategoryId: taxCatId,
+          categoryId: Value(categoryId),
+          brandId: Value(brand.id),
+          unitId: unitId,
         ),
       );
 
@@ -179,12 +169,9 @@ void main() {
         db.ProductsCompanion.insert(
           productCode: 'P-102',
           productName: 'Galaxy Tab',
-          categoryId: categoryId,
-          brandId: brand.id,
-          purchaseUnitId: unitId,
-          salesUnitId: unitId,
-          stockUnitId: unitId,
-          taxCategoryId: taxCatId,
+          categoryId: Value(categoryId),
+          brandId: Value(brand.id),
+          unitId: unitId,
         ),
       );
 

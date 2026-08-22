@@ -113,8 +113,6 @@ void main() {
         final categories = await database.select(database.categories).get();
         final units = await database.select(database.units).get();
         final brands = await database.select(database.brands).get();
-        final taxCategories =
-            await database.select(database.taxCategories).get();
 
         final categoryId = categories.isNotEmpty
             ? categories.first.id
@@ -127,18 +125,14 @@ void main() {
 
         final unitId = units.first.id;
         final brandId = brands.first.id;
-        final taxCatId = taxCategories.first.id;
 
         await database.into(database.products).insert(
           db.ProductsCompanion.insert(
-            productCode: 'P-200',
-            productName: 'Taxed Product',
-            categoryId: categoryId,
-            brandId: brandId,
-            purchaseUnitId: unitId,
-            salesUnitId: unitId,
-            stockUnitId: unitId,
-            taxCategoryId: taxCatId,
+          productCode: 'P-200',
+          productName: 'Taxed Product',
+          categoryId: Value(categoryId),
+          brandId: Value(brandId),
+          unitId: unitId,
             taxTypeId: Value(taxType.id),
           ),
         );

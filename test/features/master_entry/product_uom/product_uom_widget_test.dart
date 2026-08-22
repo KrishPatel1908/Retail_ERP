@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart' show Value;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:retail_erp/app/retail_erp_app.dart';
 import 'package:retail_erp/core/database/app_database.dart' as db;
@@ -20,12 +21,9 @@ void main() {
       db.ProductsCompanion.insert(
         productCode: 'PROD-1',
         productName: 'Test Biscuit',
-        categoryId: categoryId,
-        brandId: 1,
-        purchaseUnitId: 1,
-        salesUnitId: 1,
-        stockUnitId: 1,
-        taxCategoryId: 1,
+        categoryId: Value(categoryId),
+        brandId: const Value(1),
+        unitId: 1,
       ),
     );
   }

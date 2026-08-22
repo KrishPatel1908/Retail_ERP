@@ -10,6 +10,9 @@ import '../master_entry/category/domain/entities/category.dart';
 import '../master_entry/customer/domain/entities/customer.dart';
 import '../master_entry/customer/presentation/pages/create_customer_page.dart';
 import '../master_entry/customer/presentation/pages/customer_list_page.dart';
+import '../master_entry/product/domain/entities/product.dart';
+import '../master_entry/product/presentation/pages/create_product_page.dart';
+import '../master_entry/product/presentation/pages/product_list_page.dart';
 import '../master_entry/category/presentation/pages/category_list_page.dart';
 import '../master_entry/category/presentation/pages/create_category_page.dart';
 import '../master_entry/sub_category/domain/entities/sub_category.dart';
@@ -148,6 +151,14 @@ class _ShellPageState extends State<ShellPage> {
     setState(() => _contentStack.removeLast());
   }
 
+  void _openProductForm({ProductEntity? product}) {
+    setState(() => _contentStack.add(ProductFormRoute(product: product)));
+  }
+
+  void _closeProductForm() {
+    setState(() => _contentStack.removeLast());
+  }
+
   void _openCustomerForm({Customer? customer}) {
     setState(() => _contentStack.add(CustomerFormRoute(customer: customer)));
   }
@@ -208,6 +219,11 @@ class _ShellPageState extends State<ShellPage> {
           onEditCustomer: (customer) =>
               _openCustomerForm(customer: customer),
         ),
+        AppPage.product => ProductListPage(
+          onAddProduct: () => _openProductForm(),
+          onEditProduct: (product) =>
+              _openProductForm(product: product),
+        ),
         AppPage.supplier => SupplierListPage(
           onAddSupplier: () => _openSupplierForm(),
           onEditSupplier: (supplier) =>
@@ -262,6 +278,11 @@ class _ShellPageState extends State<ShellPage> {
         onCancel: _closeCustomerForm,
         customer: customer,
       ),
+      ProductFormRoute(:final product) => CreateProductPage(
+        onSave: _closeProductForm,
+        onCancel: _closeProductForm,
+        product: product,
+      ),
       SupplierFormRoute(:final supplier) => CreateSupplierPage(
         onSave: _closeSupplierForm,
         onCancel: _closeSupplierForm,
@@ -282,6 +303,7 @@ class _ShellPageState extends State<ShellPage> {
       UomConversionFormRoute() => 'uom-conversion-form',
       ProductUomFormRoute() => 'product-uom-form',
       CustomerFormRoute() => 'customer-form',
+      ProductFormRoute() => 'product-form',
       SupplierFormRoute() => 'supplier-form',
     };
   }

@@ -54,8 +54,8 @@ void main() {
     await tester.tap(find.text('Product Master'));
     await tester.pumpAndSettle();
 
-    // Sidebar + content area + status bar.
-    expect(find.text('Product Master'), findsNWidgets(3));
+    // Sidebar + breadcrumb + content title + status bar.
+    expect(find.text('Product Master'), findsNWidgets(4));
   });
 
   testWidgets('sidebar can be collapsed and expanded', (tester) async {

@@ -419,6 +419,10 @@ Customer Master
 
 Supplier Master
 
+Company Settings
+
+Product Master
+
 ---
 
 # Pending Modules
@@ -426,10 +430,6 @@ Supplier Master
 Sub Category
 
 Warehouse Master
-
-Company Settings
-
-Product Master
 
 Inventory
 

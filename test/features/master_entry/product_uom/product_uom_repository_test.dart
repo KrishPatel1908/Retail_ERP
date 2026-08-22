@@ -1,3 +1,4 @@
+import 'package:drift/drift.dart' show Value;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -30,12 +31,9 @@ void main() {
             db.ProductsCompanion.insert(
               productCode: 'P-1',
               productName: 'Banana',
-              categoryId: categoryId,
-              brandId: 1,
-              purchaseUnitId: 1,
-              salesUnitId: 1,
-              stockUnitId: 1,
-              taxCategoryId: 1,
+              categoryId: Value(categoryId),
+              brandId: const Value(1),
+              unitId: 1,
             ),
           );
     });

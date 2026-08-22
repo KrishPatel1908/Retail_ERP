@@ -10401,18 +10401,6 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
     type: DriftSqlType.string,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _barcodeMeta = const VerificationMeta(
-    'barcode',
-  );
-  @override
-  late final GeneratedColumn<String> barcode = GeneratedColumn<String>(
-    'barcode',
-    aliasedName,
-    true,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
-  );
   static const VerificationMeta _categoryIdMeta = const VerificationMeta(
     'categoryId',
   );
@@ -10420,9 +10408,9 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
   late final GeneratedColumn<int> categoryId = GeneratedColumn<int>(
     'category_id',
     aliasedName,
-    false,
+    true,
     type: DriftSqlType.int,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
       'REFERENCES category (id)',
     ),
@@ -10437,6 +10425,9 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
     true,
     type: DriftSqlType.int,
     requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES sub_category (id)',
+    ),
   );
   static const VerificationMeta _brandIdMeta = const VerificationMeta(
     'brandId',
@@ -10445,19 +10436,17 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
   late final GeneratedColumn<int> brandId = GeneratedColumn<int>(
     'brand_id',
     aliasedName,
-    false,
+    true,
     type: DriftSqlType.int,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
     defaultConstraints: GeneratedColumn.constraintIsAlways(
       'REFERENCES brand (id)',
     ),
   );
-  static const VerificationMeta _purchaseUnitIdMeta = const VerificationMeta(
-    'purchaseUnitId',
-  );
+  static const VerificationMeta _unitIdMeta = const VerificationMeta('unitId');
   @override
-  late final GeneratedColumn<int> purchaseUnitId = GeneratedColumn<int>(
-    'purchase_unit_id',
+  late final GeneratedColumn<int> unitId = GeneratedColumn<int>(
+    'unit_id',
     aliasedName,
     false,
     type: DriftSqlType.int,
@@ -10466,116 +10455,17 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
       'REFERENCES unit (id)',
     ),
   );
-  static const VerificationMeta _salesUnitIdMeta = const VerificationMeta(
-    'salesUnitId',
+  static const VerificationMeta _sellingPriceMeta = const VerificationMeta(
+    'sellingPrice',
   );
   @override
-  late final GeneratedColumn<int> salesUnitId = GeneratedColumn<int>(
-    'sales_unit_id',
-    aliasedName,
-    false,
-    type: DriftSqlType.int,
-    requiredDuringInsert: true,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES unit (id)',
-    ),
-  );
-  static const VerificationMeta _stockUnitIdMeta = const VerificationMeta(
-    'stockUnitId',
-  );
-  @override
-  late final GeneratedColumn<int> stockUnitId = GeneratedColumn<int>(
-    'stock_unit_id',
-    aliasedName,
-    false,
-    type: DriftSqlType.int,
-    requiredDuringInsert: true,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES unit (id)',
-    ),
-  );
-  static const VerificationMeta _purchasePriceMeta = const VerificationMeta(
-    'purchasePrice',
-  );
-  @override
-  late final GeneratedColumn<int> purchasePrice = GeneratedColumn<int>(
-    'purchase_price',
+  late final GeneratedColumn<int> sellingPrice = GeneratedColumn<int>(
+    'selling_price',
     aliasedName,
     false,
     type: DriftSqlType.int,
     requiredDuringInsert: false,
     defaultValue: const Constant(0),
-  );
-  static const VerificationMeta _landingCostMeta = const VerificationMeta(
-    'landingCost',
-  );
-  @override
-  late final GeneratedColumn<int> landingCost = GeneratedColumn<int>(
-    'landing_cost',
-    aliasedName,
-    false,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-    defaultValue: const Constant(0),
-  );
-  static const VerificationMeta _mrpMeta = const VerificationMeta('mrp');
-  @override
-  late final GeneratedColumn<int> mrp = GeneratedColumn<int>(
-    'mrp',
-    aliasedName,
-    false,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-    defaultValue: const Constant(0),
-  );
-  static const VerificationMeta _retailPriceMeta = const VerificationMeta(
-    'retailPrice',
-  );
-  @override
-  late final GeneratedColumn<int> retailPrice = GeneratedColumn<int>(
-    'retail_price',
-    aliasedName,
-    false,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-    defaultValue: const Constant(0),
-  );
-  static const VerificationMeta _wholesalePriceMeta = const VerificationMeta(
-    'wholesalePrice',
-  );
-  @override
-  late final GeneratedColumn<int> wholesalePrice = GeneratedColumn<int>(
-    'wholesale_price',
-    aliasedName,
-    false,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-    defaultValue: const Constant(0),
-  );
-  static const VerificationMeta _specialPriceMeta = const VerificationMeta(
-    'specialPrice',
-  );
-  @override
-  late final GeneratedColumn<int> specialPrice = GeneratedColumn<int>(
-    'special_price',
-    aliasedName,
-    true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-  );
-  static const VerificationMeta _taxCategoryIdMeta = const VerificationMeta(
-    'taxCategoryId',
-  );
-  @override
-  late final GeneratedColumn<int> taxCategoryId = GeneratedColumn<int>(
-    'tax_category_id',
-    aliasedName,
-    false,
-    type: DriftSqlType.int,
-    requiredDuringInsert: true,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES tax_category (id)',
-    ),
   );
   static const VerificationMeta _taxTypeIdMeta = const VerificationMeta(
     'taxTypeId',
@@ -10591,124 +10481,25 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
       'REFERENCES tax_type (id)',
     ),
   );
-  static const VerificationMeta _defaultWarehouseIdMeta =
-      const VerificationMeta('defaultWarehouseId');
+  static const VerificationMeta _expiryDateMeta = const VerificationMeta(
+    'expiryDate',
+  );
   @override
-  late final GeneratedColumn<int> defaultWarehouseId = GeneratedColumn<int>(
-    'default_warehouse_id',
+  late final GeneratedColumn<DateTime> expiryDate = GeneratedColumn<DateTime>(
+    'expiry_date',
     aliasedName,
     true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES warehouse (id)',
-    ),
-  );
-  static const VerificationMeta _minStockMeta = const VerificationMeta(
-    'minStock',
-  );
-  @override
-  late final GeneratedColumn<double> minStock = GeneratedColumn<double>(
-    'min_stock',
-    aliasedName,
-    false,
-    type: DriftSqlType.double,
-    requiredDuringInsert: false,
-    defaultValue: const Constant(0.0),
-  );
-  static const VerificationMeta _maxStockMeta = const VerificationMeta(
-    'maxStock',
-  );
-  @override
-  late final GeneratedColumn<double> maxStock = GeneratedColumn<double>(
-    'max_stock',
-    aliasedName,
-    false,
-    type: DriftSqlType.double,
-    requiredDuringInsert: false,
-    defaultValue: const Constant(0.0),
-  );
-  static const VerificationMeta _reorderLevelMeta = const VerificationMeta(
-    'reorderLevel',
-  );
-  @override
-  late final GeneratedColumn<double> reorderLevel = GeneratedColumn<double>(
-    'reorder_level',
-    aliasedName,
-    false,
-    type: DriftSqlType.double,
-    requiredDuringInsert: false,
-    defaultValue: const Constant(0.0),
-  );
-  static const VerificationMeta _openingStockMeta = const VerificationMeta(
-    'openingStock',
-  );
-  @override
-  late final GeneratedColumn<double> openingStock = GeneratedColumn<double>(
-    'opening_stock',
-    aliasedName,
-    false,
-    type: DriftSqlType.double,
-    requiredDuringInsert: false,
-    defaultValue: const Constant(0.0),
-  );
-  static const VerificationMeta _currentStockMeta = const VerificationMeta(
-    'currentStock',
-  );
-  @override
-  late final GeneratedColumn<double> currentStock = GeneratedColumn<double>(
-    'current_stock',
-    aliasedName,
-    false,
-    type: DriftSqlType.double,
-    requiredDuringInsert: false,
-    defaultValue: const Constant(0.0),
-  );
-  static const VerificationMeta _weightMeta = const VerificationMeta('weight');
-  @override
-  late final GeneratedColumn<double> weight = GeneratedColumn<double>(
-    'weight',
-    aliasedName,
-    true,
-    type: DriftSqlType.double,
+    type: DriftSqlType.dateTime,
     requiredDuringInsert: false,
   );
-  static const VerificationMeta _descriptionMeta = const VerificationMeta(
-    'description',
-  );
+  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
   @override
-  late final GeneratedColumn<String> description = GeneratedColumn<String>(
-    'description',
+  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
+    'notes',
     aliasedName,
     true,
     type: DriftSqlType.string,
     requiredDuringInsert: false,
-  );
-  static const VerificationMeta _imagePathMeta = const VerificationMeta(
-    'imagePath',
-  );
-  @override
-  late final GeneratedColumn<String> imagePath = GeneratedColumn<String>(
-    'image_path',
-    aliasedName,
-    true,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-  );
-  static const VerificationMeta _isStockItemMeta = const VerificationMeta(
-    'isStockItem',
-  );
-  @override
-  late final GeneratedColumn<bool> isStockItem = GeneratedColumn<bool>(
-    'is_stock_item',
-    aliasedName,
-    false,
-    type: DriftSqlType.bool,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'CHECK ("is_stock_item" IN (0, 1))',
-    ),
-    defaultValue: const Constant(true),
   );
   static const VerificationMeta _isActiveMeta = const VerificationMeta(
     'isActive',
@@ -10754,31 +10545,14 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
     id,
     productCode,
     productName,
-    barcode,
     categoryId,
     subCategoryId,
     brandId,
-    purchaseUnitId,
-    salesUnitId,
-    stockUnitId,
-    purchasePrice,
-    landingCost,
-    mrp,
-    retailPrice,
-    wholesalePrice,
-    specialPrice,
-    taxCategoryId,
+    unitId,
+    sellingPrice,
     taxTypeId,
-    defaultWarehouseId,
-    minStock,
-    maxStock,
-    reorderLevel,
-    openingStock,
-    currentStock,
-    weight,
-    description,
-    imagePath,
-    isStockItem,
+    expiryDate,
+    notes,
     isActive,
     createdAt,
     updatedAt,
@@ -10820,19 +10594,11 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
     } else if (isInserting) {
       context.missing(_productNameMeta);
     }
-    if (data.containsKey('barcode')) {
-      context.handle(
-        _barcodeMeta,
-        barcode.isAcceptableOrUnknown(data['barcode']!, _barcodeMeta),
-      );
-    }
     if (data.containsKey('category_id')) {
       context.handle(
         _categoryIdMeta,
         categoryId.isAcceptableOrUnknown(data['category_id']!, _categoryIdMeta),
       );
-    } else if (isInserting) {
-      context.missing(_categoryIdMeta);
     }
     if (data.containsKey('sub_category_id')) {
       context.handle(
@@ -10848,103 +10614,23 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
         _brandIdMeta,
         brandId.isAcceptableOrUnknown(data['brand_id']!, _brandIdMeta),
       );
-    } else if (isInserting) {
-      context.missing(_brandIdMeta);
     }
-    if (data.containsKey('purchase_unit_id')) {
+    if (data.containsKey('unit_id')) {
       context.handle(
-        _purchaseUnitIdMeta,
-        purchaseUnitId.isAcceptableOrUnknown(
-          data['purchase_unit_id']!,
-          _purchaseUnitIdMeta,
-        ),
+        _unitIdMeta,
+        unitId.isAcceptableOrUnknown(data['unit_id']!, _unitIdMeta),
       );
     } else if (isInserting) {
-      context.missing(_purchaseUnitIdMeta);
+      context.missing(_unitIdMeta);
     }
-    if (data.containsKey('sales_unit_id')) {
+    if (data.containsKey('selling_price')) {
       context.handle(
-        _salesUnitIdMeta,
-        salesUnitId.isAcceptableOrUnknown(
-          data['sales_unit_id']!,
-          _salesUnitIdMeta,
+        _sellingPriceMeta,
+        sellingPrice.isAcceptableOrUnknown(
+          data['selling_price']!,
+          _sellingPriceMeta,
         ),
       );
-    } else if (isInserting) {
-      context.missing(_salesUnitIdMeta);
-    }
-    if (data.containsKey('stock_unit_id')) {
-      context.handle(
-        _stockUnitIdMeta,
-        stockUnitId.isAcceptableOrUnknown(
-          data['stock_unit_id']!,
-          _stockUnitIdMeta,
-        ),
-      );
-    } else if (isInserting) {
-      context.missing(_stockUnitIdMeta);
-    }
-    if (data.containsKey('purchase_price')) {
-      context.handle(
-        _purchasePriceMeta,
-        purchasePrice.isAcceptableOrUnknown(
-          data['purchase_price']!,
-          _purchasePriceMeta,
-        ),
-      );
-    }
-    if (data.containsKey('landing_cost')) {
-      context.handle(
-        _landingCostMeta,
-        landingCost.isAcceptableOrUnknown(
-          data['landing_cost']!,
-          _landingCostMeta,
-        ),
-      );
-    }
-    if (data.containsKey('mrp')) {
-      context.handle(
-        _mrpMeta,
-        mrp.isAcceptableOrUnknown(data['mrp']!, _mrpMeta),
-      );
-    }
-    if (data.containsKey('retail_price')) {
-      context.handle(
-        _retailPriceMeta,
-        retailPrice.isAcceptableOrUnknown(
-          data['retail_price']!,
-          _retailPriceMeta,
-        ),
-      );
-    }
-    if (data.containsKey('wholesale_price')) {
-      context.handle(
-        _wholesalePriceMeta,
-        wholesalePrice.isAcceptableOrUnknown(
-          data['wholesale_price']!,
-          _wholesalePriceMeta,
-        ),
-      );
-    }
-    if (data.containsKey('special_price')) {
-      context.handle(
-        _specialPriceMeta,
-        specialPrice.isAcceptableOrUnknown(
-          data['special_price']!,
-          _specialPriceMeta,
-        ),
-      );
-    }
-    if (data.containsKey('tax_category_id')) {
-      context.handle(
-        _taxCategoryIdMeta,
-        taxCategoryId.isAcceptableOrUnknown(
-          data['tax_category_id']!,
-          _taxCategoryIdMeta,
-        ),
-      );
-    } else if (isInserting) {
-      context.missing(_taxCategoryIdMeta);
     }
     if (data.containsKey('tax_type_id')) {
       context.handle(
@@ -10952,82 +10638,16 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
         taxTypeId.isAcceptableOrUnknown(data['tax_type_id']!, _taxTypeIdMeta),
       );
     }
-    if (data.containsKey('default_warehouse_id')) {
+    if (data.containsKey('expiry_date')) {
       context.handle(
-        _defaultWarehouseIdMeta,
-        defaultWarehouseId.isAcceptableOrUnknown(
-          data['default_warehouse_id']!,
-          _defaultWarehouseIdMeta,
-        ),
+        _expiryDateMeta,
+        expiryDate.isAcceptableOrUnknown(data['expiry_date']!, _expiryDateMeta),
       );
     }
-    if (data.containsKey('min_stock')) {
+    if (data.containsKey('notes')) {
       context.handle(
-        _minStockMeta,
-        minStock.isAcceptableOrUnknown(data['min_stock']!, _minStockMeta),
-      );
-    }
-    if (data.containsKey('max_stock')) {
-      context.handle(
-        _maxStockMeta,
-        maxStock.isAcceptableOrUnknown(data['max_stock']!, _maxStockMeta),
-      );
-    }
-    if (data.containsKey('reorder_level')) {
-      context.handle(
-        _reorderLevelMeta,
-        reorderLevel.isAcceptableOrUnknown(
-          data['reorder_level']!,
-          _reorderLevelMeta,
-        ),
-      );
-    }
-    if (data.containsKey('opening_stock')) {
-      context.handle(
-        _openingStockMeta,
-        openingStock.isAcceptableOrUnknown(
-          data['opening_stock']!,
-          _openingStockMeta,
-        ),
-      );
-    }
-    if (data.containsKey('current_stock')) {
-      context.handle(
-        _currentStockMeta,
-        currentStock.isAcceptableOrUnknown(
-          data['current_stock']!,
-          _currentStockMeta,
-        ),
-      );
-    }
-    if (data.containsKey('weight')) {
-      context.handle(
-        _weightMeta,
-        weight.isAcceptableOrUnknown(data['weight']!, _weightMeta),
-      );
-    }
-    if (data.containsKey('description')) {
-      context.handle(
-        _descriptionMeta,
-        description.isAcceptableOrUnknown(
-          data['description']!,
-          _descriptionMeta,
-        ),
-      );
-    }
-    if (data.containsKey('image_path')) {
-      context.handle(
-        _imagePathMeta,
-        imagePath.isAcceptableOrUnknown(data['image_path']!, _imagePathMeta),
-      );
-    }
-    if (data.containsKey('is_stock_item')) {
-      context.handle(
-        _isStockItemMeta,
-        isStockItem.isAcceptableOrUnknown(
-          data['is_stock_item']!,
-          _isStockItemMeta,
-        ),
+        _notesMeta,
+        notes.isAcceptableOrUnknown(data['notes']!, _notesMeta),
       );
     }
     if (data.containsKey('is_active')) {
@@ -11069,14 +10689,10 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
         DriftSqlType.string,
         data['${effectivePrefix}product_name'],
       )!,
-      barcode: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}barcode'],
-      ),
       categoryId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}category_id'],
-      )!,
+      ),
       subCategoryId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}sub_category_id'],
@@ -11084,91 +10700,27 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
       brandId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}brand_id'],
-      )!,
-      purchaseUnitId: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}purchase_unit_id'],
-      )!,
-      salesUnitId: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}sales_unit_id'],
-      )!,
-      stockUnitId: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}stock_unit_id'],
-      )!,
-      purchasePrice: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}purchase_price'],
-      )!,
-      landingCost: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}landing_cost'],
-      )!,
-      mrp: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}mrp'],
-      )!,
-      retailPrice: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}retail_price'],
-      )!,
-      wholesalePrice: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}wholesale_price'],
-      )!,
-      specialPrice: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}special_price'],
       ),
-      taxCategoryId: attachedDatabase.typeMapping.read(
+      unitId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
-        data['${effectivePrefix}tax_category_id'],
+        data['${effectivePrefix}unit_id'],
+      )!,
+      sellingPrice: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}selling_price'],
       )!,
       taxTypeId: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}tax_type_id'],
       ),
-      defaultWarehouseId: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}default_warehouse_id'],
+      expiryDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}expiry_date'],
       ),
-      minStock: attachedDatabase.typeMapping.read(
-        DriftSqlType.double,
-        data['${effectivePrefix}min_stock'],
-      )!,
-      maxStock: attachedDatabase.typeMapping.read(
-        DriftSqlType.double,
-        data['${effectivePrefix}max_stock'],
-      )!,
-      reorderLevel: attachedDatabase.typeMapping.read(
-        DriftSqlType.double,
-        data['${effectivePrefix}reorder_level'],
-      )!,
-      openingStock: attachedDatabase.typeMapping.read(
-        DriftSqlType.double,
-        data['${effectivePrefix}opening_stock'],
-      )!,
-      currentStock: attachedDatabase.typeMapping.read(
-        DriftSqlType.double,
-        data['${effectivePrefix}current_stock'],
-      )!,
-      weight: attachedDatabase.typeMapping.read(
-        DriftSqlType.double,
-        data['${effectivePrefix}weight'],
-      ),
-      description: attachedDatabase.typeMapping.read(
+      notes: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
-        data['${effectivePrefix}description'],
+        data['${effectivePrefix}notes'],
       ),
-      imagePath: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}image_path'],
-      ),
-      isStockItem: attachedDatabase.typeMapping.read(
-        DriftSqlType.bool,
-        data['${effectivePrefix}is_stock_item'],
-      )!,
       isActive: attachedDatabase.typeMapping.read(
         DriftSqlType.bool,
         data['${effectivePrefix}is_active'],
@@ -11194,34 +10746,16 @@ class Product extends DataClass implements Insertable<Product> {
   final int id;
   final String productCode;
   final String productName;
-  final String? barcode;
-  final int categoryId;
-
-  /// Belongs to `category_id`; enforced by the composite foreign key in
-  /// [customConstraints] (no single-column reference).
+  final int? categoryId;
   final int? subCategoryId;
-  final int brandId;
-  final int purchaseUnitId;
-  final int salesUnitId;
-  final int stockUnitId;
-  final int purchasePrice;
-  final int landingCost;
-  final int mrp;
-  final int retailPrice;
-  final int wholesalePrice;
-  final int? specialPrice;
-  final int taxCategoryId;
+  final int? brandId;
+  final int unitId;
+  final int sellingPrice;
   final int? taxTypeId;
-  final int? defaultWarehouseId;
-  final double minStock;
-  final double maxStock;
-  final double reorderLevel;
-  final double openingStock;
-  final double currentStock;
-  final double? weight;
-  final String? description;
-  final String? imagePath;
-  final bool isStockItem;
+
+  /// Optional expiry date for the parent product (e.g. food, medicine).
+  final DateTime? expiryDate;
+  final String? notes;
   final bool isActive;
   final DateTime createdAt;
   final DateTime updatedAt;
@@ -11229,31 +10763,14 @@ class Product extends DataClass implements Insertable<Product> {
     required this.id,
     required this.productCode,
     required this.productName,
-    this.barcode,
-    required this.categoryId,
+    this.categoryId,
     this.subCategoryId,
-    required this.brandId,
-    required this.purchaseUnitId,
-    required this.salesUnitId,
-    required this.stockUnitId,
-    required this.purchasePrice,
-    required this.landingCost,
-    required this.mrp,
-    required this.retailPrice,
-    required this.wholesalePrice,
-    this.specialPrice,
-    required this.taxCategoryId,
+    this.brandId,
+    required this.unitId,
+    required this.sellingPrice,
     this.taxTypeId,
-    this.defaultWarehouseId,
-    required this.minStock,
-    required this.maxStock,
-    required this.reorderLevel,
-    required this.openingStock,
-    required this.currentStock,
-    this.weight,
-    this.description,
-    this.imagePath,
-    required this.isStockItem,
+    this.expiryDate,
+    this.notes,
     required this.isActive,
     required this.createdAt,
     required this.updatedAt,
@@ -11264,47 +10781,26 @@ class Product extends DataClass implements Insertable<Product> {
     map['id'] = Variable<int>(id);
     map['product_code'] = Variable<String>(productCode);
     map['product_name'] = Variable<String>(productName);
-    if (!nullToAbsent || barcode != null) {
-      map['barcode'] = Variable<String>(barcode);
+    if (!nullToAbsent || categoryId != null) {
+      map['category_id'] = Variable<int>(categoryId);
     }
-    map['category_id'] = Variable<int>(categoryId);
     if (!nullToAbsent || subCategoryId != null) {
       map['sub_category_id'] = Variable<int>(subCategoryId);
     }
-    map['brand_id'] = Variable<int>(brandId);
-    map['purchase_unit_id'] = Variable<int>(purchaseUnitId);
-    map['sales_unit_id'] = Variable<int>(salesUnitId);
-    map['stock_unit_id'] = Variable<int>(stockUnitId);
-    map['purchase_price'] = Variable<int>(purchasePrice);
-    map['landing_cost'] = Variable<int>(landingCost);
-    map['mrp'] = Variable<int>(mrp);
-    map['retail_price'] = Variable<int>(retailPrice);
-    map['wholesale_price'] = Variable<int>(wholesalePrice);
-    if (!nullToAbsent || specialPrice != null) {
-      map['special_price'] = Variable<int>(specialPrice);
+    if (!nullToAbsent || brandId != null) {
+      map['brand_id'] = Variable<int>(brandId);
     }
-    map['tax_category_id'] = Variable<int>(taxCategoryId);
+    map['unit_id'] = Variable<int>(unitId);
+    map['selling_price'] = Variable<int>(sellingPrice);
     if (!nullToAbsent || taxTypeId != null) {
       map['tax_type_id'] = Variable<int>(taxTypeId);
     }
-    if (!nullToAbsent || defaultWarehouseId != null) {
-      map['default_warehouse_id'] = Variable<int>(defaultWarehouseId);
+    if (!nullToAbsent || expiryDate != null) {
+      map['expiry_date'] = Variable<DateTime>(expiryDate);
     }
-    map['min_stock'] = Variable<double>(minStock);
-    map['max_stock'] = Variable<double>(maxStock);
-    map['reorder_level'] = Variable<double>(reorderLevel);
-    map['opening_stock'] = Variable<double>(openingStock);
-    map['current_stock'] = Variable<double>(currentStock);
-    if (!nullToAbsent || weight != null) {
-      map['weight'] = Variable<double>(weight);
+    if (!nullToAbsent || notes != null) {
+      map['notes'] = Variable<String>(notes);
     }
-    if (!nullToAbsent || description != null) {
-      map['description'] = Variable<String>(description);
-    }
-    if (!nullToAbsent || imagePath != null) {
-      map['image_path'] = Variable<String>(imagePath);
-    }
-    map['is_stock_item'] = Variable<bool>(isStockItem);
     map['is_active'] = Variable<bool>(isActive);
     map['created_at'] = Variable<DateTime>(createdAt);
     map['updated_at'] = Variable<DateTime>(updatedAt);
@@ -11316,47 +10812,26 @@ class Product extends DataClass implements Insertable<Product> {
       id: Value(id),
       productCode: Value(productCode),
       productName: Value(productName),
-      barcode: barcode == null && nullToAbsent
+      categoryId: categoryId == null && nullToAbsent
           ? const Value.absent()
-          : Value(barcode),
-      categoryId: Value(categoryId),
+          : Value(categoryId),
       subCategoryId: subCategoryId == null && nullToAbsent
           ? const Value.absent()
           : Value(subCategoryId),
-      brandId: Value(brandId),
-      purchaseUnitId: Value(purchaseUnitId),
-      salesUnitId: Value(salesUnitId),
-      stockUnitId: Value(stockUnitId),
-      purchasePrice: Value(purchasePrice),
-      landingCost: Value(landingCost),
-      mrp: Value(mrp),
-      retailPrice: Value(retailPrice),
-      wholesalePrice: Value(wholesalePrice),
-      specialPrice: specialPrice == null && nullToAbsent
+      brandId: brandId == null && nullToAbsent
           ? const Value.absent()
-          : Value(specialPrice),
-      taxCategoryId: Value(taxCategoryId),
+          : Value(brandId),
+      unitId: Value(unitId),
+      sellingPrice: Value(sellingPrice),
       taxTypeId: taxTypeId == null && nullToAbsent
           ? const Value.absent()
           : Value(taxTypeId),
-      defaultWarehouseId: defaultWarehouseId == null && nullToAbsent
+      expiryDate: expiryDate == null && nullToAbsent
           ? const Value.absent()
-          : Value(defaultWarehouseId),
-      minStock: Value(minStock),
-      maxStock: Value(maxStock),
-      reorderLevel: Value(reorderLevel),
-      openingStock: Value(openingStock),
-      currentStock: Value(currentStock),
-      weight: weight == null && nullToAbsent
+          : Value(expiryDate),
+      notes: notes == null && nullToAbsent
           ? const Value.absent()
-          : Value(weight),
-      description: description == null && nullToAbsent
-          ? const Value.absent()
-          : Value(description),
-      imagePath: imagePath == null && nullToAbsent
-          ? const Value.absent()
-          : Value(imagePath),
-      isStockItem: Value(isStockItem),
+          : Value(notes),
       isActive: Value(isActive),
       createdAt: Value(createdAt),
       updatedAt: Value(updatedAt),
@@ -11372,31 +10847,14 @@ class Product extends DataClass implements Insertable<Product> {
       id: serializer.fromJson<int>(json['id']),
       productCode: serializer.fromJson<String>(json['productCode']),
       productName: serializer.fromJson<String>(json['productName']),
-      barcode: serializer.fromJson<String?>(json['barcode']),
-      categoryId: serializer.fromJson<int>(json['categoryId']),
+      categoryId: serializer.fromJson<int?>(json['categoryId']),
       subCategoryId: serializer.fromJson<int?>(json['subCategoryId']),
-      brandId: serializer.fromJson<int>(json['brandId']),
-      purchaseUnitId: serializer.fromJson<int>(json['purchaseUnitId']),
-      salesUnitId: serializer.fromJson<int>(json['salesUnitId']),
-      stockUnitId: serializer.fromJson<int>(json['stockUnitId']),
-      purchasePrice: serializer.fromJson<int>(json['purchasePrice']),
-      landingCost: serializer.fromJson<int>(json['landingCost']),
-      mrp: serializer.fromJson<int>(json['mrp']),
-      retailPrice: serializer.fromJson<int>(json['retailPrice']),
-      wholesalePrice: serializer.fromJson<int>(json['wholesalePrice']),
-      specialPrice: serializer.fromJson<int?>(json['specialPrice']),
-      taxCategoryId: serializer.fromJson<int>(json['taxCategoryId']),
+      brandId: serializer.fromJson<int?>(json['brandId']),
+      unitId: serializer.fromJson<int>(json['unitId']),
+      sellingPrice: serializer.fromJson<int>(json['sellingPrice']),
       taxTypeId: serializer.fromJson<int?>(json['taxTypeId']),
-      defaultWarehouseId: serializer.fromJson<int?>(json['defaultWarehouseId']),
-      minStock: serializer.fromJson<double>(json['minStock']),
-      maxStock: serializer.fromJson<double>(json['maxStock']),
-      reorderLevel: serializer.fromJson<double>(json['reorderLevel']),
-      openingStock: serializer.fromJson<double>(json['openingStock']),
-      currentStock: serializer.fromJson<double>(json['currentStock']),
-      weight: serializer.fromJson<double?>(json['weight']),
-      description: serializer.fromJson<String?>(json['description']),
-      imagePath: serializer.fromJson<String?>(json['imagePath']),
-      isStockItem: serializer.fromJson<bool>(json['isStockItem']),
+      expiryDate: serializer.fromJson<DateTime?>(json['expiryDate']),
+      notes: serializer.fromJson<String?>(json['notes']),
       isActive: serializer.fromJson<bool>(json['isActive']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
@@ -11409,31 +10867,14 @@ class Product extends DataClass implements Insertable<Product> {
       'id': serializer.toJson<int>(id),
       'productCode': serializer.toJson<String>(productCode),
       'productName': serializer.toJson<String>(productName),
-      'barcode': serializer.toJson<String?>(barcode),
-      'categoryId': serializer.toJson<int>(categoryId),
+      'categoryId': serializer.toJson<int?>(categoryId),
       'subCategoryId': serializer.toJson<int?>(subCategoryId),
-      'brandId': serializer.toJson<int>(brandId),
-      'purchaseUnitId': serializer.toJson<int>(purchaseUnitId),
-      'salesUnitId': serializer.toJson<int>(salesUnitId),
-      'stockUnitId': serializer.toJson<int>(stockUnitId),
-      'purchasePrice': serializer.toJson<int>(purchasePrice),
-      'landingCost': serializer.toJson<int>(landingCost),
-      'mrp': serializer.toJson<int>(mrp),
-      'retailPrice': serializer.toJson<int>(retailPrice),
-      'wholesalePrice': serializer.toJson<int>(wholesalePrice),
-      'specialPrice': serializer.toJson<int?>(specialPrice),
-      'taxCategoryId': serializer.toJson<int>(taxCategoryId),
+      'brandId': serializer.toJson<int?>(brandId),
+      'unitId': serializer.toJson<int>(unitId),
+      'sellingPrice': serializer.toJson<int>(sellingPrice),
       'taxTypeId': serializer.toJson<int?>(taxTypeId),
-      'defaultWarehouseId': serializer.toJson<int?>(defaultWarehouseId),
-      'minStock': serializer.toJson<double>(minStock),
-      'maxStock': serializer.toJson<double>(maxStock),
-      'reorderLevel': serializer.toJson<double>(reorderLevel),
-      'openingStock': serializer.toJson<double>(openingStock),
-      'currentStock': serializer.toJson<double>(currentStock),
-      'weight': serializer.toJson<double?>(weight),
-      'description': serializer.toJson<String?>(description),
-      'imagePath': serializer.toJson<String?>(imagePath),
-      'isStockItem': serializer.toJson<bool>(isStockItem),
+      'expiryDate': serializer.toJson<DateTime?>(expiryDate),
+      'notes': serializer.toJson<String?>(notes),
       'isActive': serializer.toJson<bool>(isActive),
       'createdAt': serializer.toJson<DateTime>(createdAt),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
@@ -11444,31 +10885,14 @@ class Product extends DataClass implements Insertable<Product> {
     int? id,
     String? productCode,
     String? productName,
-    Value<String?> barcode = const Value.absent(),
-    int? categoryId,
+    Value<int?> categoryId = const Value.absent(),
     Value<int?> subCategoryId = const Value.absent(),
-    int? brandId,
-    int? purchaseUnitId,
-    int? salesUnitId,
-    int? stockUnitId,
-    int? purchasePrice,
-    int? landingCost,
-    int? mrp,
-    int? retailPrice,
-    int? wholesalePrice,
-    Value<int?> specialPrice = const Value.absent(),
-    int? taxCategoryId,
+    Value<int?> brandId = const Value.absent(),
+    int? unitId,
+    int? sellingPrice,
     Value<int?> taxTypeId = const Value.absent(),
-    Value<int?> defaultWarehouseId = const Value.absent(),
-    double? minStock,
-    double? maxStock,
-    double? reorderLevel,
-    double? openingStock,
-    double? currentStock,
-    Value<double?> weight = const Value.absent(),
-    Value<String?> description = const Value.absent(),
-    Value<String?> imagePath = const Value.absent(),
-    bool? isStockItem,
+    Value<DateTime?> expiryDate = const Value.absent(),
+    Value<String?> notes = const Value.absent(),
     bool? isActive,
     DateTime? createdAt,
     DateTime? updatedAt,
@@ -11476,35 +10900,16 @@ class Product extends DataClass implements Insertable<Product> {
     id: id ?? this.id,
     productCode: productCode ?? this.productCode,
     productName: productName ?? this.productName,
-    barcode: barcode.present ? barcode.value : this.barcode,
-    categoryId: categoryId ?? this.categoryId,
+    categoryId: categoryId.present ? categoryId.value : this.categoryId,
     subCategoryId: subCategoryId.present
         ? subCategoryId.value
         : this.subCategoryId,
-    brandId: brandId ?? this.brandId,
-    purchaseUnitId: purchaseUnitId ?? this.purchaseUnitId,
-    salesUnitId: salesUnitId ?? this.salesUnitId,
-    stockUnitId: stockUnitId ?? this.stockUnitId,
-    purchasePrice: purchasePrice ?? this.purchasePrice,
-    landingCost: landingCost ?? this.landingCost,
-    mrp: mrp ?? this.mrp,
-    retailPrice: retailPrice ?? this.retailPrice,
-    wholesalePrice: wholesalePrice ?? this.wholesalePrice,
-    specialPrice: specialPrice.present ? specialPrice.value : this.specialPrice,
-    taxCategoryId: taxCategoryId ?? this.taxCategoryId,
+    brandId: brandId.present ? brandId.value : this.brandId,
+    unitId: unitId ?? this.unitId,
+    sellingPrice: sellingPrice ?? this.sellingPrice,
     taxTypeId: taxTypeId.present ? taxTypeId.value : this.taxTypeId,
-    defaultWarehouseId: defaultWarehouseId.present
-        ? defaultWarehouseId.value
-        : this.defaultWarehouseId,
-    minStock: minStock ?? this.minStock,
-    maxStock: maxStock ?? this.maxStock,
-    reorderLevel: reorderLevel ?? this.reorderLevel,
-    openingStock: openingStock ?? this.openingStock,
-    currentStock: currentStock ?? this.currentStock,
-    weight: weight.present ? weight.value : this.weight,
-    description: description.present ? description.value : this.description,
-    imagePath: imagePath.present ? imagePath.value : this.imagePath,
-    isStockItem: isStockItem ?? this.isStockItem,
+    expiryDate: expiryDate.present ? expiryDate.value : this.expiryDate,
+    notes: notes.present ? notes.value : this.notes,
     isActive: isActive ?? this.isActive,
     createdAt: createdAt ?? this.createdAt,
     updatedAt: updatedAt ?? this.updatedAt,
@@ -11518,7 +10923,6 @@ class Product extends DataClass implements Insertable<Product> {
       productName: data.productName.present
           ? data.productName.value
           : this.productName,
-      barcode: data.barcode.present ? data.barcode.value : this.barcode,
       categoryId: data.categoryId.present
           ? data.categoryId.value
           : this.categoryId,
@@ -11526,57 +10930,15 @@ class Product extends DataClass implements Insertable<Product> {
           ? data.subCategoryId.value
           : this.subCategoryId,
       brandId: data.brandId.present ? data.brandId.value : this.brandId,
-      purchaseUnitId: data.purchaseUnitId.present
-          ? data.purchaseUnitId.value
-          : this.purchaseUnitId,
-      salesUnitId: data.salesUnitId.present
-          ? data.salesUnitId.value
-          : this.salesUnitId,
-      stockUnitId: data.stockUnitId.present
-          ? data.stockUnitId.value
-          : this.stockUnitId,
-      purchasePrice: data.purchasePrice.present
-          ? data.purchasePrice.value
-          : this.purchasePrice,
-      landingCost: data.landingCost.present
-          ? data.landingCost.value
-          : this.landingCost,
-      mrp: data.mrp.present ? data.mrp.value : this.mrp,
-      retailPrice: data.retailPrice.present
-          ? data.retailPrice.value
-          : this.retailPrice,
-      wholesalePrice: data.wholesalePrice.present
-          ? data.wholesalePrice.value
-          : this.wholesalePrice,
-      specialPrice: data.specialPrice.present
-          ? data.specialPrice.value
-          : this.specialPrice,
-      taxCategoryId: data.taxCategoryId.present
-          ? data.taxCategoryId.value
-          : this.taxCategoryId,
+      unitId: data.unitId.present ? data.unitId.value : this.unitId,
+      sellingPrice: data.sellingPrice.present
+          ? data.sellingPrice.value
+          : this.sellingPrice,
       taxTypeId: data.taxTypeId.present ? data.taxTypeId.value : this.taxTypeId,
-      defaultWarehouseId: data.defaultWarehouseId.present
-          ? data.defaultWarehouseId.value
-          : this.defaultWarehouseId,
-      minStock: data.minStock.present ? data.minStock.value : this.minStock,
-      maxStock: data.maxStock.present ? data.maxStock.value : this.maxStock,
-      reorderLevel: data.reorderLevel.present
-          ? data.reorderLevel.value
-          : this.reorderLevel,
-      openingStock: data.openingStock.present
-          ? data.openingStock.value
-          : this.openingStock,
-      currentStock: data.currentStock.present
-          ? data.currentStock.value
-          : this.currentStock,
-      weight: data.weight.present ? data.weight.value : this.weight,
-      description: data.description.present
-          ? data.description.value
-          : this.description,
-      imagePath: data.imagePath.present ? data.imagePath.value : this.imagePath,
-      isStockItem: data.isStockItem.present
-          ? data.isStockItem.value
-          : this.isStockItem,
+      expiryDate: data.expiryDate.present
+          ? data.expiryDate.value
+          : this.expiryDate,
+      notes: data.notes.present ? data.notes.value : this.notes,
       isActive: data.isActive.present ? data.isActive.value : this.isActive,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
@@ -11589,31 +10951,14 @@ class Product extends DataClass implements Insertable<Product> {
           ..write('id: $id, ')
           ..write('productCode: $productCode, ')
           ..write('productName: $productName, ')
-          ..write('barcode: $barcode, ')
           ..write('categoryId: $categoryId, ')
           ..write('subCategoryId: $subCategoryId, ')
           ..write('brandId: $brandId, ')
-          ..write('purchaseUnitId: $purchaseUnitId, ')
-          ..write('salesUnitId: $salesUnitId, ')
-          ..write('stockUnitId: $stockUnitId, ')
-          ..write('purchasePrice: $purchasePrice, ')
-          ..write('landingCost: $landingCost, ')
-          ..write('mrp: $mrp, ')
-          ..write('retailPrice: $retailPrice, ')
-          ..write('wholesalePrice: $wholesalePrice, ')
-          ..write('specialPrice: $specialPrice, ')
-          ..write('taxCategoryId: $taxCategoryId, ')
+          ..write('unitId: $unitId, ')
+          ..write('sellingPrice: $sellingPrice, ')
           ..write('taxTypeId: $taxTypeId, ')
-          ..write('defaultWarehouseId: $defaultWarehouseId, ')
-          ..write('minStock: $minStock, ')
-          ..write('maxStock: $maxStock, ')
-          ..write('reorderLevel: $reorderLevel, ')
-          ..write('openingStock: $openingStock, ')
-          ..write('currentStock: $currentStock, ')
-          ..write('weight: $weight, ')
-          ..write('description: $description, ')
-          ..write('imagePath: $imagePath, ')
-          ..write('isStockItem: $isStockItem, ')
+          ..write('expiryDate: $expiryDate, ')
+          ..write('notes: $notes, ')
           ..write('isActive: $isActive, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
@@ -11622,39 +10967,22 @@ class Product extends DataClass implements Insertable<Product> {
   }
 
   @override
-  int get hashCode => Object.hashAll([
+  int get hashCode => Object.hash(
     id,
     productCode,
     productName,
-    barcode,
     categoryId,
     subCategoryId,
     brandId,
-    purchaseUnitId,
-    salesUnitId,
-    stockUnitId,
-    purchasePrice,
-    landingCost,
-    mrp,
-    retailPrice,
-    wholesalePrice,
-    specialPrice,
-    taxCategoryId,
+    unitId,
+    sellingPrice,
     taxTypeId,
-    defaultWarehouseId,
-    minStock,
-    maxStock,
-    reorderLevel,
-    openingStock,
-    currentStock,
-    weight,
-    description,
-    imagePath,
-    isStockItem,
+    expiryDate,
+    notes,
     isActive,
     createdAt,
     updatedAt,
-  ]);
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -11662,31 +10990,14 @@ class Product extends DataClass implements Insertable<Product> {
           other.id == this.id &&
           other.productCode == this.productCode &&
           other.productName == this.productName &&
-          other.barcode == this.barcode &&
           other.categoryId == this.categoryId &&
           other.subCategoryId == this.subCategoryId &&
           other.brandId == this.brandId &&
-          other.purchaseUnitId == this.purchaseUnitId &&
-          other.salesUnitId == this.salesUnitId &&
-          other.stockUnitId == this.stockUnitId &&
-          other.purchasePrice == this.purchasePrice &&
-          other.landingCost == this.landingCost &&
-          other.mrp == this.mrp &&
-          other.retailPrice == this.retailPrice &&
-          other.wholesalePrice == this.wholesalePrice &&
-          other.specialPrice == this.specialPrice &&
-          other.taxCategoryId == this.taxCategoryId &&
+          other.unitId == this.unitId &&
+          other.sellingPrice == this.sellingPrice &&
           other.taxTypeId == this.taxTypeId &&
-          other.defaultWarehouseId == this.defaultWarehouseId &&
-          other.minStock == this.minStock &&
-          other.maxStock == this.maxStock &&
-          other.reorderLevel == this.reorderLevel &&
-          other.openingStock == this.openingStock &&
-          other.currentStock == this.currentStock &&
-          other.weight == this.weight &&
-          other.description == this.description &&
-          other.imagePath == this.imagePath &&
-          other.isStockItem == this.isStockItem &&
+          other.expiryDate == this.expiryDate &&
+          other.notes == this.notes &&
           other.isActive == this.isActive &&
           other.createdAt == this.createdAt &&
           other.updatedAt == this.updatedAt);
@@ -11696,31 +11007,14 @@ class ProductsCompanion extends UpdateCompanion<Product> {
   final Value<int> id;
   final Value<String> productCode;
   final Value<String> productName;
-  final Value<String?> barcode;
-  final Value<int> categoryId;
+  final Value<int?> categoryId;
   final Value<int?> subCategoryId;
-  final Value<int> brandId;
-  final Value<int> purchaseUnitId;
-  final Value<int> salesUnitId;
-  final Value<int> stockUnitId;
-  final Value<int> purchasePrice;
-  final Value<int> landingCost;
-  final Value<int> mrp;
-  final Value<int> retailPrice;
-  final Value<int> wholesalePrice;
-  final Value<int?> specialPrice;
-  final Value<int> taxCategoryId;
+  final Value<int?> brandId;
+  final Value<int> unitId;
+  final Value<int> sellingPrice;
   final Value<int?> taxTypeId;
-  final Value<int?> defaultWarehouseId;
-  final Value<double> minStock;
-  final Value<double> maxStock;
-  final Value<double> reorderLevel;
-  final Value<double> openingStock;
-  final Value<double> currentStock;
-  final Value<double?> weight;
-  final Value<String?> description;
-  final Value<String?> imagePath;
-  final Value<bool> isStockItem;
+  final Value<DateTime?> expiryDate;
+  final Value<String?> notes;
   final Value<bool> isActive;
   final Value<DateTime> createdAt;
   final Value<DateTime> updatedAt;
@@ -11728,31 +11022,14 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     this.id = const Value.absent(),
     this.productCode = const Value.absent(),
     this.productName = const Value.absent(),
-    this.barcode = const Value.absent(),
     this.categoryId = const Value.absent(),
     this.subCategoryId = const Value.absent(),
     this.brandId = const Value.absent(),
-    this.purchaseUnitId = const Value.absent(),
-    this.salesUnitId = const Value.absent(),
-    this.stockUnitId = const Value.absent(),
-    this.purchasePrice = const Value.absent(),
-    this.landingCost = const Value.absent(),
-    this.mrp = const Value.absent(),
-    this.retailPrice = const Value.absent(),
-    this.wholesalePrice = const Value.absent(),
-    this.specialPrice = const Value.absent(),
-    this.taxCategoryId = const Value.absent(),
+    this.unitId = const Value.absent(),
+    this.sellingPrice = const Value.absent(),
     this.taxTypeId = const Value.absent(),
-    this.defaultWarehouseId = const Value.absent(),
-    this.minStock = const Value.absent(),
-    this.maxStock = const Value.absent(),
-    this.reorderLevel = const Value.absent(),
-    this.openingStock = const Value.absent(),
-    this.currentStock = const Value.absent(),
-    this.weight = const Value.absent(),
-    this.description = const Value.absent(),
-    this.imagePath = const Value.absent(),
-    this.isStockItem = const Value.absent(),
+    this.expiryDate = const Value.absent(),
+    this.notes = const Value.absent(),
     this.isActive = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
@@ -11761,71 +11038,32 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     this.id = const Value.absent(),
     required String productCode,
     required String productName,
-    this.barcode = const Value.absent(),
-    required int categoryId,
+    this.categoryId = const Value.absent(),
     this.subCategoryId = const Value.absent(),
-    required int brandId,
-    required int purchaseUnitId,
-    required int salesUnitId,
-    required int stockUnitId,
-    this.purchasePrice = const Value.absent(),
-    this.landingCost = const Value.absent(),
-    this.mrp = const Value.absent(),
-    this.retailPrice = const Value.absent(),
-    this.wholesalePrice = const Value.absent(),
-    this.specialPrice = const Value.absent(),
-    required int taxCategoryId,
+    this.brandId = const Value.absent(),
+    required int unitId,
+    this.sellingPrice = const Value.absent(),
     this.taxTypeId = const Value.absent(),
-    this.defaultWarehouseId = const Value.absent(),
-    this.minStock = const Value.absent(),
-    this.maxStock = const Value.absent(),
-    this.reorderLevel = const Value.absent(),
-    this.openingStock = const Value.absent(),
-    this.currentStock = const Value.absent(),
-    this.weight = const Value.absent(),
-    this.description = const Value.absent(),
-    this.imagePath = const Value.absent(),
-    this.isStockItem = const Value.absent(),
+    this.expiryDate = const Value.absent(),
+    this.notes = const Value.absent(),
     this.isActive = const Value.absent(),
     this.createdAt = const Value.absent(),
     this.updatedAt = const Value.absent(),
   }) : productCode = Value(productCode),
        productName = Value(productName),
-       categoryId = Value(categoryId),
-       brandId = Value(brandId),
-       purchaseUnitId = Value(purchaseUnitId),
-       salesUnitId = Value(salesUnitId),
-       stockUnitId = Value(stockUnitId),
-       taxCategoryId = Value(taxCategoryId);
+       unitId = Value(unitId);
   static Insertable<Product> custom({
     Expression<int>? id,
     Expression<String>? productCode,
     Expression<String>? productName,
-    Expression<String>? barcode,
     Expression<int>? categoryId,
     Expression<int>? subCategoryId,
     Expression<int>? brandId,
-    Expression<int>? purchaseUnitId,
-    Expression<int>? salesUnitId,
-    Expression<int>? stockUnitId,
-    Expression<int>? purchasePrice,
-    Expression<int>? landingCost,
-    Expression<int>? mrp,
-    Expression<int>? retailPrice,
-    Expression<int>? wholesalePrice,
-    Expression<int>? specialPrice,
-    Expression<int>? taxCategoryId,
+    Expression<int>? unitId,
+    Expression<int>? sellingPrice,
     Expression<int>? taxTypeId,
-    Expression<int>? defaultWarehouseId,
-    Expression<double>? minStock,
-    Expression<double>? maxStock,
-    Expression<double>? reorderLevel,
-    Expression<double>? openingStock,
-    Expression<double>? currentStock,
-    Expression<double>? weight,
-    Expression<String>? description,
-    Expression<String>? imagePath,
-    Expression<bool>? isStockItem,
+    Expression<DateTime>? expiryDate,
+    Expression<String>? notes,
     Expression<bool>? isActive,
     Expression<DateTime>? createdAt,
     Expression<DateTime>? updatedAt,
@@ -11834,32 +11072,14 @@ class ProductsCompanion extends UpdateCompanion<Product> {
       if (id != null) 'id': id,
       if (productCode != null) 'product_code': productCode,
       if (productName != null) 'product_name': productName,
-      if (barcode != null) 'barcode': barcode,
       if (categoryId != null) 'category_id': categoryId,
       if (subCategoryId != null) 'sub_category_id': subCategoryId,
       if (brandId != null) 'brand_id': brandId,
-      if (purchaseUnitId != null) 'purchase_unit_id': purchaseUnitId,
-      if (salesUnitId != null) 'sales_unit_id': salesUnitId,
-      if (stockUnitId != null) 'stock_unit_id': stockUnitId,
-      if (purchasePrice != null) 'purchase_price': purchasePrice,
-      if (landingCost != null) 'landing_cost': landingCost,
-      if (mrp != null) 'mrp': mrp,
-      if (retailPrice != null) 'retail_price': retailPrice,
-      if (wholesalePrice != null) 'wholesale_price': wholesalePrice,
-      if (specialPrice != null) 'special_price': specialPrice,
-      if (taxCategoryId != null) 'tax_category_id': taxCategoryId,
+      if (unitId != null) 'unit_id': unitId,
+      if (sellingPrice != null) 'selling_price': sellingPrice,
       if (taxTypeId != null) 'tax_type_id': taxTypeId,
-      if (defaultWarehouseId != null)
-        'default_warehouse_id': defaultWarehouseId,
-      if (minStock != null) 'min_stock': minStock,
-      if (maxStock != null) 'max_stock': maxStock,
-      if (reorderLevel != null) 'reorder_level': reorderLevel,
-      if (openingStock != null) 'opening_stock': openingStock,
-      if (currentStock != null) 'current_stock': currentStock,
-      if (weight != null) 'weight': weight,
-      if (description != null) 'description': description,
-      if (imagePath != null) 'image_path': imagePath,
-      if (isStockItem != null) 'is_stock_item': isStockItem,
+      if (expiryDate != null) 'expiry_date': expiryDate,
+      if (notes != null) 'notes': notes,
       if (isActive != null) 'is_active': isActive,
       if (createdAt != null) 'created_at': createdAt,
       if (updatedAt != null) 'updated_at': updatedAt,
@@ -11870,31 +11090,14 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     Value<int>? id,
     Value<String>? productCode,
     Value<String>? productName,
-    Value<String?>? barcode,
-    Value<int>? categoryId,
+    Value<int?>? categoryId,
     Value<int?>? subCategoryId,
-    Value<int>? brandId,
-    Value<int>? purchaseUnitId,
-    Value<int>? salesUnitId,
-    Value<int>? stockUnitId,
-    Value<int>? purchasePrice,
-    Value<int>? landingCost,
-    Value<int>? mrp,
-    Value<int>? retailPrice,
-    Value<int>? wholesalePrice,
-    Value<int?>? specialPrice,
-    Value<int>? taxCategoryId,
+    Value<int?>? brandId,
+    Value<int>? unitId,
+    Value<int>? sellingPrice,
     Value<int?>? taxTypeId,
-    Value<int?>? defaultWarehouseId,
-    Value<double>? minStock,
-    Value<double>? maxStock,
-    Value<double>? reorderLevel,
-    Value<double>? openingStock,
-    Value<double>? currentStock,
-    Value<double?>? weight,
-    Value<String?>? description,
-    Value<String?>? imagePath,
-    Value<bool>? isStockItem,
+    Value<DateTime?>? expiryDate,
+    Value<String?>? notes,
     Value<bool>? isActive,
     Value<DateTime>? createdAt,
     Value<DateTime>? updatedAt,
@@ -11903,31 +11106,14 @@ class ProductsCompanion extends UpdateCompanion<Product> {
       id: id ?? this.id,
       productCode: productCode ?? this.productCode,
       productName: productName ?? this.productName,
-      barcode: barcode ?? this.barcode,
       categoryId: categoryId ?? this.categoryId,
       subCategoryId: subCategoryId ?? this.subCategoryId,
       brandId: brandId ?? this.brandId,
-      purchaseUnitId: purchaseUnitId ?? this.purchaseUnitId,
-      salesUnitId: salesUnitId ?? this.salesUnitId,
-      stockUnitId: stockUnitId ?? this.stockUnitId,
-      purchasePrice: purchasePrice ?? this.purchasePrice,
-      landingCost: landingCost ?? this.landingCost,
-      mrp: mrp ?? this.mrp,
-      retailPrice: retailPrice ?? this.retailPrice,
-      wholesalePrice: wholesalePrice ?? this.wholesalePrice,
-      specialPrice: specialPrice ?? this.specialPrice,
-      taxCategoryId: taxCategoryId ?? this.taxCategoryId,
+      unitId: unitId ?? this.unitId,
+      sellingPrice: sellingPrice ?? this.sellingPrice,
       taxTypeId: taxTypeId ?? this.taxTypeId,
-      defaultWarehouseId: defaultWarehouseId ?? this.defaultWarehouseId,
-      minStock: minStock ?? this.minStock,
-      maxStock: maxStock ?? this.maxStock,
-      reorderLevel: reorderLevel ?? this.reorderLevel,
-      openingStock: openingStock ?? this.openingStock,
-      currentStock: currentStock ?? this.currentStock,
-      weight: weight ?? this.weight,
-      description: description ?? this.description,
-      imagePath: imagePath ?? this.imagePath,
-      isStockItem: isStockItem ?? this.isStockItem,
+      expiryDate: expiryDate ?? this.expiryDate,
+      notes: notes ?? this.notes,
       isActive: isActive ?? this.isActive,
       createdAt: createdAt ?? this.createdAt,
       updatedAt: updatedAt ?? this.updatedAt,
@@ -11946,9 +11132,6 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     if (productName.present) {
       map['product_name'] = Variable<String>(productName.value);
     }
-    if (barcode.present) {
-      map['barcode'] = Variable<String>(barcode.value);
-    }
     if (categoryId.present) {
       map['category_id'] = Variable<int>(categoryId.value);
     }
@@ -11958,68 +11141,20 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     if (brandId.present) {
       map['brand_id'] = Variable<int>(brandId.value);
     }
-    if (purchaseUnitId.present) {
-      map['purchase_unit_id'] = Variable<int>(purchaseUnitId.value);
+    if (unitId.present) {
+      map['unit_id'] = Variable<int>(unitId.value);
     }
-    if (salesUnitId.present) {
-      map['sales_unit_id'] = Variable<int>(salesUnitId.value);
-    }
-    if (stockUnitId.present) {
-      map['stock_unit_id'] = Variable<int>(stockUnitId.value);
-    }
-    if (purchasePrice.present) {
-      map['purchase_price'] = Variable<int>(purchasePrice.value);
-    }
-    if (landingCost.present) {
-      map['landing_cost'] = Variable<int>(landingCost.value);
-    }
-    if (mrp.present) {
-      map['mrp'] = Variable<int>(mrp.value);
-    }
-    if (retailPrice.present) {
-      map['retail_price'] = Variable<int>(retailPrice.value);
-    }
-    if (wholesalePrice.present) {
-      map['wholesale_price'] = Variable<int>(wholesalePrice.value);
-    }
-    if (specialPrice.present) {
-      map['special_price'] = Variable<int>(specialPrice.value);
-    }
-    if (taxCategoryId.present) {
-      map['tax_category_id'] = Variable<int>(taxCategoryId.value);
+    if (sellingPrice.present) {
+      map['selling_price'] = Variable<int>(sellingPrice.value);
     }
     if (taxTypeId.present) {
       map['tax_type_id'] = Variable<int>(taxTypeId.value);
     }
-    if (defaultWarehouseId.present) {
-      map['default_warehouse_id'] = Variable<int>(defaultWarehouseId.value);
+    if (expiryDate.present) {
+      map['expiry_date'] = Variable<DateTime>(expiryDate.value);
     }
-    if (minStock.present) {
-      map['min_stock'] = Variable<double>(minStock.value);
-    }
-    if (maxStock.present) {
-      map['max_stock'] = Variable<double>(maxStock.value);
-    }
-    if (reorderLevel.present) {
-      map['reorder_level'] = Variable<double>(reorderLevel.value);
-    }
-    if (openingStock.present) {
-      map['opening_stock'] = Variable<double>(openingStock.value);
-    }
-    if (currentStock.present) {
-      map['current_stock'] = Variable<double>(currentStock.value);
-    }
-    if (weight.present) {
-      map['weight'] = Variable<double>(weight.value);
-    }
-    if (description.present) {
-      map['description'] = Variable<String>(description.value);
-    }
-    if (imagePath.present) {
-      map['image_path'] = Variable<String>(imagePath.value);
-    }
-    if (isStockItem.present) {
-      map['is_stock_item'] = Variable<bool>(isStockItem.value);
+    if (notes.present) {
+      map['notes'] = Variable<String>(notes.value);
     }
     if (isActive.present) {
       map['is_active'] = Variable<bool>(isActive.value);
@@ -12039,31 +11174,578 @@ class ProductsCompanion extends UpdateCompanion<Product> {
           ..write('id: $id, ')
           ..write('productCode: $productCode, ')
           ..write('productName: $productName, ')
-          ..write('barcode: $barcode, ')
           ..write('categoryId: $categoryId, ')
           ..write('subCategoryId: $subCategoryId, ')
           ..write('brandId: $brandId, ')
-          ..write('purchaseUnitId: $purchaseUnitId, ')
-          ..write('salesUnitId: $salesUnitId, ')
-          ..write('stockUnitId: $stockUnitId, ')
-          ..write('purchasePrice: $purchasePrice, ')
-          ..write('landingCost: $landingCost, ')
-          ..write('mrp: $mrp, ')
-          ..write('retailPrice: $retailPrice, ')
-          ..write('wholesalePrice: $wholesalePrice, ')
-          ..write('specialPrice: $specialPrice, ')
-          ..write('taxCategoryId: $taxCategoryId, ')
+          ..write('unitId: $unitId, ')
+          ..write('sellingPrice: $sellingPrice, ')
           ..write('taxTypeId: $taxTypeId, ')
-          ..write('defaultWarehouseId: $defaultWarehouseId, ')
-          ..write('minStock: $minStock, ')
-          ..write('maxStock: $maxStock, ')
-          ..write('reorderLevel: $reorderLevel, ')
-          ..write('openingStock: $openingStock, ')
-          ..write('currentStock: $currentStock, ')
-          ..write('weight: $weight, ')
-          ..write('description: $description, ')
-          ..write('imagePath: $imagePath, ')
-          ..write('isStockItem: $isStockItem, ')
+          ..write('expiryDate: $expiryDate, ')
+          ..write('notes: $notes, ')
+          ..write('isActive: $isActive, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $ProductVariantsTable extends ProductVariants
+    with TableInfo<$ProductVariantsTable, ProductVariant> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $ProductVariantsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _productIdMeta = const VerificationMeta(
+    'productId',
+  );
+  @override
+  late final GeneratedColumn<int> productId = GeneratedColumn<int>(
+    'product_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES product (id)',
+    ),
+  );
+  static const VerificationMeta _variantNameMeta = const VerificationMeta(
+    'variantName',
+  );
+  @override
+  late final GeneratedColumn<String> variantName = GeneratedColumn<String>(
+    'variant_name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _sellingPriceMeta = const VerificationMeta(
+    'sellingPrice',
+  );
+  @override
+  late final GeneratedColumn<int> sellingPrice = GeneratedColumn<int>(
+    'selling_price',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(0),
+  );
+  static const VerificationMeta _expiryDateMeta = const VerificationMeta(
+    'expiryDate',
+  );
+  @override
+  late final GeneratedColumn<DateTime> expiryDate = GeneratedColumn<DateTime>(
+    'expiry_date',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
+  @override
+  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
+    'notes',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _isActiveMeta = const VerificationMeta(
+    'isActive',
+  );
+  @override
+  late final GeneratedColumn<bool> isActive = GeneratedColumn<bool>(
+    'is_active',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_active" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    productId,
+    variantName,
+    sellingPrice,
+    expiryDate,
+    notes,
+    isActive,
+    createdAt,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'product_variant';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<ProductVariant> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('product_id')) {
+      context.handle(
+        _productIdMeta,
+        productId.isAcceptableOrUnknown(data['product_id']!, _productIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_productIdMeta);
+    }
+    if (data.containsKey('variant_name')) {
+      context.handle(
+        _variantNameMeta,
+        variantName.isAcceptableOrUnknown(
+          data['variant_name']!,
+          _variantNameMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_variantNameMeta);
+    }
+    if (data.containsKey('selling_price')) {
+      context.handle(
+        _sellingPriceMeta,
+        sellingPrice.isAcceptableOrUnknown(
+          data['selling_price']!,
+          _sellingPriceMeta,
+        ),
+      );
+    }
+    if (data.containsKey('expiry_date')) {
+      context.handle(
+        _expiryDateMeta,
+        expiryDate.isAcceptableOrUnknown(data['expiry_date']!, _expiryDateMeta),
+      );
+    }
+    if (data.containsKey('notes')) {
+      context.handle(
+        _notesMeta,
+        notes.isAcceptableOrUnknown(data['notes']!, _notesMeta),
+      );
+    }
+    if (data.containsKey('is_active')) {
+      context.handle(
+        _isActiveMeta,
+        isActive.isAcceptableOrUnknown(data['is_active']!, _isActiveMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  List<Set<GeneratedColumn>> get uniqueKeys => [
+    {productId, variantName},
+  ];
+  @override
+  ProductVariant map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return ProductVariant(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      productId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}product_id'],
+      )!,
+      variantName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}variant_name'],
+      )!,
+      sellingPrice: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}selling_price'],
+      )!,
+      expiryDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}expiry_date'],
+      ),
+      notes: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}notes'],
+      ),
+      isActive: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_active'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $ProductVariantsTable createAlias(String alias) {
+    return $ProductVariantsTable(attachedDatabase, alias);
+  }
+}
+
+class ProductVariant extends DataClass implements Insertable<ProductVariant> {
+  final int id;
+  final int productId;
+  final String variantName;
+  final int sellingPrice;
+  final DateTime? expiryDate;
+  final String? notes;
+  final bool isActive;
+  final DateTime createdAt;
+  final DateTime updatedAt;
+  const ProductVariant({
+    required this.id,
+    required this.productId,
+    required this.variantName,
+    required this.sellingPrice,
+    this.expiryDate,
+    this.notes,
+    required this.isActive,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['product_id'] = Variable<int>(productId);
+    map['variant_name'] = Variable<String>(variantName);
+    map['selling_price'] = Variable<int>(sellingPrice);
+    if (!nullToAbsent || expiryDate != null) {
+      map['expiry_date'] = Variable<DateTime>(expiryDate);
+    }
+    if (!nullToAbsent || notes != null) {
+      map['notes'] = Variable<String>(notes);
+    }
+    map['is_active'] = Variable<bool>(isActive);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  ProductVariantsCompanion toCompanion(bool nullToAbsent) {
+    return ProductVariantsCompanion(
+      id: Value(id),
+      productId: Value(productId),
+      variantName: Value(variantName),
+      sellingPrice: Value(sellingPrice),
+      expiryDate: expiryDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(expiryDate),
+      notes: notes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(notes),
+      isActive: Value(isActive),
+      createdAt: Value(createdAt),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory ProductVariant.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return ProductVariant(
+      id: serializer.fromJson<int>(json['id']),
+      productId: serializer.fromJson<int>(json['productId']),
+      variantName: serializer.fromJson<String>(json['variantName']),
+      sellingPrice: serializer.fromJson<int>(json['sellingPrice']),
+      expiryDate: serializer.fromJson<DateTime?>(json['expiryDate']),
+      notes: serializer.fromJson<String?>(json['notes']),
+      isActive: serializer.fromJson<bool>(json['isActive']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'productId': serializer.toJson<int>(productId),
+      'variantName': serializer.toJson<String>(variantName),
+      'sellingPrice': serializer.toJson<int>(sellingPrice),
+      'expiryDate': serializer.toJson<DateTime?>(expiryDate),
+      'notes': serializer.toJson<String?>(notes),
+      'isActive': serializer.toJson<bool>(isActive),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  ProductVariant copyWith({
+    int? id,
+    int? productId,
+    String? variantName,
+    int? sellingPrice,
+    Value<DateTime?> expiryDate = const Value.absent(),
+    Value<String?> notes = const Value.absent(),
+    bool? isActive,
+    DateTime? createdAt,
+    DateTime? updatedAt,
+  }) => ProductVariant(
+    id: id ?? this.id,
+    productId: productId ?? this.productId,
+    variantName: variantName ?? this.variantName,
+    sellingPrice: sellingPrice ?? this.sellingPrice,
+    expiryDate: expiryDate.present ? expiryDate.value : this.expiryDate,
+    notes: notes.present ? notes.value : this.notes,
+    isActive: isActive ?? this.isActive,
+    createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  ProductVariant copyWithCompanion(ProductVariantsCompanion data) {
+    return ProductVariant(
+      id: data.id.present ? data.id.value : this.id,
+      productId: data.productId.present ? data.productId.value : this.productId,
+      variantName: data.variantName.present
+          ? data.variantName.value
+          : this.variantName,
+      sellingPrice: data.sellingPrice.present
+          ? data.sellingPrice.value
+          : this.sellingPrice,
+      expiryDate: data.expiryDate.present
+          ? data.expiryDate.value
+          : this.expiryDate,
+      notes: data.notes.present ? data.notes.value : this.notes,
+      isActive: data.isActive.present ? data.isActive.value : this.isActive,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ProductVariant(')
+          ..write('id: $id, ')
+          ..write('productId: $productId, ')
+          ..write('variantName: $variantName, ')
+          ..write('sellingPrice: $sellingPrice, ')
+          ..write('expiryDate: $expiryDate, ')
+          ..write('notes: $notes, ')
+          ..write('isActive: $isActive, ')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    productId,
+    variantName,
+    sellingPrice,
+    expiryDate,
+    notes,
+    isActive,
+    createdAt,
+    updatedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is ProductVariant &&
+          other.id == this.id &&
+          other.productId == this.productId &&
+          other.variantName == this.variantName &&
+          other.sellingPrice == this.sellingPrice &&
+          other.expiryDate == this.expiryDate &&
+          other.notes == this.notes &&
+          other.isActive == this.isActive &&
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt);
+}
+
+class ProductVariantsCompanion extends UpdateCompanion<ProductVariant> {
+  final Value<int> id;
+  final Value<int> productId;
+  final Value<String> variantName;
+  final Value<int> sellingPrice;
+  final Value<DateTime?> expiryDate;
+  final Value<String?> notes;
+  final Value<bool> isActive;
+  final Value<DateTime> createdAt;
+  final Value<DateTime> updatedAt;
+  const ProductVariantsCompanion({
+    this.id = const Value.absent(),
+    this.productId = const Value.absent(),
+    this.variantName = const Value.absent(),
+    this.sellingPrice = const Value.absent(),
+    this.expiryDate = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.isActive = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  });
+  ProductVariantsCompanion.insert({
+    this.id = const Value.absent(),
+    required int productId,
+    required String variantName,
+    this.sellingPrice = const Value.absent(),
+    this.expiryDate = const Value.absent(),
+    this.notes = const Value.absent(),
+    this.isActive = const Value.absent(),
+    this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+  }) : productId = Value(productId),
+       variantName = Value(variantName);
+  static Insertable<ProductVariant> custom({
+    Expression<int>? id,
+    Expression<int>? productId,
+    Expression<String>? variantName,
+    Expression<int>? sellingPrice,
+    Expression<DateTime>? expiryDate,
+    Expression<String>? notes,
+    Expression<bool>? isActive,
+    Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (productId != null) 'product_id': productId,
+      if (variantName != null) 'variant_name': variantName,
+      if (sellingPrice != null) 'selling_price': sellingPrice,
+      if (expiryDate != null) 'expiry_date': expiryDate,
+      if (notes != null) 'notes': notes,
+      if (isActive != null) 'is_active': isActive,
+      if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+    });
+  }
+
+  ProductVariantsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? productId,
+    Value<String>? variantName,
+    Value<int>? sellingPrice,
+    Value<DateTime?>? expiryDate,
+    Value<String?>? notes,
+    Value<bool>? isActive,
+    Value<DateTime>? createdAt,
+    Value<DateTime>? updatedAt,
+  }) {
+    return ProductVariantsCompanion(
+      id: id ?? this.id,
+      productId: productId ?? this.productId,
+      variantName: variantName ?? this.variantName,
+      sellingPrice: sellingPrice ?? this.sellingPrice,
+      expiryDate: expiryDate ?? this.expiryDate,
+      notes: notes ?? this.notes,
+      isActive: isActive ?? this.isActive,
+      createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (productId.present) {
+      map['product_id'] = Variable<int>(productId.value);
+    }
+    if (variantName.present) {
+      map['variant_name'] = Variable<String>(variantName.value);
+    }
+    if (sellingPrice.present) {
+      map['selling_price'] = Variable<int>(sellingPrice.value);
+    }
+    if (expiryDate.present) {
+      map['expiry_date'] = Variable<DateTime>(expiryDate.value);
+    }
+    if (notes.present) {
+      map['notes'] = Variable<String>(notes.value);
+    }
+    if (isActive.present) {
+      map['is_active'] = Variable<bool>(isActive.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('ProductVariantsCompanion(')
+          ..write('id: $id, ')
+          ..write('productId: $productId, ')
+          ..write('variantName: $variantName, ')
+          ..write('sellingPrice: $sellingPrice, ')
+          ..write('expiryDate: $expiryDate, ')
+          ..write('notes: $notes, ')
           ..write('isActive: $isActive, ')
           ..write('createdAt: $createdAt, ')
           ..write('updatedAt: $updatedAt')
@@ -13268,6 +12950,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $SuppliersTable suppliers = $SuppliersTable(this);
   late final $WarehousesTable warehouses = $WarehousesTable(this);
   late final $ProductsTable products = $ProductsTable(this);
+  late final $ProductVariantsTable productVariants = $ProductVariantsTable(
+    this,
+  );
   late final $ProductUomsTable productUoms = $ProductUomsTable(this);
   late final $DocumentNumberSequencesTable documentNumberSequences =
       $DocumentNumberSequencesTable(this);
@@ -13315,21 +13000,25 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     'idx_product_category',
     'CREATE INDEX idx_product_category ON product (category_id)',
   );
-  late final Index idxProductCategorySubCategory = Index(
-    'idx_product_category_sub_category',
-    'CREATE INDEX idx_product_category_sub_category ON product (category_id, sub_category_id)',
-  );
   late final Index idxProductBrand = Index(
     'idx_product_brand',
     'CREATE INDEX idx_product_brand ON product (brand_id)',
   );
-  late final Index idxProductDefaultWarehouse = Index(
-    'idx_product_default_warehouse',
-    'CREATE INDEX idx_product_default_warehouse ON product (default_warehouse_id)',
-  );
   late final Index idxProductActive = Index(
     'idx_product_active',
     'CREATE INDEX idx_product_active ON product (is_active)',
+  );
+  late final Index idxProductCreatedAt = Index(
+    'idx_product_created_at',
+    'CREATE INDEX idx_product_created_at ON product (created_at)',
+  );
+  late final Index idxVariantProduct = Index(
+    'idx_variant_product',
+    'CREATE INDEX idx_variant_product ON product_variant (product_id)',
+  );
+  late final Index idxVariantName = Index(
+    'idx_variant_name',
+    'CREATE INDEX idx_variant_name ON product_variant (variant_name)',
   );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
@@ -13349,6 +13038,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     suppliers,
     warehouses,
     products,
+    productVariants,
     productUoms,
     documentNumberSequences,
     idxSubCategoryCategory,
@@ -13362,10 +13052,11 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     idxSupplierActiveName,
     idxProductName,
     idxProductCategory,
-    idxProductCategorySubCategory,
     idxProductBrand,
-    idxProductDefaultWarehouse,
     idxProductActive,
+    idxProductCreatedAt,
+    idxVariantProduct,
+    idxVariantName,
   ];
 }
 
@@ -14848,6 +14539,25 @@ final class $$SubCategoriesTableReferences
       manager.$state.copyWith(prefetchedData: [item]),
     );
   }
+
+  static MultiTypedResultKey<$ProductsTable, List<Product>> _productsRefsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.products,
+    aliasName: 'sub_category__id__product__sub_category_id',
+  );
+
+  $$ProductsTableProcessedTableManager get productsRefs {
+    final manager = $$ProductsTableTableManager(
+      $_db,
+      $_db.products,
+    ).filter((f) => f.subCategoryId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_productsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$SubCategoriesTableFilterComposer
@@ -14915,6 +14625,31 @@ class $$SubCategoriesTableFilterComposer
           ),
     );
     return composer;
+  }
+
+  Expression<bool> productsRefs(
+    Expression<bool> Function($$ProductsTableFilterComposer f) f,
+  ) {
+    final $$ProductsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.products,
+      getReferencedColumn: (t) => t.subCategoryId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProductsTableFilterComposer(
+            $db: $db,
+            $table: $db.products,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
   }
 }
 
@@ -15044,6 +14779,31 @@ class $$SubCategoriesTableAnnotationComposer
     );
     return composer;
   }
+
+  Expression<T> productsRefs<T extends Object>(
+    Expression<T> Function($$ProductsTableAnnotationComposer a) f,
+  ) {
+    final $$ProductsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.products,
+      getReferencedColumn: (t) => t.subCategoryId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProductsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.products,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$SubCategoriesTableTableManager
@@ -15059,7 +14819,7 @@ class $$SubCategoriesTableTableManager
           $$SubCategoriesTableUpdateCompanionBuilder,
           (SubCategory, $$SubCategoriesTableReferences),
           SubCategory,
-          PrefetchHooks Function({bool categoryId})
+          PrefetchHooks Function({bool categoryId, bool productsRefs})
         > {
   $$SubCategoriesTableTableManager(_$AppDatabase db, $SubCategoriesTable table)
     : super(
@@ -15120,10 +14880,10 @@ class $$SubCategoriesTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({categoryId = false}) {
+          prefetchHooksCallback: ({categoryId = false, productsRefs = false}) {
             return PrefetchHooks(
               db: db,
-              explicitlyWatchedTables: [],
+              explicitlyWatchedTables: [if (productsRefs) db.products],
               addJoins:
                   <
                     T extends TableManagerState<
@@ -15157,7 +14917,29 @@ class $$SubCategoriesTableTableManager
                     return state;
                   },
               getPrefetchedDataCallback: (items) async {
-                return [];
+                return [
+                  if (productsRefs)
+                    await $_getPrefetchedData<
+                      SubCategory,
+                      $SubCategoriesTable,
+                      Product
+                    >(
+                      currentTable: table,
+                      referencedTable: $$SubCategoriesTableReferences
+                          ._productsRefsTable(db),
+                      managerFromTypedResult: (p0) =>
+                          $$SubCategoriesTableReferences(
+                            db,
+                            table,
+                            p0,
+                          ).productsRefs,
+                      referencedItemsForCurrentItem: (item, referencedItems) =>
+                          referencedItems.where(
+                            (e) => e.subCategoryId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
+                ];
               },
             );
           },
@@ -15177,7 +14959,7 @@ typedef $$SubCategoriesTableProcessedTableManager =
       $$SubCategoriesTableUpdateCompanionBuilder,
       (SubCategory, $$SubCategoriesTableReferences),
       SubCategory,
-      PrefetchHooks Function({bool categoryId})
+      PrefetchHooks Function({bool categoryId, bool productsRefs})
     >;
 typedef $$BrandsTableCreateCompanionBuilder =
     BrandsCompanion Function({
@@ -15568,58 +15350,20 @@ final class $$UnitsTableReferences
     );
   }
 
-  static MultiTypedResultKey<$ProductsTable, List<Product>> _purchaseUnitTable(
+  static MultiTypedResultKey<$ProductsTable, List<Product>> _productsRefsTable(
     _$AppDatabase db,
   ) => MultiTypedResultKey.fromTable(
     db.products,
-    aliasName: 'unit__id__product__purchase_unit_id',
+    aliasName: 'unit__id__product__unit_id',
   );
 
-  $$ProductsTableProcessedTableManager get purchaseUnit {
+  $$ProductsTableProcessedTableManager get productsRefs {
     final manager = $$ProductsTableTableManager(
       $_db,
       $_db.products,
-    ).filter((f) => f.purchaseUnitId.id.sqlEquals($_itemColumn<int>('id')!));
+    ).filter((f) => f.unitId.id.sqlEquals($_itemColumn<int>('id')!));
 
-    final cache = $_typedResult.readTableOrNull(_purchaseUnitTable($_db));
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
-
-  static MultiTypedResultKey<$ProductsTable, List<Product>> _salesUnitTable(
-    _$AppDatabase db,
-  ) => MultiTypedResultKey.fromTable(
-    db.products,
-    aliasName: 'unit__id__product__sales_unit_id',
-  );
-
-  $$ProductsTableProcessedTableManager get salesUnit {
-    final manager = $$ProductsTableTableManager(
-      $_db,
-      $_db.products,
-    ).filter((f) => f.salesUnitId.id.sqlEquals($_itemColumn<int>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(_salesUnitTable($_db));
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
-
-  static MultiTypedResultKey<$ProductsTable, List<Product>> _stockUnitTable(
-    _$AppDatabase db,
-  ) => MultiTypedResultKey.fromTable(
-    db.products,
-    aliasName: 'unit__id__product__stock_unit_id',
-  );
-
-  $$ProductsTableProcessedTableManager get stockUnit {
-    final manager = $$ProductsTableTableManager(
-      $_db,
-      $_db.products,
-    ).filter((f) => f.stockUnitId.id.sqlEquals($_itemColumn<int>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(_stockUnitTable($_db));
+    final cache = $_typedResult.readTableOrNull(_productsRefsTable($_db));
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
     );
@@ -15760,64 +15504,14 @@ class $$UnitsTableFilterComposer extends Composer<_$AppDatabase, $UnitsTable> {
     return f(composer);
   }
 
-  Expression<bool> purchaseUnit(
+  Expression<bool> productsRefs(
     Expression<bool> Function($$ProductsTableFilterComposer f) f,
   ) {
     final $$ProductsTableFilterComposer composer = $composerBuilder(
       composer: this,
       getCurrentColumn: (t) => t.id,
       referencedTable: $db.products,
-      getReferencedColumn: (t) => t.purchaseUnitId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$ProductsTableFilterComposer(
-            $db: $db,
-            $table: $db.products,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-
-  Expression<bool> salesUnit(
-    Expression<bool> Function($$ProductsTableFilterComposer f) f,
-  ) {
-    final $$ProductsTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.products,
-      getReferencedColumn: (t) => t.salesUnitId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$ProductsTableFilterComposer(
-            $db: $db,
-            $table: $db.products,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-
-  Expression<bool> stockUnit(
-    Expression<bool> Function($$ProductsTableFilterComposer f) f,
-  ) {
-    final $$ProductsTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.products,
-      getReferencedColumn: (t) => t.stockUnitId,
+      getReferencedColumn: (t) => t.unitId,
       builder:
           (
             joinBuilder, {
@@ -16025,64 +15719,14 @@ class $$UnitsTableAnnotationComposer
     return f(composer);
   }
 
-  Expression<T> purchaseUnit<T extends Object>(
+  Expression<T> productsRefs<T extends Object>(
     Expression<T> Function($$ProductsTableAnnotationComposer a) f,
   ) {
     final $$ProductsTableAnnotationComposer composer = $composerBuilder(
       composer: this,
       getCurrentColumn: (t) => t.id,
       referencedTable: $db.products,
-      getReferencedColumn: (t) => t.purchaseUnitId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$ProductsTableAnnotationComposer(
-            $db: $db,
-            $table: $db.products,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-
-  Expression<T> salesUnit<T extends Object>(
-    Expression<T> Function($$ProductsTableAnnotationComposer a) f,
-  ) {
-    final $$ProductsTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.products,
-      getReferencedColumn: (t) => t.salesUnitId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$ProductsTableAnnotationComposer(
-            $db: $db,
-            $table: $db.products,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-
-  Expression<T> stockUnit<T extends Object>(
-    Expression<T> Function($$ProductsTableAnnotationComposer a) f,
-  ) {
-    final $$ProductsTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.products,
-      getReferencedColumn: (t) => t.stockUnitId,
+      getReferencedColumn: (t) => t.unitId,
       builder:
           (
             joinBuilder, {
@@ -16167,9 +15811,7 @@ class $$UnitsTableTableManager
           PrefetchHooks Function({
             bool fromUnit,
             bool toUnit,
-            bool purchaseUnit,
-            bool salesUnit,
-            bool stockUnit,
+            bool productsRefs,
             bool productUomsFrom,
             bool productUomsTo,
           })
@@ -16235,9 +15877,7 @@ class $$UnitsTableTableManager
               ({
                 fromUnit = false,
                 toUnit = false,
-                purchaseUnit = false,
-                salesUnit = false,
-                stockUnit = false,
+                productsRefs = false,
                 productUomsFrom = false,
                 productUomsTo = false,
               }) {
@@ -16246,9 +15886,7 @@ class $$UnitsTableTableManager
                   explicitlyWatchedTables: [
                     if (fromUnit) db.uomConversions,
                     if (toUnit) db.uomConversions,
-                    if (purchaseUnit) db.products,
-                    if (salesUnit) db.products,
-                    if (stockUnit) db.products,
+                    if (productsRefs) db.products,
                     if (productUomsFrom) db.productUoms,
                     if (productUomsTo) db.productUoms,
                   ],
@@ -16290,46 +15928,20 @@ class $$UnitsTableTableManager
                               ),
                           typedResults: items,
                         ),
-                      if (purchaseUnit)
+                      if (productsRefs)
                         await $_getPrefetchedData<Unit, $UnitsTable, Product>(
                           currentTable: table,
                           referencedTable: $$UnitsTableReferences
-                              ._purchaseUnitTable(db),
+                              ._productsRefsTable(db),
                           managerFromTypedResult: (p0) =>
                               $$UnitsTableReferences(
                                 db,
                                 table,
                                 p0,
-                              ).purchaseUnit,
+                              ).productsRefs,
                           referencedItemsForCurrentItem:
                               (item, referencedItems) => referencedItems.where(
-                                (e) => e.purchaseUnitId == item.id,
-                              ),
-                          typedResults: items,
-                        ),
-                      if (salesUnit)
-                        await $_getPrefetchedData<Unit, $UnitsTable, Product>(
-                          currentTable: table,
-                          referencedTable: $$UnitsTableReferences
-                              ._salesUnitTable(db),
-                          managerFromTypedResult: (p0) =>
-                              $$UnitsTableReferences(db, table, p0).salesUnit,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.salesUnitId == item.id,
-                              ),
-                          typedResults: items,
-                        ),
-                      if (stockUnit)
-                        await $_getPrefetchedData<Unit, $UnitsTable, Product>(
-                          currentTable: table,
-                          referencedTable: $$UnitsTableReferences
-                              ._stockUnitTable(db),
-                          managerFromTypedResult: (p0) =>
-                              $$UnitsTableReferences(db, table, p0).stockUnit,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.stockUnitId == item.id,
+                                (e) => e.unitId == item.id,
                               ),
                           typedResults: items,
                         ),
@@ -16398,9 +16010,7 @@ typedef $$UnitsTableProcessedTableManager =
       PrefetchHooks Function({
         bool fromUnit,
         bool toUnit,
-        bool purchaseUnit,
-        bool salesUnit,
-        bool stockUnit,
+        bool productsRefs,
         bool productUomsFrom,
         bool productUomsTo,
       })
@@ -16919,25 +16529,6 @@ final class $$TaxCategoriesTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
-
-  static MultiTypedResultKey<$ProductsTable, List<Product>> _productsRefsTable(
-    _$AppDatabase db,
-  ) => MultiTypedResultKey.fromTable(
-    db.products,
-    aliasName: 'tax_category__id__product__tax_category_id',
-  );
-
-  $$ProductsTableProcessedTableManager get productsRefs {
-    final manager = $$ProductsTableTableManager(
-      $_db,
-      $_db.products,
-    ).filter((f) => f.taxCategoryId.id.sqlEquals($_itemColumn<int>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(_productsRefsTable($_db));
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
 }
 
 class $$TaxCategoriesTableFilterComposer
@@ -17000,31 +16591,6 @@ class $$TaxCategoriesTableFilterComposer
           }) => $$TaxCategoryRatesTableFilterComposer(
             $db: $db,
             $table: $db.taxCategoryRates,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-
-  Expression<bool> productsRefs(
-    Expression<bool> Function($$ProductsTableFilterComposer f) f,
-  ) {
-    final $$ProductsTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.products,
-      getReferencedColumn: (t) => t.taxCategoryId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$ProductsTableFilterComposer(
-            $db: $db,
-            $table: $db.products,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -17140,31 +16706,6 @@ class $$TaxCategoriesTableAnnotationComposer
     );
     return f(composer);
   }
-
-  Expression<T> productsRefs<T extends Object>(
-    Expression<T> Function($$ProductsTableAnnotationComposer a) f,
-  ) {
-    final $$ProductsTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.products,
-      getReferencedColumn: (t) => t.taxCategoryId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$ProductsTableAnnotationComposer(
-            $db: $db,
-            $table: $db.products,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
 }
 
 class $$TaxCategoriesTableTableManager
@@ -17180,7 +16721,7 @@ class $$TaxCategoriesTableTableManager
           $$TaxCategoriesTableUpdateCompanionBuilder,
           (TaxCategory, $$TaxCategoriesTableReferences),
           TaxCategory,
-          PrefetchHooks Function({bool taxCategoryRatesRefs, bool productsRefs})
+          PrefetchHooks Function({bool taxCategoryRatesRefs})
         > {
   $$TaxCategoriesTableTableManager(_$AppDatabase db, $TaxCategoriesTable table)
     : super(
@@ -17237,63 +16778,40 @@ class $$TaxCategoriesTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback:
-              ({taxCategoryRatesRefs = false, productsRefs = false}) {
-                return PrefetchHooks(
-                  db: db,
-                  explicitlyWatchedTables: [
-                    if (taxCategoryRatesRefs) db.taxCategoryRates,
-                    if (productsRefs) db.products,
-                  ],
-                  addJoins: null,
-                  getPrefetchedDataCallback: (items) async {
-                    return [
-                      if (taxCategoryRatesRefs)
-                        await $_getPrefetchedData<
-                          TaxCategory,
-                          $TaxCategoriesTable,
-                          TaxCategoryRate
-                        >(
-                          currentTable: table,
-                          referencedTable: $$TaxCategoriesTableReferences
-                              ._taxCategoryRatesRefsTable(db),
-                          managerFromTypedResult: (p0) =>
-                              $$TaxCategoriesTableReferences(
-                                db,
-                                table,
-                                p0,
-                              ).taxCategoryRatesRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.taxCategoryId == item.id,
-                              ),
-                          typedResults: items,
-                        ),
-                      if (productsRefs)
-                        await $_getPrefetchedData<
-                          TaxCategory,
-                          $TaxCategoriesTable,
-                          Product
-                        >(
-                          currentTable: table,
-                          referencedTable: $$TaxCategoriesTableReferences
-                              ._productsRefsTable(db),
-                          managerFromTypedResult: (p0) =>
-                              $$TaxCategoriesTableReferences(
-                                db,
-                                table,
-                                p0,
-                              ).productsRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.taxCategoryId == item.id,
-                              ),
-                          typedResults: items,
-                        ),
-                    ];
-                  },
-                );
+          prefetchHooksCallback: ({taxCategoryRatesRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [
+                if (taxCategoryRatesRefs) db.taxCategoryRates,
+              ],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (taxCategoryRatesRefs)
+                    await $_getPrefetchedData<
+                      TaxCategory,
+                      $TaxCategoriesTable,
+                      TaxCategoryRate
+                    >(
+                      currentTable: table,
+                      referencedTable: $$TaxCategoriesTableReferences
+                          ._taxCategoryRatesRefsTable(db),
+                      managerFromTypedResult: (p0) =>
+                          $$TaxCategoriesTableReferences(
+                            db,
+                            table,
+                            p0,
+                          ).taxCategoryRatesRefs,
+                      referencedItemsForCurrentItem: (item, referencedItems) =>
+                          referencedItems.where(
+                            (e) => e.taxCategoryId == item.id,
+                          ),
+                      typedResults: items,
+                    ),
+                ];
               },
+            );
+          },
         ),
       );
 }
@@ -17310,7 +16828,7 @@ typedef $$TaxCategoriesTableProcessedTableManager =
       $$TaxCategoriesTableUpdateCompanionBuilder,
       (TaxCategory, $$TaxCategoriesTableReferences),
       TaxCategory,
-      PrefetchHooks Function({bool taxCategoryRatesRefs, bool productsRefs})
+      PrefetchHooks Function({bool taxCategoryRatesRefs})
     >;
 typedef $$TaxTypesTableCreateCompanionBuilder =
     TaxTypesCompanion Function({
@@ -19615,29 +19133,6 @@ typedef $$WarehousesTableUpdateCompanionBuilder =
       Value<DateTime> updatedAt,
     });
 
-final class $$WarehousesTableReferences
-    extends BaseReferences<_$AppDatabase, $WarehousesTable, Warehouse> {
-  $$WarehousesTableReferences(super.$_db, super.$_table, super.$_typedResult);
-
-  static MultiTypedResultKey<$ProductsTable, List<Product>> _productsRefsTable(
-    _$AppDatabase db,
-  ) => MultiTypedResultKey.fromTable(
-    db.products,
-    aliasName: 'warehouse__id__product__default_warehouse_id',
-  );
-
-  $$ProductsTableProcessedTableManager get productsRefs {
-    final manager = $$ProductsTableTableManager($_db, $_db.products).filter(
-      (f) => f.defaultWarehouseId.id.sqlEquals($_itemColumn<int>('id')!),
-    );
-
-    final cache = $_typedResult.readTableOrNull(_productsRefsTable($_db));
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
-}
-
 class $$WarehousesTableFilterComposer
     extends Composer<_$AppDatabase, $WarehousesTable> {
   $$WarehousesTableFilterComposer({
@@ -19716,31 +19211,6 @@ class $$WarehousesTableFilterComposer
     column: $table.updatedAt,
     builder: (column) => ColumnFilters(column),
   );
-
-  Expression<bool> productsRefs(
-    Expression<bool> Function($$ProductsTableFilterComposer f) f,
-  ) {
-    final $$ProductsTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.products,
-      getReferencedColumn: (t) => t.defaultWarehouseId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$ProductsTableFilterComposer(
-            $db: $db,
-            $table: $db.products,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
 }
 
 class $$WarehousesTableOrderingComposer
@@ -19879,31 +19349,6 @@ class $$WarehousesTableAnnotationComposer
 
   GeneratedColumn<DateTime> get updatedAt =>
       $composableBuilder(column: $table.updatedAt, builder: (column) => column);
-
-  Expression<T> productsRefs<T extends Object>(
-    Expression<T> Function($$ProductsTableAnnotationComposer a) f,
-  ) {
-    final $$ProductsTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.products,
-      getReferencedColumn: (t) => t.defaultWarehouseId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$ProductsTableAnnotationComposer(
-            $db: $db,
-            $table: $db.products,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
 }
 
 class $$WarehousesTableTableManager
@@ -19917,9 +19362,12 @@ class $$WarehousesTableTableManager
           $$WarehousesTableAnnotationComposer,
           $$WarehousesTableCreateCompanionBuilder,
           $$WarehousesTableUpdateCompanionBuilder,
-          (Warehouse, $$WarehousesTableReferences),
+          (
+            Warehouse,
+            BaseReferences<_$AppDatabase, $WarehousesTable, Warehouse>,
+          ),
           Warehouse,
-          PrefetchHooks Function({bool productsRefs})
+          PrefetchHooks Function()
         > {
   $$WarehousesTableTableManager(_$AppDatabase db, $WarehousesTable table)
     : super(
@@ -19997,45 +19445,9 @@ class $$WarehousesTableTableManager
                 updatedAt: updatedAt,
               ),
           withReferenceMapper: (p0) => p0
-              .map(
-                (e) => (
-                  e.readTable(table),
-                  $$WarehousesTableReferences(db, table, e),
-                ),
-              )
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
               .toList(),
-          prefetchHooksCallback: ({productsRefs = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [if (productsRefs) db.products],
-              addJoins: null,
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (productsRefs)
-                    await $_getPrefetchedData<
-                      Warehouse,
-                      $WarehousesTable,
-                      Product
-                    >(
-                      currentTable: table,
-                      referencedTable: $$WarehousesTableReferences
-                          ._productsRefsTable(db),
-                      managerFromTypedResult: (p0) =>
-                          $$WarehousesTableReferences(
-                            db,
-                            table,
-                            p0,
-                          ).productsRefs,
-                      referencedItemsForCurrentItem: (item, referencedItems) =>
-                          referencedItems.where(
-                            (e) => e.defaultWarehouseId == item.id,
-                          ),
-                      typedResults: items,
-                    ),
-                ];
-              },
-            );
-          },
+          prefetchHooksCallback: null,
         ),
       );
 }
@@ -20050,40 +19462,23 @@ typedef $$WarehousesTableProcessedTableManager =
       $$WarehousesTableAnnotationComposer,
       $$WarehousesTableCreateCompanionBuilder,
       $$WarehousesTableUpdateCompanionBuilder,
-      (Warehouse, $$WarehousesTableReferences),
+      (Warehouse, BaseReferences<_$AppDatabase, $WarehousesTable, Warehouse>),
       Warehouse,
-      PrefetchHooks Function({bool productsRefs})
+      PrefetchHooks Function()
     >;
 typedef $$ProductsTableCreateCompanionBuilder =
     ProductsCompanion Function({
       Value<int> id,
       required String productCode,
       required String productName,
-      Value<String?> barcode,
-      required int categoryId,
+      Value<int?> categoryId,
       Value<int?> subCategoryId,
-      required int brandId,
-      required int purchaseUnitId,
-      required int salesUnitId,
-      required int stockUnitId,
-      Value<int> purchasePrice,
-      Value<int> landingCost,
-      Value<int> mrp,
-      Value<int> retailPrice,
-      Value<int> wholesalePrice,
-      Value<int?> specialPrice,
-      required int taxCategoryId,
+      Value<int?> brandId,
+      required int unitId,
+      Value<int> sellingPrice,
       Value<int?> taxTypeId,
-      Value<int?> defaultWarehouseId,
-      Value<double> minStock,
-      Value<double> maxStock,
-      Value<double> reorderLevel,
-      Value<double> openingStock,
-      Value<double> currentStock,
-      Value<double?> weight,
-      Value<String?> description,
-      Value<String?> imagePath,
-      Value<bool> isStockItem,
+      Value<DateTime?> expiryDate,
+      Value<String?> notes,
       Value<bool> isActive,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
@@ -20093,31 +19488,14 @@ typedef $$ProductsTableUpdateCompanionBuilder =
       Value<int> id,
       Value<String> productCode,
       Value<String> productName,
-      Value<String?> barcode,
-      Value<int> categoryId,
+      Value<int?> categoryId,
       Value<int?> subCategoryId,
-      Value<int> brandId,
-      Value<int> purchaseUnitId,
-      Value<int> salesUnitId,
-      Value<int> stockUnitId,
-      Value<int> purchasePrice,
-      Value<int> landingCost,
-      Value<int> mrp,
-      Value<int> retailPrice,
-      Value<int> wholesalePrice,
-      Value<int?> specialPrice,
-      Value<int> taxCategoryId,
+      Value<int?> brandId,
+      Value<int> unitId,
+      Value<int> sellingPrice,
       Value<int?> taxTypeId,
-      Value<int?> defaultWarehouseId,
-      Value<double> minStock,
-      Value<double> maxStock,
-      Value<double> reorderLevel,
-      Value<double> openingStock,
-      Value<double> currentStock,
-      Value<double?> weight,
-      Value<String?> description,
-      Value<String?> imagePath,
-      Value<bool> isStockItem,
+      Value<DateTime?> expiryDate,
+      Value<String?> notes,
       Value<bool> isActive,
       Value<DateTime> createdAt,
       Value<DateTime> updatedAt,
@@ -20130,9 +19508,9 @@ final class $$ProductsTableReferences
   static $CategoriesTable _categoryIdTable(_$AppDatabase db) =>
       db.categories.createAlias('product__category_id__category__id');
 
-  $$CategoriesTableProcessedTableManager get categoryId {
-    final $_column = $_itemColumn<int>('category_id')!;
-
+  $$CategoriesTableProcessedTableManager? get categoryId {
+    final $_column = $_itemColumn<int>('category_id');
+    if ($_column == null) return null;
     final manager = $$CategoriesTableTableManager(
       $_db,
       $_db.categories,
@@ -20144,12 +19522,30 @@ final class $$ProductsTableReferences
     );
   }
 
+  static $SubCategoriesTable _subCategoryIdTable(_$AppDatabase db) => db
+      .subCategories
+      .createAlias('product__sub_category_id__sub_category__id');
+
+  $$SubCategoriesTableProcessedTableManager? get subCategoryId {
+    final $_column = $_itemColumn<int>('sub_category_id');
+    if ($_column == null) return null;
+    final manager = $$SubCategoriesTableTableManager(
+      $_db,
+      $_db.subCategories,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_subCategoryIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
   static $BrandsTable _brandIdTable(_$AppDatabase db) =>
       db.brands.createAlias('product__brand_id__brand__id');
 
-  $$BrandsTableProcessedTableManager get brandId {
-    final $_column = $_itemColumn<int>('brand_id')!;
-
+  $$BrandsTableProcessedTableManager? get brandId {
+    final $_column = $_itemColumn<int>('brand_id');
+    if ($_column == null) return null;
     final manager = $$BrandsTableTableManager(
       $_db,
       $_db.brands,
@@ -20161,69 +19557,17 @@ final class $$ProductsTableReferences
     );
   }
 
-  static $UnitsTable _purchaseUnitIdTable(_$AppDatabase db) =>
-      db.units.createAlias('product__purchase_unit_id__unit__id');
+  static $UnitsTable _unitIdTable(_$AppDatabase db) =>
+      db.units.createAlias('product__unit_id__unit__id');
 
-  $$UnitsTableProcessedTableManager get purchaseUnitId {
-    final $_column = $_itemColumn<int>('purchase_unit_id')!;
-
-    final manager = $$UnitsTableTableManager(
-      $_db,
-      $_db.units,
-    ).filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_purchaseUnitIdTable($_db));
-    if (item == null) return manager;
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: [item]),
-    );
-  }
-
-  static $UnitsTable _salesUnitIdTable(_$AppDatabase db) =>
-      db.units.createAlias('product__sales_unit_id__unit__id');
-
-  $$UnitsTableProcessedTableManager get salesUnitId {
-    final $_column = $_itemColumn<int>('sales_unit_id')!;
+  $$UnitsTableProcessedTableManager get unitId {
+    final $_column = $_itemColumn<int>('unit_id')!;
 
     final manager = $$UnitsTableTableManager(
       $_db,
       $_db.units,
     ).filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_salesUnitIdTable($_db));
-    if (item == null) return manager;
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: [item]),
-    );
-  }
-
-  static $UnitsTable _stockUnitIdTable(_$AppDatabase db) =>
-      db.units.createAlias('product__stock_unit_id__unit__id');
-
-  $$UnitsTableProcessedTableManager get stockUnitId {
-    final $_column = $_itemColumn<int>('stock_unit_id')!;
-
-    final manager = $$UnitsTableTableManager(
-      $_db,
-      $_db.units,
-    ).filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_stockUnitIdTable($_db));
-    if (item == null) return manager;
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: [item]),
-    );
-  }
-
-  static $TaxCategoriesTable _taxCategoryIdTable(_$AppDatabase db) => db
-      .taxCategories
-      .createAlias('product__tax_category_id__tax_category__id');
-
-  $$TaxCategoriesTableProcessedTableManager get taxCategoryId {
-    final $_column = $_itemColumn<int>('tax_category_id')!;
-
-    final manager = $$TaxCategoriesTableTableManager(
-      $_db,
-      $_db.taxCategories,
-    ).filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_taxCategoryIdTable($_db));
+    final item = $_typedResult.readTableOrNull(_unitIdTable($_db));
     if (item == null) return manager;
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: [item]),
@@ -20247,20 +19591,23 @@ final class $$ProductsTableReferences
     );
   }
 
-  static $WarehousesTable _defaultWarehouseIdTable(_$AppDatabase db) =>
-      db.warehouses.createAlias('product__default_warehouse_id__warehouse__id');
+  static MultiTypedResultKey<$ProductVariantsTable, List<ProductVariant>>
+  _productVariantsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.productVariants,
+    aliasName: 'product__id__product_variant__product_id',
+  );
 
-  $$WarehousesTableProcessedTableManager? get defaultWarehouseId {
-    final $_column = $_itemColumn<int>('default_warehouse_id');
-    if ($_column == null) return null;
-    final manager = $$WarehousesTableTableManager(
+  $$ProductVariantsTableProcessedTableManager get productVariantsRefs {
+    final manager = $$ProductVariantsTableTableManager(
       $_db,
-      $_db.warehouses,
-    ).filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_defaultWarehouseIdTable($_db));
-    if (item == null) return manager;
+      $_db.productVariants,
+    ).filter((f) => f.productId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(
+      _productVariantsRefsTable($_db),
+    );
     return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: [item]),
+      manager.$state.copyWith(prefetchedData: cache),
     );
   }
 
@@ -20307,88 +19654,18 @@ class $$ProductsTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<String> get barcode => $composableBuilder(
-    column: $table.barcode,
+  ColumnFilters<int> get sellingPrice => $composableBuilder(
+    column: $table.sellingPrice,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<int> get subCategoryId => $composableBuilder(
-    column: $table.subCategoryId,
+  ColumnFilters<DateTime> get expiryDate => $composableBuilder(
+    column: $table.expiryDate,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<int> get purchasePrice => $composableBuilder(
-    column: $table.purchasePrice,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<int> get landingCost => $composableBuilder(
-    column: $table.landingCost,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<int> get mrp => $composableBuilder(
-    column: $table.mrp,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<int> get retailPrice => $composableBuilder(
-    column: $table.retailPrice,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<int> get wholesalePrice => $composableBuilder(
-    column: $table.wholesalePrice,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<int> get specialPrice => $composableBuilder(
-    column: $table.specialPrice,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<double> get minStock => $composableBuilder(
-    column: $table.minStock,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<double> get maxStock => $composableBuilder(
-    column: $table.maxStock,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<double> get reorderLevel => $composableBuilder(
-    column: $table.reorderLevel,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<double> get openingStock => $composableBuilder(
-    column: $table.openingStock,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<double> get currentStock => $composableBuilder(
-    column: $table.currentStock,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<double> get weight => $composableBuilder(
-    column: $table.weight,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get description => $composableBuilder(
-    column: $table.description,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get imagePath => $composableBuilder(
-    column: $table.imagePath,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<bool> get isStockItem => $composableBuilder(
-    column: $table.isStockItem,
+  ColumnFilters<String> get notes => $composableBuilder(
+    column: $table.notes,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -20430,6 +19707,29 @@ class $$ProductsTableFilterComposer
     return composer;
   }
 
+  $$SubCategoriesTableFilterComposer get subCategoryId {
+    final $$SubCategoriesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.subCategoryId,
+      referencedTable: $db.subCategories,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SubCategoriesTableFilterComposer(
+            $db: $db,
+            $table: $db.subCategories,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
   $$BrandsTableFilterComposer get brandId {
     final $$BrandsTableFilterComposer composer = $composerBuilder(
       composer: this,
@@ -20453,10 +19753,10 @@ class $$ProductsTableFilterComposer
     return composer;
   }
 
-  $$UnitsTableFilterComposer get purchaseUnitId {
+  $$UnitsTableFilterComposer get unitId {
     final $$UnitsTableFilterComposer composer = $composerBuilder(
       composer: this,
-      getCurrentColumn: (t) => t.purchaseUnitId,
+      getCurrentColumn: (t) => t.unitId,
       referencedTable: $db.units,
       getReferencedColumn: (t) => t.id,
       builder:
@@ -20467,75 +19767,6 @@ class $$ProductsTableFilterComposer
           }) => $$UnitsTableFilterComposer(
             $db: $db,
             $table: $db.units,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-
-  $$UnitsTableFilterComposer get salesUnitId {
-    final $$UnitsTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.salesUnitId,
-      referencedTable: $db.units,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$UnitsTableFilterComposer(
-            $db: $db,
-            $table: $db.units,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-
-  $$UnitsTableFilterComposer get stockUnitId {
-    final $$UnitsTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.stockUnitId,
-      referencedTable: $db.units,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$UnitsTableFilterComposer(
-            $db: $db,
-            $table: $db.units,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-
-  $$TaxCategoriesTableFilterComposer get taxCategoryId {
-    final $$TaxCategoriesTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.taxCategoryId,
-      referencedTable: $db.taxCategories,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$TaxCategoriesTableFilterComposer(
-            $db: $db,
-            $table: $db.taxCategories,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -20568,27 +19799,29 @@ class $$ProductsTableFilterComposer
     return composer;
   }
 
-  $$WarehousesTableFilterComposer get defaultWarehouseId {
-    final $$WarehousesTableFilterComposer composer = $composerBuilder(
+  Expression<bool> productVariantsRefs(
+    Expression<bool> Function($$ProductVariantsTableFilterComposer f) f,
+  ) {
+    final $$ProductVariantsTableFilterComposer composer = $composerBuilder(
       composer: this,
-      getCurrentColumn: (t) => t.defaultWarehouseId,
-      referencedTable: $db.warehouses,
-      getReferencedColumn: (t) => t.id,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.productVariants,
+      getReferencedColumn: (t) => t.productId,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$WarehousesTableFilterComposer(
+          }) => $$ProductVariantsTableFilterComposer(
             $db: $db,
-            $table: $db.warehouses,
+            $table: $db.productVariants,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
                 $removeJoinBuilderFromRootComposer,
           ),
     );
-    return composer;
+    return f(composer);
   }
 
   Expression<bool> productUomsRefs(
@@ -20641,88 +19874,18 @@ class $$ProductsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<String> get barcode => $composableBuilder(
-    column: $table.barcode,
+  ColumnOrderings<int> get sellingPrice => $composableBuilder(
+    column: $table.sellingPrice,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<int> get subCategoryId => $composableBuilder(
-    column: $table.subCategoryId,
+  ColumnOrderings<DateTime> get expiryDate => $composableBuilder(
+    column: $table.expiryDate,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<int> get purchasePrice => $composableBuilder(
-    column: $table.purchasePrice,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<int> get landingCost => $composableBuilder(
-    column: $table.landingCost,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<int> get mrp => $composableBuilder(
-    column: $table.mrp,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<int> get retailPrice => $composableBuilder(
-    column: $table.retailPrice,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<int> get wholesalePrice => $composableBuilder(
-    column: $table.wholesalePrice,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<int> get specialPrice => $composableBuilder(
-    column: $table.specialPrice,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<double> get minStock => $composableBuilder(
-    column: $table.minStock,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<double> get maxStock => $composableBuilder(
-    column: $table.maxStock,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<double> get reorderLevel => $composableBuilder(
-    column: $table.reorderLevel,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<double> get openingStock => $composableBuilder(
-    column: $table.openingStock,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<double> get currentStock => $composableBuilder(
-    column: $table.currentStock,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<double> get weight => $composableBuilder(
-    column: $table.weight,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get description => $composableBuilder(
-    column: $table.description,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get imagePath => $composableBuilder(
-    column: $table.imagePath,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<bool> get isStockItem => $composableBuilder(
-    column: $table.isStockItem,
+  ColumnOrderings<String> get notes => $composableBuilder(
+    column: $table.notes,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -20764,6 +19927,29 @@ class $$ProductsTableOrderingComposer
     return composer;
   }
 
+  $$SubCategoriesTableOrderingComposer get subCategoryId {
+    final $$SubCategoriesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.subCategoryId,
+      referencedTable: $db.subCategories,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SubCategoriesTableOrderingComposer(
+            $db: $db,
+            $table: $db.subCategories,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
   $$BrandsTableOrderingComposer get brandId {
     final $$BrandsTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -20787,10 +19973,10 @@ class $$ProductsTableOrderingComposer
     return composer;
   }
 
-  $$UnitsTableOrderingComposer get purchaseUnitId {
+  $$UnitsTableOrderingComposer get unitId {
     final $$UnitsTableOrderingComposer composer = $composerBuilder(
       composer: this,
-      getCurrentColumn: (t) => t.purchaseUnitId,
+      getCurrentColumn: (t) => t.unitId,
       referencedTable: $db.units,
       getReferencedColumn: (t) => t.id,
       builder:
@@ -20801,75 +19987,6 @@ class $$ProductsTableOrderingComposer
           }) => $$UnitsTableOrderingComposer(
             $db: $db,
             $table: $db.units,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-
-  $$UnitsTableOrderingComposer get salesUnitId {
-    final $$UnitsTableOrderingComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.salesUnitId,
-      referencedTable: $db.units,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$UnitsTableOrderingComposer(
-            $db: $db,
-            $table: $db.units,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-
-  $$UnitsTableOrderingComposer get stockUnitId {
-    final $$UnitsTableOrderingComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.stockUnitId,
-      referencedTable: $db.units,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$UnitsTableOrderingComposer(
-            $db: $db,
-            $table: $db.units,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-
-  $$TaxCategoriesTableOrderingComposer get taxCategoryId {
-    final $$TaxCategoriesTableOrderingComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.taxCategoryId,
-      referencedTable: $db.taxCategories,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$TaxCategoriesTableOrderingComposer(
-            $db: $db,
-            $table: $db.taxCategories,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -20893,29 +20010,6 @@ class $$ProductsTableOrderingComposer
           }) => $$TaxTypesTableOrderingComposer(
             $db: $db,
             $table: $db.taxTypes,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-
-  $$WarehousesTableOrderingComposer get defaultWarehouseId {
-    final $$WarehousesTableOrderingComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.defaultWarehouseId,
-      referencedTable: $db.warehouses,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$WarehousesTableOrderingComposer(
-            $db: $db,
-            $table: $db.warehouses,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -20948,78 +20042,18 @@ class $$ProductsTableAnnotationComposer
     builder: (column) => column,
   );
 
-  GeneratedColumn<String> get barcode =>
-      $composableBuilder(column: $table.barcode, builder: (column) => column);
-
-  GeneratedColumn<int> get subCategoryId => $composableBuilder(
-    column: $table.subCategoryId,
+  GeneratedColumn<int> get sellingPrice => $composableBuilder(
+    column: $table.sellingPrice,
     builder: (column) => column,
   );
 
-  GeneratedColumn<int> get purchasePrice => $composableBuilder(
-    column: $table.purchasePrice,
+  GeneratedColumn<DateTime> get expiryDate => $composableBuilder(
+    column: $table.expiryDate,
     builder: (column) => column,
   );
 
-  GeneratedColumn<int> get landingCost => $composableBuilder(
-    column: $table.landingCost,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<int> get mrp =>
-      $composableBuilder(column: $table.mrp, builder: (column) => column);
-
-  GeneratedColumn<int> get retailPrice => $composableBuilder(
-    column: $table.retailPrice,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<int> get wholesalePrice => $composableBuilder(
-    column: $table.wholesalePrice,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<int> get specialPrice => $composableBuilder(
-    column: $table.specialPrice,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<double> get minStock =>
-      $composableBuilder(column: $table.minStock, builder: (column) => column);
-
-  GeneratedColumn<double> get maxStock =>
-      $composableBuilder(column: $table.maxStock, builder: (column) => column);
-
-  GeneratedColumn<double> get reorderLevel => $composableBuilder(
-    column: $table.reorderLevel,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<double> get openingStock => $composableBuilder(
-    column: $table.openingStock,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<double> get currentStock => $composableBuilder(
-    column: $table.currentStock,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<double> get weight =>
-      $composableBuilder(column: $table.weight, builder: (column) => column);
-
-  GeneratedColumn<String> get description => $composableBuilder(
-    column: $table.description,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<String> get imagePath =>
-      $composableBuilder(column: $table.imagePath, builder: (column) => column);
-
-  GeneratedColumn<bool> get isStockItem => $composableBuilder(
-    column: $table.isStockItem,
-    builder: (column) => column,
-  );
+  GeneratedColumn<String> get notes =>
+      $composableBuilder(column: $table.notes, builder: (column) => column);
 
   GeneratedColumn<bool> get isActive =>
       $composableBuilder(column: $table.isActive, builder: (column) => column);
@@ -21053,6 +20087,29 @@ class $$ProductsTableAnnotationComposer
     return composer;
   }
 
+  $$SubCategoriesTableAnnotationComposer get subCategoryId {
+    final $$SubCategoriesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.subCategoryId,
+      referencedTable: $db.subCategories,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$SubCategoriesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.subCategories,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
   $$BrandsTableAnnotationComposer get brandId {
     final $$BrandsTableAnnotationComposer composer = $composerBuilder(
       composer: this,
@@ -21076,10 +20133,10 @@ class $$ProductsTableAnnotationComposer
     return composer;
   }
 
-  $$UnitsTableAnnotationComposer get purchaseUnitId {
+  $$UnitsTableAnnotationComposer get unitId {
     final $$UnitsTableAnnotationComposer composer = $composerBuilder(
       composer: this,
-      getCurrentColumn: (t) => t.purchaseUnitId,
+      getCurrentColumn: (t) => t.unitId,
       referencedTable: $db.units,
       getReferencedColumn: (t) => t.id,
       builder:
@@ -21090,75 +20147,6 @@ class $$ProductsTableAnnotationComposer
           }) => $$UnitsTableAnnotationComposer(
             $db: $db,
             $table: $db.units,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-
-  $$UnitsTableAnnotationComposer get salesUnitId {
-    final $$UnitsTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.salesUnitId,
-      referencedTable: $db.units,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$UnitsTableAnnotationComposer(
-            $db: $db,
-            $table: $db.units,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-
-  $$UnitsTableAnnotationComposer get stockUnitId {
-    final $$UnitsTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.stockUnitId,
-      referencedTable: $db.units,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$UnitsTableAnnotationComposer(
-            $db: $db,
-            $table: $db.units,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-
-  $$TaxCategoriesTableAnnotationComposer get taxCategoryId {
-    final $$TaxCategoriesTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.taxCategoryId,
-      referencedTable: $db.taxCategories,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$TaxCategoriesTableAnnotationComposer(
-            $db: $db,
-            $table: $db.taxCategories,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -21191,27 +20179,29 @@ class $$ProductsTableAnnotationComposer
     return composer;
   }
 
-  $$WarehousesTableAnnotationComposer get defaultWarehouseId {
-    final $$WarehousesTableAnnotationComposer composer = $composerBuilder(
+  Expression<T> productVariantsRefs<T extends Object>(
+    Expression<T> Function($$ProductVariantsTableAnnotationComposer a) f,
+  ) {
+    final $$ProductVariantsTableAnnotationComposer composer = $composerBuilder(
       composer: this,
-      getCurrentColumn: (t) => t.defaultWarehouseId,
-      referencedTable: $db.warehouses,
-      getReferencedColumn: (t) => t.id,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.productVariants,
+      getReferencedColumn: (t) => t.productId,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$WarehousesTableAnnotationComposer(
+          }) => $$ProductVariantsTableAnnotationComposer(
             $db: $db,
-            $table: $db.warehouses,
+            $table: $db.productVariants,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
                 $removeJoinBuilderFromRootComposer,
           ),
     );
-    return composer;
+    return f(composer);
   }
 
   Expression<T> productUomsRefs<T extends Object>(
@@ -21255,13 +20245,11 @@ class $$ProductsTableTableManager
           Product,
           PrefetchHooks Function({
             bool categoryId,
+            bool subCategoryId,
             bool brandId,
-            bool purchaseUnitId,
-            bool salesUnitId,
-            bool stockUnitId,
-            bool taxCategoryId,
+            bool unitId,
             bool taxTypeId,
-            bool defaultWarehouseId,
+            bool productVariantsRefs,
             bool productUomsRefs,
           })
         > {
@@ -21281,31 +20269,14 @@ class $$ProductsTableTableManager
                 Value<int> id = const Value.absent(),
                 Value<String> productCode = const Value.absent(),
                 Value<String> productName = const Value.absent(),
-                Value<String?> barcode = const Value.absent(),
-                Value<int> categoryId = const Value.absent(),
+                Value<int?> categoryId = const Value.absent(),
                 Value<int?> subCategoryId = const Value.absent(),
-                Value<int> brandId = const Value.absent(),
-                Value<int> purchaseUnitId = const Value.absent(),
-                Value<int> salesUnitId = const Value.absent(),
-                Value<int> stockUnitId = const Value.absent(),
-                Value<int> purchasePrice = const Value.absent(),
-                Value<int> landingCost = const Value.absent(),
-                Value<int> mrp = const Value.absent(),
-                Value<int> retailPrice = const Value.absent(),
-                Value<int> wholesalePrice = const Value.absent(),
-                Value<int?> specialPrice = const Value.absent(),
-                Value<int> taxCategoryId = const Value.absent(),
+                Value<int?> brandId = const Value.absent(),
+                Value<int> unitId = const Value.absent(),
+                Value<int> sellingPrice = const Value.absent(),
                 Value<int?> taxTypeId = const Value.absent(),
-                Value<int?> defaultWarehouseId = const Value.absent(),
-                Value<double> minStock = const Value.absent(),
-                Value<double> maxStock = const Value.absent(),
-                Value<double> reorderLevel = const Value.absent(),
-                Value<double> openingStock = const Value.absent(),
-                Value<double> currentStock = const Value.absent(),
-                Value<double?> weight = const Value.absent(),
-                Value<String?> description = const Value.absent(),
-                Value<String?> imagePath = const Value.absent(),
-                Value<bool> isStockItem = const Value.absent(),
+                Value<DateTime?> expiryDate = const Value.absent(),
+                Value<String?> notes = const Value.absent(),
                 Value<bool> isActive = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
@@ -21313,31 +20284,14 @@ class $$ProductsTableTableManager
                 id: id,
                 productCode: productCode,
                 productName: productName,
-                barcode: barcode,
                 categoryId: categoryId,
                 subCategoryId: subCategoryId,
                 brandId: brandId,
-                purchaseUnitId: purchaseUnitId,
-                salesUnitId: salesUnitId,
-                stockUnitId: stockUnitId,
-                purchasePrice: purchasePrice,
-                landingCost: landingCost,
-                mrp: mrp,
-                retailPrice: retailPrice,
-                wholesalePrice: wholesalePrice,
-                specialPrice: specialPrice,
-                taxCategoryId: taxCategoryId,
+                unitId: unitId,
+                sellingPrice: sellingPrice,
                 taxTypeId: taxTypeId,
-                defaultWarehouseId: defaultWarehouseId,
-                minStock: minStock,
-                maxStock: maxStock,
-                reorderLevel: reorderLevel,
-                openingStock: openingStock,
-                currentStock: currentStock,
-                weight: weight,
-                description: description,
-                imagePath: imagePath,
-                isStockItem: isStockItem,
+                expiryDate: expiryDate,
+                notes: notes,
                 isActive: isActive,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
@@ -21347,31 +20301,14 @@ class $$ProductsTableTableManager
                 Value<int> id = const Value.absent(),
                 required String productCode,
                 required String productName,
-                Value<String?> barcode = const Value.absent(),
-                required int categoryId,
+                Value<int?> categoryId = const Value.absent(),
                 Value<int?> subCategoryId = const Value.absent(),
-                required int brandId,
-                required int purchaseUnitId,
-                required int salesUnitId,
-                required int stockUnitId,
-                Value<int> purchasePrice = const Value.absent(),
-                Value<int> landingCost = const Value.absent(),
-                Value<int> mrp = const Value.absent(),
-                Value<int> retailPrice = const Value.absent(),
-                Value<int> wholesalePrice = const Value.absent(),
-                Value<int?> specialPrice = const Value.absent(),
-                required int taxCategoryId,
+                Value<int?> brandId = const Value.absent(),
+                required int unitId,
+                Value<int> sellingPrice = const Value.absent(),
                 Value<int?> taxTypeId = const Value.absent(),
-                Value<int?> defaultWarehouseId = const Value.absent(),
-                Value<double> minStock = const Value.absent(),
-                Value<double> maxStock = const Value.absent(),
-                Value<double> reorderLevel = const Value.absent(),
-                Value<double> openingStock = const Value.absent(),
-                Value<double> currentStock = const Value.absent(),
-                Value<double?> weight = const Value.absent(),
-                Value<String?> description = const Value.absent(),
-                Value<String?> imagePath = const Value.absent(),
-                Value<bool> isStockItem = const Value.absent(),
+                Value<DateTime?> expiryDate = const Value.absent(),
+                Value<String?> notes = const Value.absent(),
                 Value<bool> isActive = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
@@ -21379,31 +20316,14 @@ class $$ProductsTableTableManager
                 id: id,
                 productCode: productCode,
                 productName: productName,
-                barcode: barcode,
                 categoryId: categoryId,
                 subCategoryId: subCategoryId,
                 brandId: brandId,
-                purchaseUnitId: purchaseUnitId,
-                salesUnitId: salesUnitId,
-                stockUnitId: stockUnitId,
-                purchasePrice: purchasePrice,
-                landingCost: landingCost,
-                mrp: mrp,
-                retailPrice: retailPrice,
-                wholesalePrice: wholesalePrice,
-                specialPrice: specialPrice,
-                taxCategoryId: taxCategoryId,
+                unitId: unitId,
+                sellingPrice: sellingPrice,
                 taxTypeId: taxTypeId,
-                defaultWarehouseId: defaultWarehouseId,
-                minStock: minStock,
-                maxStock: maxStock,
-                reorderLevel: reorderLevel,
-                openingStock: openingStock,
-                currentStock: currentStock,
-                weight: weight,
-                description: description,
-                imagePath: imagePath,
-                isStockItem: isStockItem,
+                expiryDate: expiryDate,
+                notes: notes,
                 isActive: isActive,
                 createdAt: createdAt,
                 updatedAt: updatedAt,
@@ -21419,18 +20339,17 @@ class $$ProductsTableTableManager
           prefetchHooksCallback:
               ({
                 categoryId = false,
+                subCategoryId = false,
                 brandId = false,
-                purchaseUnitId = false,
-                salesUnitId = false,
-                stockUnitId = false,
-                taxCategoryId = false,
+                unitId = false,
                 taxTypeId = false,
-                defaultWarehouseId = false,
+                productVariantsRefs = false,
                 productUomsRefs = false,
               }) {
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [
+                    if (productVariantsRefs) db.productVariants,
                     if (productUomsRefs) db.productUoms,
                   ],
                   addJoins:
@@ -21462,6 +20381,19 @@ class $$ProductsTableTableManager
                                   )
                                   as T;
                         }
+                        if (subCategoryId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.subCategoryId,
+                                    referencedTable: $$ProductsTableReferences
+                                        ._subCategoryIdTable(db),
+                                    referencedColumn: $$ProductsTableReferences
+                                        ._subCategoryIdTable(db)
+                                        .id,
+                                  )
+                                  as T;
+                        }
                         if (brandId) {
                           state =
                               state.withJoin(
@@ -21475,54 +20407,15 @@ class $$ProductsTableTableManager
                                   )
                                   as T;
                         }
-                        if (purchaseUnitId) {
+                        if (unitId) {
                           state =
                               state.withJoin(
                                     currentTable: table,
-                                    currentColumn: table.purchaseUnitId,
+                                    currentColumn: table.unitId,
                                     referencedTable: $$ProductsTableReferences
-                                        ._purchaseUnitIdTable(db),
+                                        ._unitIdTable(db),
                                     referencedColumn: $$ProductsTableReferences
-                                        ._purchaseUnitIdTable(db)
-                                        .id,
-                                  )
-                                  as T;
-                        }
-                        if (salesUnitId) {
-                          state =
-                              state.withJoin(
-                                    currentTable: table,
-                                    currentColumn: table.salesUnitId,
-                                    referencedTable: $$ProductsTableReferences
-                                        ._salesUnitIdTable(db),
-                                    referencedColumn: $$ProductsTableReferences
-                                        ._salesUnitIdTable(db)
-                                        .id,
-                                  )
-                                  as T;
-                        }
-                        if (stockUnitId) {
-                          state =
-                              state.withJoin(
-                                    currentTable: table,
-                                    currentColumn: table.stockUnitId,
-                                    referencedTable: $$ProductsTableReferences
-                                        ._stockUnitIdTable(db),
-                                    referencedColumn: $$ProductsTableReferences
-                                        ._stockUnitIdTable(db)
-                                        .id,
-                                  )
-                                  as T;
-                        }
-                        if (taxCategoryId) {
-                          state =
-                              state.withJoin(
-                                    currentTable: table,
-                                    currentColumn: table.taxCategoryId,
-                                    referencedTable: $$ProductsTableReferences
-                                        ._taxCategoryIdTable(db),
-                                    referencedColumn: $$ProductsTableReferences
-                                        ._taxCategoryIdTable(db)
+                                        ._unitIdTable(db)
                                         .id,
                                   )
                                   as T;
@@ -21540,24 +20433,32 @@ class $$ProductsTableTableManager
                                   )
                                   as T;
                         }
-                        if (defaultWarehouseId) {
-                          state =
-                              state.withJoin(
-                                    currentTable: table,
-                                    currentColumn: table.defaultWarehouseId,
-                                    referencedTable: $$ProductsTableReferences
-                                        ._defaultWarehouseIdTable(db),
-                                    referencedColumn: $$ProductsTableReferences
-                                        ._defaultWarehouseIdTable(db)
-                                        .id,
-                                  )
-                                  as T;
-                        }
 
                         return state;
                       },
                   getPrefetchedDataCallback: (items) async {
                     return [
+                      if (productVariantsRefs)
+                        await $_getPrefetchedData<
+                          Product,
+                          $ProductsTable,
+                          ProductVariant
+                        >(
+                          currentTable: table,
+                          referencedTable: $$ProductsTableReferences
+                              ._productVariantsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$ProductsTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).productVariantsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.productId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
                       if (productUomsRefs)
                         await $_getPrefetchedData<
                           Product,
@@ -21601,15 +20502,415 @@ typedef $$ProductsTableProcessedTableManager =
       Product,
       PrefetchHooks Function({
         bool categoryId,
+        bool subCategoryId,
         bool brandId,
-        bool purchaseUnitId,
-        bool salesUnitId,
-        bool stockUnitId,
-        bool taxCategoryId,
+        bool unitId,
         bool taxTypeId,
-        bool defaultWarehouseId,
+        bool productVariantsRefs,
         bool productUomsRefs,
       })
+    >;
+typedef $$ProductVariantsTableCreateCompanionBuilder =
+    ProductVariantsCompanion Function({
+      Value<int> id,
+      required int productId,
+      required String variantName,
+      Value<int> sellingPrice,
+      Value<DateTime?> expiryDate,
+      Value<String?> notes,
+      Value<bool> isActive,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+    });
+typedef $$ProductVariantsTableUpdateCompanionBuilder =
+    ProductVariantsCompanion Function({
+      Value<int> id,
+      Value<int> productId,
+      Value<String> variantName,
+      Value<int> sellingPrice,
+      Value<DateTime?> expiryDate,
+      Value<String?> notes,
+      Value<bool> isActive,
+      Value<DateTime> createdAt,
+      Value<DateTime> updatedAt,
+    });
+
+final class $$ProductVariantsTableReferences
+    extends
+        BaseReferences<_$AppDatabase, $ProductVariantsTable, ProductVariant> {
+  $$ProductVariantsTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static $ProductsTable _productIdTable(_$AppDatabase db) =>
+      db.products.createAlias('product_variant__product_id__product__id');
+
+  $$ProductsTableProcessedTableManager get productId {
+    final $_column = $_itemColumn<int>('product_id')!;
+
+    final manager = $$ProductsTableTableManager(
+      $_db,
+      $_db.products,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_productIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$ProductVariantsTableFilterComposer
+    extends Composer<_$AppDatabase, $ProductVariantsTable> {
+  $$ProductVariantsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get variantName => $composableBuilder(
+    column: $table.variantName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get sellingPrice => $composableBuilder(
+    column: $table.sellingPrice,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get expiryDate => $composableBuilder(
+    column: $table.expiryDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isActive => $composableBuilder(
+    column: $table.isActive,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$ProductsTableFilterComposer get productId {
+    final $$ProductsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.productId,
+      referencedTable: $db.products,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProductsTableFilterComposer(
+            $db: $db,
+            $table: $db.products,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ProductVariantsTableOrderingComposer
+    extends Composer<_$AppDatabase, $ProductVariantsTable> {
+  $$ProductVariantsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get variantName => $composableBuilder(
+    column: $table.variantName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get sellingPrice => $composableBuilder(
+    column: $table.sellingPrice,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get expiryDate => $composableBuilder(
+    column: $table.expiryDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isActive => $composableBuilder(
+    column: $table.isActive,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$ProductsTableOrderingComposer get productId {
+    final $$ProductsTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.productId,
+      referencedTable: $db.products,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProductsTableOrderingComposer(
+            $db: $db,
+            $table: $db.products,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ProductVariantsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $ProductVariantsTable> {
+  $$ProductVariantsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get variantName => $composableBuilder(
+    column: $table.variantName,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get sellingPrice => $composableBuilder(
+    column: $table.sellingPrice,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get expiryDate => $composableBuilder(
+    column: $table.expiryDate,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get notes =>
+      $composableBuilder(column: $table.notes, builder: (column) => column);
+
+  GeneratedColumn<bool> get isActive =>
+      $composableBuilder(column: $table.isActive, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  $$ProductsTableAnnotationComposer get productId {
+    final $$ProductsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.productId,
+      referencedTable: $db.products,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProductsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.products,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$ProductVariantsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $ProductVariantsTable,
+          ProductVariant,
+          $$ProductVariantsTableFilterComposer,
+          $$ProductVariantsTableOrderingComposer,
+          $$ProductVariantsTableAnnotationComposer,
+          $$ProductVariantsTableCreateCompanionBuilder,
+          $$ProductVariantsTableUpdateCompanionBuilder,
+          (ProductVariant, $$ProductVariantsTableReferences),
+          ProductVariant,
+          PrefetchHooks Function({bool productId})
+        > {
+  $$ProductVariantsTableTableManager(
+    _$AppDatabase db,
+    $ProductVariantsTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$ProductVariantsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$ProductVariantsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$ProductVariantsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> productId = const Value.absent(),
+                Value<String> variantName = const Value.absent(),
+                Value<int> sellingPrice = const Value.absent(),
+                Value<DateTime?> expiryDate = const Value.absent(),
+                Value<String?> notes = const Value.absent(),
+                Value<bool> isActive = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => ProductVariantsCompanion(
+                id: id,
+                productId: productId,
+                variantName: variantName,
+                sellingPrice: sellingPrice,
+                expiryDate: expiryDate,
+                notes: notes,
+                isActive: isActive,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int productId,
+                required String variantName,
+                Value<int> sellingPrice = const Value.absent(),
+                Value<DateTime?> expiryDate = const Value.absent(),
+                Value<String?> notes = const Value.absent(),
+                Value<bool> isActive = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+              }) => ProductVariantsCompanion.insert(
+                id: id,
+                productId: productId,
+                variantName: variantName,
+                sellingPrice: sellingPrice,
+                expiryDate: expiryDate,
+                notes: notes,
+                isActive: isActive,
+                createdAt: createdAt,
+                updatedAt: updatedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable(table),
+                  $$ProductVariantsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({productId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (productId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.productId,
+                                referencedTable:
+                                    $$ProductVariantsTableReferences
+                                        ._productIdTable(db),
+                                referencedColumn:
+                                    $$ProductVariantsTableReferences
+                                        ._productIdTable(db)
+                                        .id,
+                              )
+                              as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$ProductVariantsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $ProductVariantsTable,
+      ProductVariant,
+      $$ProductVariantsTableFilterComposer,
+      $$ProductVariantsTableOrderingComposer,
+      $$ProductVariantsTableAnnotationComposer,
+      $$ProductVariantsTableCreateCompanionBuilder,
+      $$ProductVariantsTableUpdateCompanionBuilder,
+      (ProductVariant, $$ProductVariantsTableReferences),
+      ProductVariant,
+      PrefetchHooks Function({bool productId})
     >;
 typedef $$ProductUomsTableCreateCompanionBuilder =
     ProductUomsCompanion Function({
@@ -22527,6 +21828,8 @@ class $AppDatabaseManager {
       $$WarehousesTableTableManager(_db, _db.warehouses);
   $$ProductsTableTableManager get products =>
       $$ProductsTableTableManager(_db, _db.products);
+  $$ProductVariantsTableTableManager get productVariants =>
+      $$ProductVariantsTableTableManager(_db, _db.productVariants);
   $$ProductUomsTableTableManager get productUoms =>
       $$ProductUomsTableTableManager(_db, _db.productUoms);
   $$DocumentNumberSequencesTableTableManager get documentNumberSequences =>

@@ -529,49 +529,46 @@ Completed
 
 Purpose
 
-The heart of the ERP.
-
-Stores every product.
+The heart of the ERP. Stores every product and its variants sold or tracked by the business.
 
 Dependencies
 
-Category
-
-Sub Category
-
-Brand
-
-Unit
-
-Global UOM
-
-Product UOM
-
-Tax Category
-
-Tax Type
-
-Warehouse
-
-HSN
+- Category
+- Sub Category
+- Brand
+- Unit
+- Tax Type
 
 Features
 
-Product Code
+- View (detailed read-only dialog modal showing Product Details, Selling & Tax info, and Variant breakdown)
+- Create & Edit with Dynamic Inline Variant Management (+ Add Variant, remove variant, per-variant price/expiry/notes)
+- Edit Variant (dialog modal allowing in-place editing of Variant Name, Selling Price, Expiry Date, and Notes)
+- Delete Product (with confirmation dialog; cascades to variants; blocked if in use)
+- Delete Variant (with confirmation dialog)
+- Server-side Search across Product Name, Code, Category, Sub Category, Brand, and Variant names
+- Advanced Server-side Filters (Category, Sub Category, Brand, Price range, Creation date range)
+- Sorting (Code, Product Name, Selling Price, Expiry Date, Category, Brand, Created Date)
+- Server-side Pagination
+- Expandable Multi-Column Table Layout (Action column with expandable chevron, view, edit, delete icons; Code, Status, Product Name, Selling Price, Expiry Date, Category, Brand, Unit, Tax, Created Date)
+- Auto-generated Product Code (PROD00001, PROD00002, ...)
+- Form keyboard focus management and scroll-to-first-error
 
-Barcode
+Business Rules
 
-Pricing
-
-Stock
-
-Images
-
-Inventory
+- Product Name is required and trimmed (max 200 chars).
+- Product Code is optional (auto-generated as PRODxxxxx if omitted) and must be unique.
+- Unit is required.
+- Selling Price is required for the main product and stored independently.
+- Each variant has its own independent Variant Name and Variant Selling Price.
+- Editing the main product price or any variant price operates independently without overriding each other.
+- Variant names must be unique within the product.
+- Prices are stored in paise and formatted in ₹ rupees.
+- Expiry date and notes are optional.
 
 Status
 
-Pending
+Completed
 
 ---
 

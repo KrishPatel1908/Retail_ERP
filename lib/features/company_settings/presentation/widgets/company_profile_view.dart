@@ -569,43 +569,62 @@ class _ProfileContentGrid extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final isWide = constraints.maxWidth > 700;
-        return Column(
-          children: [
-            if (isWide)
+        if (isWide) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(child: _buildBusinessCard(context)),
+                  // Left Column: Company & Tax Identity + Tax & Invoicing
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        _buildBusinessCard(context),
+                        const SizedBox(height: 20),
+                        _buildTaxAndBillingCard(context),
+                      ],
+                    ),
+                  ),
                   const SizedBox(width: 20),
-                  Expanded(child: _buildAddressCard(context)),
+                  // Right Column: Business Address + Financial Settings
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        _buildAddressCard(context),
+                        const SizedBox(height: 20),
+                        _buildFinancialCard(context),
+                      ],
+                    ),
+                  ),
                 ],
-              )
-            else ...[
+              ),
+              if (_hasBankDetails) ...[
+                const SizedBox(height: 20),
+                _buildBankCard(context),
+              ],
+            ],
+          );
+        } else {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
               _buildBusinessCard(context),
               const SizedBox(height: 20),
               _buildAddressCard(context),
-            ],
-            const SizedBox(height: 20),
-            if (isWide)
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(child: _buildTaxAndBillingCard(context)),
-                  const SizedBox(width: 20),
-                  Expanded(child: _buildFinancialCard(context)),
-                ],
-              )
-            else ...[
+              const SizedBox(height: 20),
               _buildTaxAndBillingCard(context),
               const SizedBox(height: 20),
               _buildFinancialCard(context),
+              if (_hasBankDetails) ...[
+                const SizedBox(height: 20),
+                _buildBankCard(context),
+              ],
             ],
-            if (_hasBankDetails) ...[
-              const SizedBox(height: 20),
-              _buildBankCard(context),
-            ],
-          ],
-        );
+          );
+        }
       },
     );
   }

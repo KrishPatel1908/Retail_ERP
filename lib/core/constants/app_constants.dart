@@ -5,8 +5,8 @@ abstract final class AppConstants {
   static const String appVersion = '1.0.0';
 
   /// Placeholder user shown until authentication is implemented.
-  static const String placeholderUserName = 'John Doe';
-  static const String placeholderUserRole = 'Administrator';
+  static const String placeholderUserName = 'Krish Patel';
+  static const String placeholderUserRole = 'Owner';
 
   // Layout breakpoints and dimensions (desktop-first).
   static const double sidebarExpandedWidth = 264;

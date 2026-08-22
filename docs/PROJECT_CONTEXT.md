@@ -127,11 +127,11 @@ Completed
 - Tax Category
 - Customer Master
 - Supplier Master
+- Product Master
 
 Pending
 
 - Warehouse Master
-- Product Master
 
 ---
 

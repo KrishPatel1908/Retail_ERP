@@ -33,6 +33,15 @@ abstract final class DatabaseSchemaVersion {
   /// logo reference.
   static const int v6 = 6;
 
+  /// Schema version 7 — rebuilds the product table to a simplified design
+  /// for the Product Master module: removes inventory/purchase/warehouse
+  /// columns and adds tracking flags and notes.
+  static const int v7 = 7;
+
+  /// Schema version 8 — adds product variants, expiry date, and removes
+  /// obsolete tracking fields from the product table.
+  static const int v8 = 8;
+
   /// The current schema version of the application.
-  static const int latest = v6;
+  static const int latest = v8;
 }

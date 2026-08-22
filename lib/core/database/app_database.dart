@@ -40,6 +40,7 @@ part 'app_database.g.dart';
     Suppliers,
     Warehouses,
     Products,
+    ProductVariants,
     ProductUoms,
     DocumentNumberSequences,
   ],

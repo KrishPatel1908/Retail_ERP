@@ -146,18 +146,31 @@ void main() {
         CategoriesCompanion.insert(id: const Value(1), categoryCode: 'CAT1', categoryName: 'General'),
       );
 
-      // Insert product referencing this taxCategory (brand 1 and units 1 are pre-seeded)
+      // Create a tax type and link it to this category via tax_category_rate
+      final taxTypeId = await database.into(database.taxTypes).insert(
+        TaxTypesCompanion.insert(
+          taxTypeCode: 'TEST-TT',
+          taxTypeName: 'Test Tax Type',
+        ),
+      );
+      await database.into(database.taxCategoryRates).insert(
+        TaxCategoryRatesCompanion.insert(
+          taxCategoryId: category.id,
+          taxTypeId: taxTypeId,
+          ratePercent: 18,
+        ),
+      );
+
+      // Insert a product referencing that tax type
       await database.into(database.products).insert(
         ProductsCompanion.insert(
           id: const Value(100),
           productCode: 'PROD100',
           productName: 'Sample Product',
-          categoryId: 1,
-          brandId: 1,
-          purchaseUnitId: 1,
-          salesUnitId: 1,
-          stockUnitId: 1,
-          taxCategoryId: category.id,
+          categoryId: const Value(1),
+          brandId: const Value(1),
+          unitId: 1,
+          taxTypeId: Value(taxTypeId),
         ),
       );
 

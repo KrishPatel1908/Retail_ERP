@@ -198,10 +198,22 @@ class TaxCategoryRepository {
 
   /// Permanently deletes a tax category.
   ///
-  /// Throws [TaxCategoryInUseException] when referenced by any product.
+  /// Throws [TaxCategoryInUseException] when referenced by any product
+  /// through a tax type in this category.
   Future<void> deleteTaxCategory(int id) async {
-    final productCount = await (_database.select(_database.products)
-      ..where((t) => t.taxCategoryId.equals(id))).get().then((l) => l.length);
+    // Check if any product uses a tax type that belongs to this category.
+    final rateQuery = _database.select(_database.taxCategoryRates)
+      ..where((t) => t.taxCategoryId.equals(id));
+    final rates = await rateQuery.get();
+    final taxTypeIds = rates.map((r) => r.taxTypeId).toSet();
+
+    int productCount = 0;
+    if (taxTypeIds.isNotEmpty) {
+      productCount = await (_database.select(_database.products)
+        ..where((t) => t.taxTypeId.isIn(taxTypeIds.toList())))
+          .get()
+          .then((l) => l.length);
+    }
 
     if (productCount > 0) {
       throw const TaxCategoryInUseException();

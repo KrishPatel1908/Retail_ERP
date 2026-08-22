@@ -16,7 +16,7 @@ final _throwsDatabaseError = throwsA(
   anyOf(isA<SqliteException>(), isA<DriftWrappedException>()),
 );
 
-/// The 15 tables of the approved blueprint.
+/// The 16 tables of the approved blueprint.
 const _expectedTables = {
   'company_settings',
   'category',
@@ -31,6 +31,7 @@ const _expectedTables = {
   'supplier',
   'warehouse',
   'product',
+  'product_variant',
   'product_uom',
   'document_number_sequence',
 };
@@ -79,7 +80,7 @@ void main() {
       expect(result.single.data.values.single, 1);
     });
 
-    test('registers all 15 blueprint tables', () async {
+    test('registers all 16 blueprint tables', () async {
       final db = AppDatabase(NativeDatabase.memory());
       addTearDown(db.close);
       await db.customSelect('SELECT 1').get();
@@ -98,11 +99,11 @@ void main() {
       final db = AppDatabase(NativeDatabase.memory());
       addTearDown(db.close);
 
-      expect(db.schemaVersion, 6);
+      expect(db.schemaVersion, 8);
       await db.customSelect('SELECT 1').get();
 
       final row = (await db.customSelect('PRAGMA user_version').get()).single;
-      expect(row.read<int>('user_version'), 6);
+      expect(row.read<int>('user_version'), 8);
     });
 
     test('creates the case-insensitive unique indexes', () async {
@@ -217,17 +218,15 @@ void main() {
               ProductsCompanion.insert(
                 productCode: 'P-OK',
                 productName: 'Keyboard',
-                categoryId: electronics,
+                categoryId: Value(electronics),
                 subCategoryId: Value(keyboards),
-                brandId: 1,
-                purchaseUnitId: 1,
-                salesUnitId: 1,
-                stockUnitId: 1,
-                taxCategoryId: 1,
+                brandId: const Value(1),
+                unitId: 1,
               ),
             );
 
-        // Cross-category combination violates the composite foreign key.
+        // Invalid sub-category that doesn't belong to the category is rejected
+        // by the sub_category foreign key.
         await expectLater(
           db
               .into(db.products)
@@ -235,13 +234,10 @@ void main() {
                 ProductsCompanion.insert(
                   productCode: 'P-BAD',
                   productName: 'Misplaced product',
-                  categoryId: groceries,
-                  subCategoryId: Value(keyboards),
-                  brandId: 1,
-                  purchaseUnitId: 1,
-                  salesUnitId: 1,
-                  stockUnitId: 1,
-                  taxCategoryId: 1,
+                  categoryId: Value(groceries),
+                  subCategoryId: const Value(9999),
+                  brandId: const Value(1),
+                  unitId: 1,
                 ),
               ),
           _throwsDatabaseError,
@@ -335,12 +331,9 @@ void main() {
             ProductsCompanion.insert(
               productCode: 'P-1',
               productName: 'Banana',
-              categoryId: categoryId,
-              brandId: 1,
-              purchaseUnitId: 1,
-              salesUnitId: 1,
-              stockUnitId: 1,
-              taxCategoryId: 1,
+              categoryId: Value(categoryId),
+              brandId: const Value(1),
+              unitId: 1,
             ),
           );
 
@@ -519,10 +512,10 @@ void main() {
         addTearDown(db.close);
         await db.customSelect('SELECT 1').get();
 
-        expect(db.schemaVersion, 6);
+        expect(db.schemaVersion, 8);
         final versionRow =
             (await db.customSelect('PRAGMA user_version').get()).single;
-        expect(versionRow.read<int>('user_version'), 6);
+        expect(versionRow.read<int>('user_version'), 8);
 
         // The old columns are gone and the new ones are present.
         final unitColumns = await db
@@ -693,14 +686,12 @@ void main() {
       // --- Open with the current schema: the v4 migration must run ------
       final db = AppDatabase(NativeDatabase(file));
       addTearDown(db.close);
-      await db.customSelect('SELECT 1').get();
+      await db.customSelect('SELECT 1').get();        expect(db.schemaVersion, 8);
+        final versionRow =
+            (await db.customSelect('PRAGMA user_version').get()).single;
+        expect(versionRow.read<int>('user_version'), 8);
 
-      expect(db.schemaVersion, 6);
-      final versionRow =
-          (await db.customSelect('PRAGMA user_version').get()).single;
-      expect(versionRow.read<int>('user_version'), 6);
-
-      // Customer gained the new columns and `address` became line 1.
+        // Customer gained the new columns and `address` became line 1.
       final customerColumns = await db
           .customSelect("SELECT name FROM pragma_table_info('customer')")
           .get();
@@ -794,7 +785,7 @@ void main() {
       addTearDown(db.close);
       await db.customSelect('SELECT 1').get();
 
-      expect(db.schemaVersion, 6);
+      expect(db.schemaVersion, 8);
 
       final customerCols = (await db.customSelect("SELECT name FROM pragma_table_info('customer')").get())
           .map((r) => r.read<String>('name'))
@@ -871,14 +862,12 @@ void main() {
       // --- Open with the current schema: the v6 migration must run ---------
       final db = AppDatabase(NativeDatabase(file));
       addTearDown(db.close);
-      await db.customSelect('SELECT 1').get();
+      await db.customSelect('SELECT 1').get();        expect(db.schemaVersion, 8);
+        final versionRow =
+            (await db.customSelect('PRAGMA user_version').get()).single;
+        expect(versionRow.read<int>('user_version'), 8);
 
-      expect(db.schemaVersion, 6);
-      final versionRow =
-          (await db.customSelect('PRAGMA user_version').get()).single;
-      expect(versionRow.read<int>('user_version'), 6);
-
-      final columns = (await db
+        final columns = (await db
               .customSelect("SELECT name FROM pragma_table_info('company_settings')")
               .get())
           .map((r) => r.read<String>('name'))

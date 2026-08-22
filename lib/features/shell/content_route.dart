@@ -2,6 +2,7 @@ import '../../core/navigation/app_page.dart';
 import '../master_entry/brand/domain/entities/brand.dart';
 import '../master_entry/category/domain/entities/category.dart';
 import '../master_entry/customer/domain/entities/customer.dart';
+import '../master_entry/product/domain/entities/product.dart';
 import '../master_entry/sub_category/domain/entities/sub_category.dart';
 import '../master_entry/supplier/domain/entities/supplier.dart';
 import '../master_entry/tax_category/domain/entities/tax_category.dart';
@@ -116,4 +117,14 @@ class SupplierFormRoute extends ContentRoute {
   const SupplierFormRoute({this.supplier});
 
   final Supplier? supplier;
+}
+
+/// The "Create / Edit Product" form shown above the Product list.
+///
+/// When [product] is provided the form edits that product, otherwise it
+/// creates a new one.
+class ProductFormRoute extends ContentRoute {
+  const ProductFormRoute({this.product});
+
+  final ProductEntity? product;
 }
