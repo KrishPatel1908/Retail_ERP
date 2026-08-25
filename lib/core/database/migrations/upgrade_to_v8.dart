@@ -175,8 +175,7 @@ Future<void> _rebuildProductTable(AppDatabase database) async {
 Future<bool> _tableExists(AppDatabase database, String tableName) async {
   final rows = await database
       .customSelect(
-        "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?",
-        variables: [Variable<String>(tableName)],
+        "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = '$tableName'",
       )
       .get();
   return rows.isNotEmpty;

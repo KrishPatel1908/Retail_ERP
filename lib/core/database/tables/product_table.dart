@@ -10,11 +10,13 @@ import 'unit_table.dart';
 ///
 /// Supports product variants: a parent product can have multiple variants
 /// stored in [ProductVariants]. The parent holds common information while
-/// each variant holds its own selling price and optional expiry date.
+/// each variant holds its own selling price and optional pricing/identification
+/// fields.
 @DataClassName('Product')
 @TableIndex(name: 'idx_product_name', columns: {#productName})
 @TableIndex(name: 'idx_product_category', columns: {#categoryId})
 @TableIndex(name: 'idx_product_brand', columns: {#brandId})
+@TableIndex(name: 'idx_product_barcode', columns: {#barcode})
 @TableIndex(name: 'idx_product_active', columns: {#isActive})
 @TableIndex(name: 'idx_product_created_at', columns: {#createdAt})
 class Products extends Table {
@@ -30,6 +32,11 @@ class Products extends Table {
   IntColumn get brandId => integer().nullable().references(Brands, #id)();
   IntColumn get unitId => integer().references(Units, #id)();
   IntColumn get sellingPrice => integer().withDefault(const Constant(0))();
+  IntColumn get purchasePrice => integer().nullable()();
+  IntColumn get mrp => integer().nullable()();
+  IntColumn get wholesalePrice => integer().nullable()();
+  TextColumn get barcode => text().nullable()();
+  TextColumn get hsnCode => text().nullable()();
   IntColumn get taxTypeId => integer().nullable().references(TaxTypes, #id)();
 
   /// Optional expiry date for the parent product (e.g. food, medicine).
@@ -44,17 +51,21 @@ class Products extends Table {
   @override
   List<String> get customConstraints => const [
     'CHECK (selling_price >= 0)',
+    'CHECK (purchase_price IS NULL OR purchase_price >= 0)',
+    'CHECK (mrp IS NULL OR mrp >= 0)',
+    'CHECK (wholesale_price IS NULL OR wholesale_price >= 0)',
   ];
 }
 
 /// Product variants — each variant belongs to a parent [Products] row.
 ///
-/// A variant inherits all common product information (category, brand, unit,
-/// tax) from the parent and only stores its own selling price, optional
-/// expiry date, and optional notes.
+/// A variant inherits common product information (category, brand, unit,
+/// tax) from the parent and stores variant-specific pricing, identification,
+/// optional expiry date, and optional notes.
 @DataClassName('ProductVariant')
 @TableIndex(name: 'idx_variant_product', columns: {#productId})
 @TableIndex(name: 'idx_variant_name', columns: {#variantName})
+@TableIndex(name: 'idx_variant_barcode', columns: {#barcode})
 class ProductVariants extends Table {
   @override
   String get tableName => 'product_variant';
@@ -63,6 +74,11 @@ class ProductVariants extends Table {
   IntColumn get productId => integer().references(Products, #id)();
   TextColumn get variantName => text()();
   IntColumn get sellingPrice => integer().withDefault(const Constant(0))();
+  IntColumn get purchasePrice => integer().nullable()();
+  IntColumn get mrp => integer().nullable()();
+  IntColumn get wholesalePrice => integer().nullable()();
+  TextColumn get barcode => text().nullable()();
+  TextColumn get hsnCode => text().nullable()();
   DateTimeColumn get expiryDate => dateTime().nullable()();
   TextColumn get notes => text().nullable()();
 
@@ -78,5 +94,8 @@ class ProductVariants extends Table {
   @override
   List<String> get customConstraints => const [
     'CHECK (selling_price >= 0)',
+    'CHECK (purchase_price IS NULL OR purchase_price >= 0)',
+    'CHECK (mrp IS NULL OR mrp >= 0)',
+    'CHECK (wholesale_price IS NULL OR wholesale_price >= 0)',
   ];
 }

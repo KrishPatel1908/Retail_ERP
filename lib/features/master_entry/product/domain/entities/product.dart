@@ -17,6 +17,11 @@ class ProductEntity {
     required this.unitId,
     this.unitName,
     required this.sellingPrice,
+    this.purchasePrice,
+    this.mrp,
+    this.wholesalePrice,
+    this.barcode,
+    this.hsnCode,
     this.taxTypeId,
     this.taxTypeName,
     this.expiryDate,
@@ -45,6 +50,21 @@ class ProductEntity {
 
   /// Selling price in paise.
   final int sellingPrice;
+
+  /// Optional purchase price in paise.
+  final int? purchasePrice;
+
+  /// Optional Maximum Retail Price (MRP) in paise.
+  final int? mrp;
+
+  /// Optional wholesale price in paise.
+  final int? wholesalePrice;
+
+  /// Optional barcode / SKU.
+  final String? barcode;
+
+  /// Optional HSN / SAC code.
+  final String? hsnCode;
 
   final int? taxTypeId;
   final String? taxTypeName;
@@ -89,6 +109,11 @@ class ProductVariantEntity {
     required this.productId,
     required this.variantName,
     required this.sellingPrice,
+    this.purchasePrice,
+    this.mrp,
+    this.wholesalePrice,
+    this.barcode,
+    this.hsnCode,
     this.expiryDate,
     this.notes,
     required this.isActive,
@@ -102,6 +127,21 @@ class ProductVariantEntity {
 
   /// Selling price in paise.
   final int sellingPrice;
+
+  /// Optional purchase price in paise.
+  final int? purchasePrice;
+
+  /// Optional Maximum Retail Price (MRP) in paise.
+  final int? mrp;
+
+  /// Optional wholesale price in paise.
+  final int? wholesalePrice;
+
+  /// Optional barcode / SKU.
+  final String? barcode;
+
+  /// Optional HSN / SAC code.
+  final String? hsnCode;
 
   /// Optional expiry date for this specific variant.
   final DateTime? expiryDate;

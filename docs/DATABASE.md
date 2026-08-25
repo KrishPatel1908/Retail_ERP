@@ -93,22 +93,59 @@ Product-specific unit conversions overriding global conversions.
 ---
 
 ### 6. `product` (`Products`)
-Product master details referencing `brand`, `category`, `unit`, etc.
+Product master details referencing `brand`, `category`, `unit`, `tax_type`, etc.
 
 | Column | Type | Constraints | Description |
 |---|---|---|---|
 | `id` | Integer | Primary Key, Auto Increment | Unique Identifier |
 | `product_code` | Text | Unique, Non-null | Product code |
 | `product_name` | Text | Non-null | Product name |
-| `brand_id` | Integer | References `brand(id)` | Foreign key to Brand |
-| `category_id` | Integer | References `category(id)` | Foreign key to Category |
-| `sub_category_id` | Integer | Nullable | Foreign key to SubCategory |
-| `purchase_unit_id` | Integer | References `unit(id)` | Purchase unit |
-| `sales_unit_id` | Integer | References `unit(id)` | Sales unit |
-| `stock_unit_id` | Integer | References `unit(id)` | Stock unit |
-| `tax_category_id` | Integer | References `tax_category(id)` | Tax category |
+| `brand_id` | Integer | Nullable, References `brand(id)` | Foreign key to Brand |
+| `category_id` | Integer | Nullable, References `category(id)` | Foreign key to Category |
+| `sub_category_id` | Integer | Nullable, References `sub_category(id)` | Foreign key to SubCategory |
+| `unit_id` | Integer | Non-null, References `unit(id)` | Base unit of measurement |
+| `selling_price` | Integer | Default `0`, `CHECK (selling_price >= 0)` | Base selling price in paise |
+| `purchase_price` | Integer | Nullable, `CHECK (purchase_price >= 0)` | Optional purchase price in paise |
+| `mrp` | Integer | Nullable, `CHECK (mrp >= 0)` | Optional MRP in paise |
+| `wholesale_price` | Integer | Nullable, `CHECK (wholesale_price >= 0)` | Optional wholesale price in paise |
+| `barcode` | Text | Nullable | Optional unique barcode / SKU |
+| `hsn_code` | Text | Nullable | Optional HSN/SAC code |
 | `tax_type_id` | Integer | Nullable, References `tax_type(id)` | Tax type |
+| `expiry_date` | DateTime | Nullable | Optional product expiry date |
+| `notes` | Text | Nullable | Optional notes |
 | `is_active` | Boolean | Default `true` | Active status flag |
+| `created_at` | DateTime | Default `now()` | Record creation timestamp |
+| `updated_at` | DateTime | Default `now()` | Record update timestamp |
+
+**Indexes & Rules:**
+- Partial unique index `idx_product_barcode_unique` on `barcode WHERE barcode IS NOT NULL AND barcode != ''`.
+- Search indexes on `product_name`, `product_code`, `barcode`, `category_id`, `brand_id`, `created_at`.
+
+---
+
+### 6.1 `product_variant` (`ProductVariants`)
+Product variants inheriting parent product's category, brand, unit, and tax attributes with specific pricing/barcode.
+
+| Column | Type | Constraints | Description |
+|---|---|---|---|
+| `id` | Integer | Primary Key, Auto Increment | Unique Identifier |
+| `product_id` | Integer | References `product(id)` ON DELETE CASCADE | Parent product foreign key |
+| `variant_name` | Text | Non-null | Variant name (e.g. 50g Small Pack) |
+| `selling_price` | Integer | Non-null, `CHECK (selling_price >= 0)` | Variant selling price in paise |
+| `purchase_price` | Integer | Nullable, `CHECK (purchase_price >= 0)` | Optional variant purchase price in paise |
+| `mrp` | Integer | Nullable, `CHECK (mrp >= 0)` | Optional variant MRP in paise |
+| `wholesale_price` | Integer | Nullable, `CHECK (wholesale_price >= 0)` | Optional variant wholesale price in paise |
+| `barcode` | Text | Nullable | Optional unique barcode / SKU |
+| `hsn_code` | Text | Nullable | Optional HSN/SAC code |
+| `expiry_date` | DateTime | Nullable | Optional variant expiry date |
+| `notes` | Text | Nullable | Optional notes |
+| `is_active` | Boolean | Default `true` | Active status flag |
+| `created_at` | DateTime | Default `now()` | Record creation timestamp |
+| `updated_at` | DateTime | Default `now()` | Record update timestamp |
+
+**Indexes & Rules:**
+- Unique constraint `(product_id, variant_name)` ensures unique variant names per product.
+- Partial unique index `idx_variant_barcode_unique` on `barcode WHERE barcode IS NOT NULL AND barcode != ''`.
 
 ---
 
@@ -328,7 +365,11 @@ repository/service layer only ever read and write `id = 1`.
 
 - **v1 → v4**: Initial setup and tax/party table additions.
 - **v4 → v5 (`upgradeToV5`)**: Added `payment_due_date`, `account_name`, `account_number`, `bank_name`, `branch_name`, `ifsc_code` to `customer`, and `credit_limit`, `payment_due_date`, `account_name`, `account_number`, `bank_name`, `branch_name`, `ifsc_code` to `supplier`.
-- **v5 → v6 (`upgradeToV6`)**: Expanded `company_settings` into the full Company Settings module — renamed `address` to `address_line1`, added `address_line2`, and added `legal_name`, `business_type`, `gst_registered`, `cin`, `currency_symbol`, `decimal_places`, `invoice_start_number`, bank details (`bank_name`, `bank_account_name`, `bank_account_number`, `bank_ifsc`, `bank_branch`, `upi_id`), invoice text/options (`invoice_footer`, `invoice_terms`, `invoice_thank_you_message`, `show_logo_on_invoice`, `show_bank_details_on_invoice`, `show_gst_details_on_invoice`). Existing rows keep their data; new columns receive defaults.
+- **v5 → v6 (`upgradeToV6`)**: Expanded `company_settings` into the full Company Settings module.
+- **v6 → v7 (`upgradeToV7`)**: Rebuilt `product` table to simplified model.
+- **v7 → v8 (`upgradeToV8`)**: Added `expiry_date` to `product`, removed obsolete tracking flags, and introduced `product_variant` table.
+- **v8 → v9 (`upgradeToV9`)**: Added Purchase module tables (`purchase`, `purchase_item`, `inventory_transaction`, `current_stock`).
+- **v9 → v10 (`upgradeToV10`)**: Added `purchase_price`, `mrp`, `wholesale_price`, `barcode`, and `hsn_code` to both `product` and `product_variant` tables; created partial unique indexes on non-empty barcodes.
 
 ## UI and keyboard behavior
 

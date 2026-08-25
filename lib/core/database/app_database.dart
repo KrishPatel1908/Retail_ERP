@@ -17,6 +17,10 @@ import 'tables/tax_type_table.dart';
 import 'tables/unit_table.dart';
 import 'tables/uom_conversion_table.dart';
 import 'tables/warehouse_table.dart';
+import 'tables/purchase_table.dart';
+import 'tables/purchase_item_table.dart';
+import 'tables/inventory_transaction_table.dart';
+import 'tables/current_stock_table.dart';
 
 part 'app_database.g.dart';
 
@@ -43,6 +47,10 @@ part 'app_database.g.dart';
     ProductVariants,
     ProductUoms,
     DocumentNumberSequences,
+    Purchases,
+    PurchaseItems,
+    InventoryTransactions,
+    CurrentStocks,
   ],
 )
 class AppDatabase extends _$AppDatabase {

@@ -21,22 +21,43 @@ class _VariantRow {
   _VariantRow({
     required this.nameController,
     required this.priceController,
+    required this.purchasePriceController,
+    required this.mrpController,
+    required this.wholesalePriceController,
+    required this.barcodeController,
+    required this.hsnCodeController,
     this.expiryDate,
     required this.notesController,
   });
 
   final TextEditingController nameController;
   final TextEditingController priceController;
+  final TextEditingController purchasePriceController;
+  final TextEditingController mrpController;
+  final TextEditingController wholesalePriceController;
+  final TextEditingController barcodeController;
+  final TextEditingController hsnCodeController;
   DateTime? expiryDate;
   final TextEditingController notesController;
 
   /// Focus nodes for this variant row.
   late final FocusNode nameFocusNode;
   late final FocusNode priceFocusNode;
+  late final FocusNode purchasePriceFocusNode;
+  late final FocusNode mrpFocusNode;
+  late final FocusNode wholesalePriceFocusNode;
+  late final FocusNode barcodeFocusNode;
+  late final FocusNode hsnCodeFocusNode;
   late final FocusNode expiryFocusNode;
   late final FocusNode notesFocusNode;
+
   late final GlobalKey nameContainerKey;
   late final GlobalKey priceContainerKey;
+  late final GlobalKey purchasePriceContainerKey;
+  late final GlobalKey mrpContainerKey;
+  late final GlobalKey wholesalePriceContainerKey;
+  late final GlobalKey barcodeContainerKey;
+  late final GlobalKey hsnCodeContainerKey;
   late final GlobalKey expiryContainerKey;
   late final GlobalKey notesContainerKey;
 
@@ -47,10 +68,23 @@ class _VariantRow {
     _focusInitialized = true;
     nameFocusNode = FocusNode(debugLabel: 'variant-$variantIndex-name');
     priceFocusNode = FocusNode(debugLabel: 'variant-$variantIndex-price');
+    purchasePriceFocusNode =
+        FocusNode(debugLabel: 'variant-$variantIndex-purchase-price');
+    mrpFocusNode = FocusNode(debugLabel: 'variant-$variantIndex-mrp');
+    wholesalePriceFocusNode =
+        FocusNode(debugLabel: 'variant-$variantIndex-wholesale-price');
+    barcodeFocusNode = FocusNode(debugLabel: 'variant-$variantIndex-barcode');
+    hsnCodeFocusNode = FocusNode(debugLabel: 'variant-$variantIndex-hsn-code');
     expiryFocusNode = FocusNode(debugLabel: 'variant-$variantIndex-expiry');
     notesFocusNode = FocusNode(debugLabel: 'variant-$variantIndex-notes');
+
     nameContainerKey = GlobalKey();
     priceContainerKey = GlobalKey();
+    purchasePriceContainerKey = GlobalKey();
+    mrpContainerKey = GlobalKey();
+    wholesalePriceContainerKey = GlobalKey();
+    barcodeContainerKey = GlobalKey();
+    hsnCodeContainerKey = GlobalKey();
     expiryContainerKey = GlobalKey();
     notesContainerKey = GlobalKey();
   }
@@ -58,10 +92,20 @@ class _VariantRow {
   void dispose() {
     nameController.dispose();
     priceController.dispose();
+    purchasePriceController.dispose();
+    mrpController.dispose();
+    wholesalePriceController.dispose();
+    barcodeController.dispose();
+    hsnCodeController.dispose();
     notesController.dispose();
     if (_focusInitialized) {
       nameFocusNode.dispose();
       priceFocusNode.dispose();
+      purchasePriceFocusNode.dispose();
+      mrpFocusNode.dispose();
+      wholesalePriceFocusNode.dispose();
+      barcodeFocusNode.dispose();
+      hsnCodeFocusNode.dispose();
       expiryFocusNode.dispose();
       notesFocusNode.dispose();
     }
@@ -90,7 +134,6 @@ class _CreateProductPageState extends State<CreateProductPage> {
   late final FormFocusController _focusController;
 
   // The field order determines exact Tab key traversal.
-  // Variants are inserted dynamically after "notes".
   static const _baseFieldOrder = [
     'name',
     'code',
@@ -98,7 +141,12 @@ class _CreateProductPageState extends State<CreateProductPage> {
     'subCategory',
     'brand',
     'unit',
+    'barcode',
+    'hsnCode',
     'sellingPrice',
+    'purchasePrice',
+    'mrp',
+    'wholesalePrice',
     'tax',
     'expiryDate',
     'notes',
@@ -111,6 +159,11 @@ class _CreateProductPageState extends State<CreateProductPage> {
   late final TextEditingController _nameController;
   late final TextEditingController _codeController;
   late final TextEditingController _sellingPriceController;
+  late final TextEditingController _purchasePriceController;
+  late final TextEditingController _mrpController;
+  late final TextEditingController _wholesalePriceController;
+  late final TextEditingController _barcodeController;
+  late final TextEditingController _hsnCodeController;
   late final TextEditingController _notesController;
 
   // Dropdown state
@@ -153,6 +206,23 @@ class _CreateProductPageState extends State<CreateProductPage> {
           ? ''
           : ProductValidator.formatPaise(product.sellingPrice),
     );
+    _purchasePriceController = TextEditingController(
+      text: product?.purchasePrice == null
+          ? ''
+          : ProductValidator.formatPaise(product!.purchasePrice!),
+    );
+    _mrpController = TextEditingController(
+      text: product?.mrp == null
+          ? ''
+          : ProductValidator.formatPaise(product!.mrp!),
+    );
+    _wholesalePriceController = TextEditingController(
+      text: product?.wholesalePrice == null
+          ? ''
+          : ProductValidator.formatPaise(product!.wholesalePrice!),
+    );
+    _barcodeController = TextEditingController(text: product?.barcode);
+    _hsnCodeController = TextEditingController(text: product?.hsnCode);
     _notesController = TextEditingController(text: product?.notes);
 
     _categoryId = product?.categoryId;
@@ -172,6 +242,21 @@ class _CreateProductPageState extends State<CreateProductPage> {
                 ? ''
                 : ProductValidator.formatPaise(v.sellingPrice),
           ),
+          purchasePriceController: TextEditingController(
+            text: v.purchasePrice == null
+                ? ''
+                : ProductValidator.formatPaise(v.purchasePrice!),
+          ),
+          mrpController: TextEditingController(
+            text: v.mrp == null ? '' : ProductValidator.formatPaise(v.mrp!),
+          ),
+          wholesalePriceController: TextEditingController(
+            text: v.wholesalePrice == null
+                ? ''
+                : ProductValidator.formatPaise(v.wholesalePrice!),
+          ),
+          barcodeController: TextEditingController(text: v.barcode ?? ''),
+          hsnCodeController: TextEditingController(text: v.hsnCode ?? ''),
           expiryDate: v.expiryDate,
           notesController: TextEditingController(text: v.notes ?? ''),
         );
@@ -184,14 +269,17 @@ class _CreateProductPageState extends State<CreateProductPage> {
     _loadDropdowns();
   }
 
-
-
   @override
   void dispose() {
     _focusController.dispose();
     _nameController.dispose();
     _codeController.dispose();
     _sellingPriceController.dispose();
+    _purchasePriceController.dispose();
+    _mrpController.dispose();
+    _wholesalePriceController.dispose();
+    _barcodeController.dispose();
+    _hsnCodeController.dispose();
     _notesController.dispose();
     for (final row in _variantRows) {
       row.dispose();
@@ -270,6 +358,11 @@ class _CreateProductPageState extends State<CreateProductPage> {
     final row = _VariantRow(
       nameController: TextEditingController(),
       priceController: TextEditingController(),
+      purchasePriceController: TextEditingController(),
+      mrpController: TextEditingController(),
+      wholesalePriceController: TextEditingController(),
+      barcodeController: TextEditingController(),
+      hsnCodeController: TextEditingController(),
       notesController: TextEditingController(),
     );
     row.initFocusNodes(_variantRows.length);
@@ -313,6 +406,31 @@ class _CreateProductPageState extends State<CreateProductPage> {
         _scrollToContext(row.priceContainerKey.currentContext);
         return;
       }
+      if (errors['variant_${i}_purchase_price'] != null) {
+        row.purchasePriceFocusNode.requestFocus();
+        _scrollToContext(row.purchasePriceContainerKey.currentContext);
+        return;
+      }
+      if (errors['variant_${i}_mrp'] != null) {
+        row.mrpFocusNode.requestFocus();
+        _scrollToContext(row.mrpContainerKey.currentContext);
+        return;
+      }
+      if (errors['variant_${i}_wholesale_price'] != null) {
+        row.wholesalePriceFocusNode.requestFocus();
+        _scrollToContext(row.wholesalePriceContainerKey.currentContext);
+        return;
+      }
+      if (errors['variant_${i}_barcode'] != null) {
+        row.barcodeFocusNode.requestFocus();
+        _scrollToContext(row.barcodeContainerKey.currentContext);
+        return;
+      }
+      if (errors['variant_${i}_hsn'] != null) {
+        row.hsnCodeFocusNode.requestFocus();
+        _scrollToContext(row.hsnCodeContainerKey.currentContext);
+        return;
+      }
       if (errors['variant_${i}_notes'] != null) {
         row.notesFocusNode.requestFocus();
         _scrollToContext(row.notesContainerKey.currentContext);
@@ -335,6 +453,11 @@ class _CreateProductPageState extends State<CreateProductPage> {
     final name = _nameController.text.trim();
     final code = _codeController.text.trim();
     final sellingPriceText = _sellingPriceController.text.trim();
+    final purchasePriceText = _purchasePriceController.text.trim();
+    final mrpText = _mrpController.text.trim();
+    final wholesalePriceText = _wholesalePriceController.text.trim();
+    final barcode = _barcodeController.text.trim();
+    final hsnCode = _hsnCodeController.text.trim();
     final notes = _notesController.text.trim();
 
     // Collect variant data.
@@ -345,18 +468,50 @@ class _CreateProductPageState extends State<CreateProductPage> {
       final row = _variantRows[i];
       final vName = row.nameController.text.trim();
       final vPrice = row.priceController.text.trim();
+      final vPurchasePrice = row.purchasePriceController.text.trim();
+      final vMrp = row.mrpController.text.trim();
+      final vWholesalePrice = row.wholesalePriceController.text.trim();
+      final vBarcode = row.barcodeController.text.trim();
+      final vHsn = row.hsnCodeController.text.trim();
       final vNotes = row.notesController.text.trim();
 
       final nameErr = ProductValidator.validateVariantName(vName);
       final priceErr = ProductValidator.validateVariantSellingPrice(vPrice);
+      final purchaseErr =
+          ProductValidator.validatePurchasePrice(vPurchasePrice);
+      final mrpErr = ProductValidator.validateMrp(vMrp);
+      final wholesaleErr =
+          ProductValidator.validateWholesalePrice(vWholesalePrice);
+      final barcodeErr = ProductValidator.validateBarcode(vBarcode);
+      final hsnErr = ProductValidator.validateHsnCode(vHsn);
 
       if (nameErr != null) variantErrors['variant_${i}_name'] = nameErr;
       if (priceErr != null) variantErrors['variant_${i}_price'] = priceErr;
+      if (purchaseErr != null) {
+        variantErrors['variant_${i}_purchase_price'] = purchaseErr;
+      }
+      if (mrpErr != null) variantErrors['variant_${i}_mrp'] = mrpErr;
+      if (wholesaleErr != null) {
+        variantErrors['variant_${i}_wholesale_price'] = wholesaleErr;
+      }
+      if (barcodeErr != null) variantErrors['variant_${i}_barcode'] = barcodeErr;
+      if (hsnErr != null) variantErrors['variant_${i}_hsn'] = hsnErr;
 
-      if (nameErr == null && priceErr == null) {
+      if (nameErr == null &&
+          priceErr == null &&
+          purchaseErr == null &&
+          mrpErr == null &&
+          wholesaleErr == null &&
+          barcodeErr == null &&
+          hsnErr == null) {
         variantInputs.add(VariantInput(
           variantName: vName,
           sellingPrice: ProductValidator.parseRupeesToPaise(vPrice) ?? 0,
+          purchasePrice: ProductValidator.parseRupeesToPaise(vPurchasePrice),
+          mrp: ProductValidator.parseRupeesToPaise(vMrp),
+          wholesalePrice: ProductValidator.parseRupeesToPaise(vWholesalePrice),
+          barcode: vBarcode.isEmpty ? null : vBarcode,
+          hsnCode: vHsn.isEmpty ? null : vHsn,
           expiryDate: row.expiryDate,
           notes: vNotes.isEmpty ? null : vNotes,
         ));
@@ -364,8 +519,14 @@ class _CreateProductPageState extends State<CreateProductPage> {
     }
 
     // Check for duplicate variant names.
-    final duplicateCheck = ProductValidator.validateVariantNamesUnique(
+    final duplicateNameCheck = ProductValidator.validateVariantNamesUnique(
       _variantRows.map((r) => r.nameController.text).toList(),
+    );
+
+    // Check for duplicate variant barcodes.
+    final duplicateBarcodeCheck =
+        ProductValidator.validateVariantBarcodesUnique(
+      _variantRows.map((r) => r.barcodeController.text).toList(),
     );
 
     final errors = <String, String?>{
@@ -376,8 +537,14 @@ class _CreateProductPageState extends State<CreateProductPage> {
         sellingPriceText,
         hasVariants: _hasVariants,
       ),
+      'purchasePrice': ProductValidator.validatePurchasePrice(purchasePriceText),
+      'mrp': ProductValidator.validateMrp(mrpText),
+      'wholesalePrice':
+          ProductValidator.validateWholesalePrice(wholesalePriceText),
+      'barcode': ProductValidator.validateBarcode(barcode),
+      'hsnCode': ProductValidator.validateHsnCode(hsnCode),
       'notes': ProductValidator.validateNotes(notes),
-      'variantDuplicate': ?duplicateCheck,
+      'variantDuplicate': duplicateNameCheck ?? duplicateBarcodeCheck,
       ...variantErrors,
     };
 
@@ -395,6 +562,11 @@ class _CreateProductPageState extends State<CreateProductPage> {
 
     final sellingPrice =
         ProductValidator.parseRupeesToPaise(sellingPriceText) ?? 0;
+    final purchasePrice =
+        ProductValidator.parseRupeesToPaise(purchasePriceText);
+    final mrp = ProductValidator.parseRupeesToPaise(mrpText);
+    final wholesalePrice =
+        ProductValidator.parseRupeesToPaise(wholesalePriceText);
 
     try {
       if (_isEditing) {
@@ -406,6 +578,11 @@ class _CreateProductPageState extends State<CreateProductPage> {
           brandId: _brandId,
           unitId: _unitId!,
           sellingPrice: sellingPrice,
+          purchasePrice: purchasePrice,
+          mrp: mrp,
+          wholesalePrice: wholesalePrice,
+          barcode: barcode.isNotEmpty ? barcode : null,
+          hsnCode: hsnCode.isNotEmpty ? hsnCode : null,
           taxTypeId: _taxTypeId,
           expiryDate: _expiryDate,
           notes: notes,
@@ -422,6 +599,11 @@ class _CreateProductPageState extends State<CreateProductPage> {
           brandId: _brandId,
           unitId: _unitId!,
           sellingPrice: sellingPrice,
+          purchasePrice: purchasePrice,
+          mrp: mrp,
+          wholesalePrice: wholesalePrice,
+          barcode: barcode.isNotEmpty ? barcode : null,
+          hsnCode: hsnCode.isNotEmpty ? hsnCode : null,
           taxTypeId: _taxTypeId,
           expiryDate: _expiryDate,
           notes: notes,
@@ -474,10 +656,19 @@ class _CreateProductPageState extends State<CreateProductPage> {
       final vPrice =
           ProductValidator.parseRupeesToPaise(row.priceController.text.trim()) ??
               0;
+      final vPurchasePrice = ProductValidator.parseRupeesToPaise(
+        row.purchasePriceController.text.trim(),
+      );
+      final vMrp =
+          ProductValidator.parseRupeesToPaise(row.mrpController.text.trim());
+      final vWholesalePrice = ProductValidator.parseRupeesToPaise(
+        row.wholesalePriceController.text.trim(),
+      );
+      final vBarcode = row.barcodeController.text.trim();
+      final vHsn = row.hsnCodeController.text.trim();
       final vNotes = row.notesController.text.trim();
 
-      // Check if this variant has an existing ID (stored via a hidden field approach).
-      // Since we don't store variant IDs in the form, we match by name.
+      // Check if this variant has an existing ID (match by name).
       final existing = product.variants.where(
         (v) => v.variantName.toLowerCase() == vName.toLowerCase(),
       );
@@ -486,12 +677,22 @@ class _CreateProductPageState extends State<CreateProductPage> {
         // Update existing variant.
         currentIds.add(existing.first.id);
         if (existing.first.sellingPrice != vPrice ||
+            existing.first.purchasePrice != vPurchasePrice ||
+            existing.first.mrp != vMrp ||
+            existing.first.wholesalePrice != vWholesalePrice ||
+            (existing.first.barcode ?? '') != vBarcode ||
+            (existing.first.hsnCode ?? '') != vHsn ||
             existing.first.expiryDate != row.expiryDate ||
             (existing.first.notes ?? '') != vNotes) {
           await _repository.updateVariant(
             existing.first.id,
             variantName: vName,
             sellingPrice: vPrice,
+            purchasePrice: vPurchasePrice,
+            mrp: vMrp,
+            wholesalePrice: vWholesalePrice,
+            barcode: vBarcode.isEmpty ? null : vBarcode,
+            hsnCode: vHsn.isEmpty ? null : vHsn,
             expiryDate: row.expiryDate,
             notes: vNotes.isEmpty ? null : vNotes,
           );
@@ -502,6 +703,11 @@ class _CreateProductPageState extends State<CreateProductPage> {
           product.id,
           variantName: vName,
           sellingPrice: vPrice,
+          purchasePrice: vPurchasePrice,
+          mrp: vMrp,
+          wholesalePrice: vWholesalePrice,
+          barcode: vBarcode.isEmpty ? null : vBarcode,
+          hsnCode: vHsn.isEmpty ? null : vHsn,
           expiryDate: row.expiryDate,
           notes: vNotes.isEmpty ? null : vNotes,
         );
@@ -671,10 +877,33 @@ class _CreateProductPageState extends State<CreateProductPage> {
                                 setState(() => _unitId = value),
                           ),
                         ]),
+                        const SizedBox(height: 20),
+                        _buildFormRow([
+                          LabelledField(
+                            label: 'Barcode',
+                            hintText: 'e.g. 8901234567890',
+                            controller: _barcodeController,
+                            errorText: _errors['barcode'],
+                            focusNode: _focusController.node('barcode'),
+                            containerKey: _focusController.key('barcode'),
+                            fieldKey: const ValueKey('product-barcode'),
+                          ),
+                          LabelledField(
+                            label: 'HSN/SAC Code',
+                            hintText: 'e.g. 1905',
+                            controller: _hsnCodeController,
+                            errorText: _errors['hsnCode'],
+                            focusNode: _focusController.node('hsnCode'),
+                            containerKey: _focusController.key('hsnCode'),
+                            fieldKey: const ValueKey('product-hsn-code'),
+                          ),
+                        ]),
                         const SizedBox(height: 28),
 
-                        // ── Section 2: Selling Information ──
-                        const PartySectionTitle(title: 'Selling Information'),
+                        // ── Section 2: Pricing & Tax Information ──
+                        const PartySectionTitle(
+                          title: 'Pricing & Tax Information',
+                        ),
                         const SizedBox(height: 16),
                         _buildFormRow([
                           LabelledField(
@@ -696,24 +925,83 @@ class _CreateProductPageState extends State<CreateProductPage> {
                               ),
                             ],
                           ),
-                          LabelledDropdown<int>(
-                            label: 'Tax',
-                            keyValue: 'product-tax',
-                            value: _taxTypeId,
-                            hintText: 'Select tax',
-                            focusNode: _focusController.node('tax'),
-                            containerKey: _focusController.key('tax'),
-                            items: [
-                              for (final t in _taxTypes)
-                                DropdownMenuItem(
-                                  value: t.id,
-                                  child: Text(t.taxTypeName),
-                                ),
+                          LabelledField(
+                            label: 'Purchase Price',
+                            hintText: 'Optional — e.g. 40',
+                            controller: _purchasePriceController,
+                            errorText: _errors['purchasePrice'],
+                            focusNode: _focusController.node('purchasePrice'),
+                            containerKey: _focusController.key('purchasePrice'),
+                            fieldKey: const ValueKey('product-purchase-price'),
+                            keyboardType:
+                                const TextInputType.numberWithOptions(
+                              decimal: true,
+                            ),
+                            inputFormatters: [
+                              FilteringTextInputFormatter.allow(
+                                RegExp(r'^\d*\.?\d{0,2}'),
+                              ),
                             ],
-                            onChanged: (value) =>
-                                setState(() => _taxTypeId = value),
                           ),
                         ]),
+                        const SizedBox(height: 20),
+                        _buildFormRow([
+                          LabelledField(
+                            label: 'MRP',
+                            hintText: 'Optional — e.g. 55',
+                            controller: _mrpController,
+                            errorText: _errors['mrp'],
+                            focusNode: _focusController.node('mrp'),
+                            containerKey: _focusController.key('mrp'),
+                            fieldKey: const ValueKey('product-mrp'),
+                            keyboardType:
+                                const TextInputType.numberWithOptions(
+                              decimal: true,
+                            ),
+                            inputFormatters: [
+                              FilteringTextInputFormatter.allow(
+                                RegExp(r'^\d*\.?\d{0,2}'),
+                              ),
+                            ],
+                          ),
+                          LabelledField(
+                            label: 'Wholesale Price',
+                            hintText: 'Optional — e.g. 45',
+                            controller: _wholesalePriceController,
+                            errorText: _errors['wholesalePrice'],
+                            focusNode: _focusController.node('wholesalePrice'),
+                            containerKey:
+                                _focusController.key('wholesalePrice'),
+                            fieldKey: const ValueKey('product-wholesale-price'),
+                            keyboardType:
+                                const TextInputType.numberWithOptions(
+                              decimal: true,
+                            ),
+                            inputFormatters: [
+                              FilteringTextInputFormatter.allow(
+                                RegExp(r'^\d*\.?\d{0,2}'),
+                              ),
+                            ],
+                          ),
+                        ]),
+                        const SizedBox(height: 20),
+                        LabelledDropdown<int>(
+                          label: 'Tax',
+                          keyValue: 'product-tax',
+                          value: _taxTypeId,
+                          hintText: 'Select tax',
+                          focusNode: _focusController.node('tax'),
+                          containerKey: _focusController.key('tax'),
+                          items: [
+                            for (final t in _taxTypes)
+                              DropdownMenuItem(
+                                value: t.id,
+                                child: Text(t.taxTypeName),
+                              ),
+                          ],
+                          onChanged: (value) =>
+                              setState(() => _taxTypeId = value),
+                        ),
                         const SizedBox(height: 28),
 
                         // ── Section 3: Additional Information ──
@@ -740,7 +1028,7 @@ class _CreateProductPageState extends State<CreateProductPage> {
                           const PartySectionTitle(title: 'Variants'),
                           const SizedBox(height: 4),
                           Text(
-                            'Add optional product variants (e.g. different sizes or prices).',
+                            'Add optional product variants (inheriting Category, Brand, Unit, and Tax).',
                             style: textTheme.bodySmall?.copyWith(
                               color: colorScheme.onSurfaceVariant,
                             ),
@@ -871,10 +1159,15 @@ class _CreateProductPageState extends State<CreateProductPage> {
     row.initFocusNodes(index);
     final variantNameKey = 'variant_${index}_name';
     final variantPriceKey = 'variant_${index}_price';
+    final variantPurchaseKey = 'variant_${index}_purchase_price';
+    final variantMrpKey = 'variant_${index}_mrp';
+    final variantWholesaleKey = 'variant_${index}_wholesale_price';
+    final variantBarcodeKey = 'variant_${index}_barcode';
+    final variantHsnKey = 'variant_${index}_hsn';
     final variantNotesKey = 'variant_${index}_notes';
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
@@ -905,7 +1198,7 @@ class _CreateProductPageState extends State<CreateProductPage> {
           LabelledField(
             label: 'Variant Name',
             isRequired: true,
-            hintText: 'e.g. Parle-G 5',
+            hintText: 'e.g. 50g Small Pack',
             controller: row.nameController,
             errorText: _errors[variantNameKey],
             focusNode: row.nameFocusNode,
@@ -917,7 +1210,7 @@ class _CreateProductPageState extends State<CreateProductPage> {
             LabelledField(
               label: 'Selling Price',
               isRequired: true,
-              hintText: 'e.g. 5',
+              hintText: 'e.g. 10',
               controller: row.priceController,
               errorText: _errors[variantPriceKey],
               focusNode: row.priceFocusNode,
@@ -932,8 +1225,84 @@ class _CreateProductPageState extends State<CreateProductPage> {
                 ),
               ],
             ),
-            _buildVariantExpiryField(index, row),
+            LabelledField(
+              label: 'Purchase Price',
+              hintText: 'Optional — e.g. 8',
+              controller: row.purchasePriceController,
+              errorText: _errors[variantPurchaseKey],
+              focusNode: row.purchasePriceFocusNode,
+              containerKey: row.purchasePriceContainerKey,
+              fieldKey: ValueKey('variant-$index-purchase-price'),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(
+                  RegExp(r'^\d*\.?\d{0,2}'),
+                ),
+              ],
+            ),
           ]),
+          const SizedBox(height: 16),
+          _buildFormRow([
+            LabelledField(
+              label: 'MRP',
+              hintText: 'Optional — e.g. 12',
+              controller: row.mrpController,
+              errorText: _errors[variantMrpKey],
+              focusNode: row.mrpFocusNode,
+              containerKey: row.mrpContainerKey,
+              fieldKey: ValueKey('variant-$index-mrp'),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(
+                  RegExp(r'^\d*\.?\d{0,2}'),
+                ),
+              ],
+            ),
+            LabelledField(
+              label: 'Wholesale Price',
+              hintText: 'Optional — e.g. 9',
+              controller: row.wholesalePriceController,
+              errorText: _errors[variantWholesaleKey],
+              focusNode: row.wholesalePriceFocusNode,
+              containerKey: row.wholesalePriceContainerKey,
+              fieldKey: ValueKey('variant-$index-wholesale-price'),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
+              inputFormatters: [
+                FilteringTextInputFormatter.allow(
+                  RegExp(r'^\d*\.?\d{0,2}'),
+                ),
+              ],
+            ),
+          ]),
+          const SizedBox(height: 16),
+          _buildFormRow([
+            LabelledField(
+              label: 'Barcode',
+              hintText: 'Optional barcode for this variant',
+              controller: row.barcodeController,
+              errorText: _errors[variantBarcodeKey],
+              focusNode: row.barcodeFocusNode,
+              containerKey: row.barcodeContainerKey,
+              fieldKey: ValueKey('variant-$index-barcode'),
+            ),
+            LabelledField(
+              label: 'HSN/SAC Code',
+              hintText: 'Optional HSN code',
+              controller: row.hsnCodeController,
+              errorText: _errors[variantHsnKey],
+              focusNode: row.hsnCodeFocusNode,
+              containerKey: row.hsnCodeContainerKey,
+              fieldKey: ValueKey('variant-$index-hsn-code'),
+            ),
+          ]),
+          const SizedBox(height: 16),
+          _buildVariantExpiryField(index, row),
           const SizedBox(height: 16),
           LabelledField(
             label: 'Notes',

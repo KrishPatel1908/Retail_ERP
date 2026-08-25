@@ -9,6 +9,7 @@ import '../master_entry/tax_category/domain/entities/tax_category.dart';
 import '../master_entry/tax_type/domain/entities/tax_type.dart';
 import '../master_entry/unit/domain/entities/unit.dart';
 import '../master_entry/uom_conversion/domain/entities/uom_conversion.dart';
+import '../purchase/domain/entities/purchase.dart';
 
 /// A page rendered inside the shell's content area.
 ///
@@ -127,4 +128,14 @@ class ProductFormRoute extends ContentRoute {
   const ProductFormRoute({this.product});
 
   final ProductEntity? product;
+}
+
+/// The "Create / Edit Purchase" form shown above the Purchase History list.
+///
+/// When [purchase] is provided the form edits that purchase, otherwise it
+/// creates a new one.
+class PurchaseFormRoute extends ContentRoute {
+  const PurchaseFormRoute({this.purchase});
+
+  final PurchaseEntity? purchase;
 }

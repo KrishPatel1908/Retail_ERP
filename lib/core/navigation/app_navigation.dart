@@ -27,7 +27,16 @@ const List<NavSection> appNavigation = [
         NavItem('Supplier', AppPage.supplier),
       ],
     ),
-    NavItem('Purchase', AppPage.purchase),
+    NavItem(
+      'Purchase',
+      null,
+      icon: Icons.shopping_cart_outlined,
+      children: [
+        NavItem('Purchase Entry', AppPage.purchaseEntry),
+        NavItem('Purchase History', AppPage.purchaseHistory),
+        NavItem('Purchase Returns', AppPage.purchaseReturns),
+      ],
+    ),
     NavItem('Sales (POS)', AppPage.salesPos),
     NavItem('Inventory', AppPage.inventory),
     NavItem('Reports', AppPage.reports),

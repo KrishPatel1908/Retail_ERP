@@ -16,7 +16,7 @@ final _throwsDatabaseError = throwsA(
   anyOf(isA<SqliteException>(), isA<DriftWrappedException>()),
 );
 
-/// The 16 tables of the approved blueprint.
+/// The 20 tables of the approved blueprint.
 const _expectedTables = {
   'company_settings',
   'category',
@@ -34,6 +34,10 @@ const _expectedTables = {
   'product_variant',
   'product_uom',
   'document_number_sequence',
+  'purchase',
+  'purchase_item',
+  'inventory_transaction',
+  'current_stock',
 };
 
 /// The 11 case-insensitive unique indexes of the approved blueprint. Units
@@ -80,7 +84,7 @@ void main() {
       expect(result.single.data.values.single, 1);
     });
 
-    test('registers all 16 blueprint tables', () async {
+    test('registers all 20 blueprint tables', () async {
       final db = AppDatabase(NativeDatabase.memory());
       addTearDown(db.close);
       await db.customSelect('SELECT 1').get();
@@ -99,11 +103,11 @@ void main() {
       final db = AppDatabase(NativeDatabase.memory());
       addTearDown(db.close);
 
-      expect(db.schemaVersion, 8);
+      expect(db.schemaVersion, 10);
       await db.customSelect('SELECT 1').get();
 
       final row = (await db.customSelect('PRAGMA user_version').get()).single;
-      expect(row.read<int>('user_version'), 8);
+      expect(row.read<int>('user_version'), 10);
     });
 
     test('creates the case-insensitive unique indexes', () async {
@@ -512,10 +516,10 @@ void main() {
         addTearDown(db.close);
         await db.customSelect('SELECT 1').get();
 
-        expect(db.schemaVersion, 8);
+        expect(db.schemaVersion, 10);
         final versionRow =
             (await db.customSelect('PRAGMA user_version').get()).single;
-        expect(versionRow.read<int>('user_version'), 8);
+        expect(versionRow.read<int>('user_version'), 10);
 
         // The old columns are gone and the new ones are present.
         final unitColumns = await db
@@ -686,10 +690,11 @@ void main() {
       // --- Open with the current schema: the v4 migration must run ------
       final db = AppDatabase(NativeDatabase(file));
       addTearDown(db.close);
-      await db.customSelect('SELECT 1').get();        expect(db.schemaVersion, 8);
-        final versionRow =
-            (await db.customSelect('PRAGMA user_version').get()).single;
-        expect(versionRow.read<int>('user_version'), 8);
+      await db.customSelect('SELECT 1').get();
+      expect(db.schemaVersion, 10);
+      final versionRow =
+          (await db.customSelect('PRAGMA user_version').get()).single;
+      expect(versionRow.read<int>('user_version'), 10);
 
         // Customer gained the new columns and `address` became line 1.
       final customerColumns = await db
@@ -784,10 +789,9 @@ void main() {
       final db = AppDatabase(NativeDatabase(file));
       addTearDown(db.close);
       await db.customSelect('SELECT 1').get();
+      expect(db.schemaVersion, 10);
 
-      expect(db.schemaVersion, 8);
-
-      final customerCols = (await db.customSelect("SELECT name FROM pragma_table_info('customer')").get())
+        final customerCols = (await db.customSelect("SELECT name FROM pragma_table_info('customer')").get())
           .map((r) => r.read<String>('name'))
           .toSet();
       expect(
@@ -862,10 +866,11 @@ void main() {
       // --- Open with the current schema: the v6 migration must run ---------
       final db = AppDatabase(NativeDatabase(file));
       addTearDown(db.close);
-      await db.customSelect('SELECT 1').get();        expect(db.schemaVersion, 8);
-        final versionRow =
-            (await db.customSelect('PRAGMA user_version').get()).single;
-        expect(versionRow.read<int>('user_version'), 8);
+      await db.customSelect('SELECT 1').get();
+      expect(db.schemaVersion, 10);
+      final versionRow =
+          (await db.customSelect('PRAGMA user_version').get()).single;
+      expect(versionRow.read<int>('user_version'), 10);
 
         final columns = (await db
               .customSelect("SELECT name FROM pragma_table_info('company_settings')")

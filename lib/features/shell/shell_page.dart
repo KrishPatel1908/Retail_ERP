@@ -21,6 +21,9 @@ import '../master_entry/sub_category/presentation/pages/sub_category_list_page.d
 import '../master_entry/supplier/domain/entities/supplier.dart';
 import '../master_entry/supplier/presentation/pages/create_supplier_page.dart';
 import '../master_entry/supplier/presentation/pages/supplier_list_page.dart';
+import '../purchase/presentation/pages/create_purchase_page.dart';
+import '../purchase/presentation/pages/purchase_history_page.dart';
+import '../purchase/presentation/pages/purchase_returns_page.dart';
 import '../master_entry/product_uom/domain/entities/product_uom_display.dart';
 import '../master_entry/product_uom/presentation/pages/create_product_uom_page.dart';
 import '../master_entry/product_uom/presentation/pages/product_uom_list_page.dart';
@@ -230,6 +233,28 @@ class _ShellPageState extends State<ShellPage> {
               _openSupplierForm(supplier: supplier),
         ),
         AppPage.companySettings => const CompanySettingsPage(),
+        AppPage.purchaseEntry => CreatePurchasePage(
+          onSave: () {
+            setState(() {
+              _contentStack
+                ..clear()
+                ..add(ModuleRoute(AppPage.purchaseHistory));
+            });
+            _onPageSelected(AppPage.purchaseHistory);
+          },
+          onCancel: () => _onPageSelected(AppPage.purchaseHistory),
+        ),
+        AppPage.purchaseHistory => PurchaseHistoryPage(
+          onNewPurchase: () => _onPageSelected(AppPage.purchaseEntry),
+          onEditPurchase: (purchase) {
+            setState(() => _contentStack.add(
+              PurchaseFormRoute(purchase: purchase),
+            ));
+          },
+        ),
+        AppPage.purchaseReturns => PurchaseReturnsPage(
+          onNewReturn: () {},
+        ),
         _ => PagePlaceholder(page: page),
       },
       CategoryFormRoute(:final category) => CreateCategoryPage(
@@ -288,6 +313,16 @@ class _ShellPageState extends State<ShellPage> {
         onCancel: _closeSupplierForm,
         supplier: supplier,
       ),
+      PurchaseFormRoute(:final purchase) => CreatePurchasePage(
+        onSave: () {
+          setState(() => _contentStack.removeLast());
+          _onPageSelected(AppPage.purchaseHistory);
+        },
+        onCancel: () {
+          setState(() => _contentStack.removeLast());
+        },
+        purchase: purchase,
+      ),
     };
   }
 
@@ -305,6 +340,7 @@ class _ShellPageState extends State<ShellPage> {
       CustomerFormRoute() => 'customer-form',
       ProductFormRoute() => 'product-form',
       SupplierFormRoute() => 'supplier-form',
+      PurchaseFormRoute() => 'purchase-form',
     };
   }
 

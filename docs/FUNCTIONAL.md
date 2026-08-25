@@ -542,15 +542,15 @@ Dependencies
 Features
 
 - View (detailed read-only dialog modal showing Product Details, Selling & Tax info, and Variant breakdown)
-- Create & Edit with Dynamic Inline Variant Management (+ Add Variant, remove variant, per-variant price/expiry/notes)
-- Edit Variant (dialog modal allowing in-place editing of Variant Name, Selling Price, Expiry Date, and Notes)
+- Create & Edit with Dynamic Inline Variant Management (+ Add Variant, remove variant, per-variant price/expiry/notes/barcode/hsn/purchase price/mrp/wholesale price)
+- Edit Variant (dialog modal allowing in-place editing of Variant Name, Selling Price, Purchase Price, MRP, Wholesale Price, Barcode, HSN/SAC Code, Expiry Date, and Notes)
 - Delete Product (with confirmation dialog; cascades to variants; blocked if in use)
 - Delete Variant (with confirmation dialog)
-- Server-side Search across Product Name, Code, Category, Sub Category, Brand, and Variant names
+- Server-side Search across Product Name, Code, Barcode, HSN/SAC Code, Category, Sub Category, Brand, and Variant names/barcodes/hsn
 - Advanced Server-side Filters (Category, Sub Category, Brand, Price range, Creation date range)
 - Sorting (Code, Product Name, Selling Price, Expiry Date, Category, Brand, Created Date)
 - Server-side Pagination
-- Expandable Multi-Column Table Layout (Action column with expandable chevron, view, edit, delete icons; Code, Status, Product Name, Selling Price, Expiry Date, Category, Brand, Unit, Tax, Created Date)
+- Expandable Multi-Column Table Layout (Action column with expandable chevron, view, edit, delete icons; Code, Status, Product Name, Selling Price, Expiry Date, Category, Brand, Unit, Tax, Created Date; expanded rows show variant details)
 - Auto-generated Product Code (PROD00001, PROD00002, ...)
 - Form keyboard focus management and scroll-to-first-error
 
@@ -558,8 +558,10 @@ Business Rules
 
 - Product Name is required and trimmed (max 200 chars).
 - Product Code is optional (auto-generated as PRODxxxxx if omitted) and must be unique.
-- Unit is required.
-- Selling Price is required for the main product and stored independently.
+- Unit is required for the main product (variants inherit unit).
+- Selling Price is required for the main product and for each variant.
+- Purchase Price, MRP, Wholesale Price, Barcode, HSN/SAC Code, and Expiry Date are optional for main products and variants.
+- Barcode must be unique across all products and variants when provided.
 - Each variant has its own independent Variant Name and Variant Selling Price.
 - Editing the main product price or any variant price operates independently without overriding each other.
 - Variant names must be unique within the product.

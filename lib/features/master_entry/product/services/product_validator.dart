@@ -20,6 +20,47 @@ abstract final class ProductValidator {
     return null;
   }
 
+  /// Validates optional purchase price.
+  static String? validatePurchasePrice(String value) {
+    if (value.trim().isEmpty) return null;
+    final parsed = double.tryParse(value.trim().replaceAll(',', ''));
+    if (parsed == null) return 'Please enter a valid price.';
+    if (parsed < 0) return 'Purchase price must be 0 or more.';
+    return null;
+  }
+
+  /// Validates optional MRP.
+  static String? validateMrp(String value) {
+    if (value.trim().isEmpty) return null;
+    final parsed = double.tryParse(value.trim().replaceAll(',', ''));
+    if (parsed == null) return 'Please enter a valid price.';
+    if (parsed < 0) return 'MRP must be 0 or more.';
+    return null;
+  }
+
+  /// Validates optional wholesale price.
+  static String? validateWholesalePrice(String value) {
+    if (value.trim().isEmpty) return null;
+    final parsed = double.tryParse(value.trim().replaceAll(',', ''));
+    if (parsed == null) return 'Please enter a valid price.';
+    if (parsed < 0) return 'Wholesale price must be 0 or more.';
+    return null;
+  }
+
+  /// Validates optional barcode.
+  static String? validateBarcode(String value) {
+    if (value.trim().isEmpty) return null;
+    if (value.trim().length > 50) return 'Barcode is too long.';
+    return null;
+  }
+
+  /// Validates optional HSN/SAC code.
+  static String? validateHsnCode(String value) {
+    if (value.trim().isEmpty) return null;
+    if (value.trim().length > 20) return 'HSN/SAC code is too long.';
+    return null;
+  }
+
   /// Validates selling price for the parent product.
   static String? validateParentSellingPrice(
     String value, {
@@ -56,6 +97,19 @@ abstract final class ProductValidator {
       if (name.isEmpty) continue;
       if (!seen.add(name)) {
         return 'Duplicate variant names are not allowed.';
+      }
+    }
+    return null;
+  }
+
+  /// Validates that variant barcodes are unique within the list (when provided).
+  static String? validateVariantBarcodesUnique(List<String> barcodes) {
+    final trimmed = barcodes.map((b) => b.trim().toLowerCase()).toList();
+    final seen = <String>{};
+    for (final barcode in trimmed) {
+      if (barcode.isEmpty) continue;
+      if (!seen.add(barcode)) {
+        return 'Duplicate variant barcodes are not allowed.';
       }
     }
     return null;

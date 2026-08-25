@@ -59,12 +59,22 @@ class VariantInput {
   const VariantInput({
     required this.variantName,
     required this.sellingPrice,
+    this.purchasePrice,
+    this.mrp,
+    this.wholesalePrice,
+    this.barcode,
+    this.hsnCode,
     this.expiryDate,
     this.notes,
   });
 
   final String variantName;
   final int sellingPrice;
+  final int? purchasePrice;
+  final int? mrp;
+  final int? wholesalePrice;
+  final String? barcode;
+  final String? hsnCode;
   final DateTime? expiryDate;
   final String? notes;
 }
@@ -112,7 +122,11 @@ class ProductRepository {
 
     // Count query.
     final countExpr = t.id.count();
-    final countQuery = _database.selectOnly(_database.products);
+    final countQuery = _database.selectOnly(t).join([
+      leftOuterJoin(catT, catT.id.equalsExp(t.categoryId)),
+      leftOuterJoin(subT, subT.id.equalsExp(t.subCategoryId)),
+      leftOuterJoin(brandT, brandT.id.equalsExp(t.brandId)),
+    ]);
     countQuery.addColumns([countExpr]);
     if (predicate != null) countQuery.where(predicate);
     final total = (await countQuery.get()).single.read(countExpr) ?? 0;
@@ -156,6 +170,11 @@ class ProductRepository {
           unitId: p.unitId,
           unitName: p.unitName,
           sellingPrice: p.sellingPrice,
+          purchasePrice: p.purchasePrice,
+          mrp: p.mrp,
+          wholesalePrice: p.wholesalePrice,
+          barcode: p.barcode,
+          hsnCode: p.hsnCode,
           taxTypeId: p.taxTypeId,
           taxTypeName: p.taxTypeName,
           expiryDate: p.expiryDate,
@@ -211,6 +230,11 @@ class ProductRepository {
       unitId: product.unitId,
       unitName: product.unitName,
       sellingPrice: product.sellingPrice,
+      purchasePrice: product.purchasePrice,
+      mrp: product.mrp,
+      wholesalePrice: product.wholesalePrice,
+      barcode: product.barcode,
+      hsnCode: product.hsnCode,
       taxTypeId: product.taxTypeId,
       taxTypeName: product.taxTypeName,
       expiryDate: product.expiryDate,
@@ -231,12 +255,19 @@ class ProductRepository {
     int? brandId,
     required int unitId,
     required int sellingPrice,
+    int? purchasePrice,
+    int? mrp,
+    int? wholesalePrice,
+    String? barcode,
+    String? hsnCode,
     int? taxTypeId,
     DateTime? expiryDate,
     String? notes,
     List<VariantInput> variants = const [],
   }) async {
     final trimmedName = productName.trim();
+    final trimmedBarcode = _normalizeText(barcode);
+    final trimmedHsnCode = _normalizeText(hsnCode);
     final trimmedNotes = _normalizeText(notes);
 
     try {
@@ -254,6 +285,11 @@ class ProductRepository {
             brandId: Value(brandId),
             unitId: unitId,
             sellingPrice: Value(sellingPrice),
+            purchasePrice: Value(purchasePrice),
+            mrp: Value(mrp),
+            wholesalePrice: Value(wholesalePrice),
+            barcode: Value(trimmedBarcode),
+            hsnCode: Value(trimmedHsnCode),
             taxTypeId: Value(taxTypeId),
             expiryDate: Value(expiryDate),
             notes: Value(trimmedNotes),
@@ -267,6 +303,11 @@ class ProductRepository {
               productId: productId,
               variantName: variant.variantName.trim(),
               sellingPrice: Value(variant.sellingPrice),
+              purchasePrice: Value(variant.purchasePrice),
+              mrp: Value(variant.mrp),
+              wholesalePrice: Value(variant.wholesalePrice),
+              barcode: Value(_normalizeText(variant.barcode)),
+              hsnCode: Value(_normalizeText(variant.hsnCode)),
               expiryDate: Value(variant.expiryDate),
               notes: Value(_normalizeText(variant.notes)),
             ),
@@ -278,13 +319,18 @@ class ProductRepository {
       return getById(id);
     } on Exception catch (error, stackTrace) {
       if (_isUniqueViolation(error)) {
-        // Determine which field caused the violation.
-        if (error.toString().contains('product_variant')) {
+        final errorStr = error.toString().toLowerCase();
+        if (errorStr.contains('barcode')) {
+          throw const ProductDuplicateException(
+            ProductDuplicateField.barcode,
+          );
+        }
+        if (errorStr.contains('product_variant')) {
           throw const ProductDuplicateException(
             ProductDuplicateField.variantName,
           );
         }
-        if (error.toString().contains('product_code')) {
+        if (errorStr.contains('product_code')) {
           throw const ProductDuplicateException(
             ProductDuplicateField.productCode,
           );
@@ -310,12 +356,19 @@ class ProductRepository {
     int? brandId,
     required int unitId,
     required int sellingPrice,
+    int? purchasePrice,
+    int? mrp,
+    int? wholesalePrice,
+    String? barcode,
+    String? hsnCode,
     int? taxTypeId,
     DateTime? expiryDate,
     String? notes,
     bool? isActive,
   }) async {
     final trimmedName = productName.trim();
+    final trimmedBarcode = _normalizeText(barcode);
+    final trimmedHsnCode = _normalizeText(hsnCode);
     final trimmedNotes = _normalizeText(notes);
 
     try {
@@ -329,6 +382,11 @@ class ProductRepository {
           brandId: Value(brandId),
           unitId: Value(unitId),
           sellingPrice: Value(sellingPrice),
+          purchasePrice: Value(purchasePrice),
+          mrp: Value(mrp),
+          wholesalePrice: Value(wholesalePrice),
+          barcode: Value(trimmedBarcode),
+          hsnCode: Value(trimmedHsnCode),
           taxTypeId: Value(taxTypeId),
           expiryDate: Value(expiryDate),
           notes: Value(trimmedNotes),
@@ -342,6 +400,12 @@ class ProductRepository {
       rethrow;
     } on Exception catch (error, stackTrace) {
       if (_isUniqueViolation(error)) {
+        final errorStr = error.toString().toLowerCase();
+        if (errorStr.contains('barcode')) {
+          throw const ProductDuplicateException(
+            ProductDuplicateField.barcode,
+          );
+        }
         throw const ProductDuplicateException(ProductDuplicateField.productCode);
       }
       throw DatabaseOperationException(
@@ -387,6 +451,11 @@ class ProductRepository {
     int productId, {
     required String variantName,
     required int sellingPrice,
+    int? purchasePrice,
+    int? mrp,
+    int? wholesalePrice,
+    String? barcode,
+    String? hsnCode,
     DateTime? expiryDate,
     String? notes,
   }) async {
@@ -396,6 +465,11 @@ class ProductRepository {
           productId: productId,
           variantName: variantName.trim(),
           sellingPrice: Value(sellingPrice),
+          purchasePrice: Value(purchasePrice),
+          mrp: Value(mrp),
+          wholesalePrice: Value(wholesalePrice),
+          barcode: Value(_normalizeText(barcode)),
+          hsnCode: Value(_normalizeText(hsnCode)),
           expiryDate: Value(expiryDate),
           notes: Value(_normalizeText(notes)),
         ),
@@ -403,6 +477,12 @@ class ProductRepository {
       return _getVariantById(id);
     } on Exception catch (error, stackTrace) {
       if (_isUniqueViolation(error)) {
+        final errorStr = error.toString().toLowerCase();
+        if (errorStr.contains('barcode')) {
+          throw const ProductDuplicateException(
+            ProductDuplicateField.barcode,
+          );
+        }
         throw const ProductDuplicateException(
           ProductDuplicateField.variantName,
         );
@@ -420,6 +500,11 @@ class ProductRepository {
     int variantId, {
     required String variantName,
     required int sellingPrice,
+    int? purchasePrice,
+    int? mrp,
+    int? wholesalePrice,
+    String? barcode,
+    String? hsnCode,
     DateTime? expiryDate,
     String? notes,
   }) async {
@@ -430,6 +515,11 @@ class ProductRepository {
         db.ProductVariantsCompanion(
           variantName: Value(variantName.trim()),
           sellingPrice: Value(sellingPrice),
+          purchasePrice: Value(purchasePrice),
+          mrp: Value(mrp),
+          wholesalePrice: Value(wholesalePrice),
+          barcode: Value(_normalizeText(barcode)),
+          hsnCode: Value(_normalizeText(hsnCode)),
           expiryDate: Value(expiryDate),
           notes: Value(_normalizeText(notes)),
           updatedAt: Value(DateTime.now()),
@@ -441,6 +531,12 @@ class ProductRepository {
       rethrow;
     } on Exception catch (error, stackTrace) {
       if (_isUniqueViolation(error)) {
+        final errorStr = error.toString().toLowerCase();
+        if (errorStr.contains('barcode')) {
+          throw const ProductDuplicateException(
+            ProductDuplicateField.barcode,
+          );
+        }
         throw const ProductDuplicateException(
           ProductDuplicateField.variantName,
         );
@@ -517,6 +613,11 @@ class ProductRepository {
         unitId: p.unitId,
         unitName: unitMap[p.unitId],
         sellingPrice: p.sellingPrice,
+        purchasePrice: p.purchasePrice,
+        mrp: p.mrp,
+        wholesalePrice: p.wholesalePrice,
+        barcode: p.barcode,
+        hsnCode: p.hsnCode,
         taxTypeId: p.taxTypeId,
         taxTypeName: taxMap[p.taxTypeId],
         expiryDate: p.expiryDate,
@@ -588,13 +689,19 @@ class ProductRepository {
   }) {
     Expression<bool> predicate = const Constant(true);
 
-    // Text search across name, code, category, sub-category, brand, and variant names.
+    // Text search across name, code, barcode, HSN, category, sub-category, brand, and variant names.
     if (normalizedQuery.isNotEmpty) {
-      // Search in variant names using a subquery.
+      // Search in variant names, barcode, hsn using a subquery.
       final variantSubQuery = _database.selectOnly(_database.productVariants)
         ..addColumns([_database.productVariants.productId])
         ..where(
           _database.productVariants.variantName
+              .lower()
+              .contains(normalizedQuery) |
+          _database.productVariants.barcode
+              .lower()
+              .contains(normalizedQuery) |
+          _database.productVariants.hsnCode
               .lower()
               .contains(normalizedQuery),
         );
@@ -602,6 +709,8 @@ class ProductRepository {
       predicate = predicate &
           (t.productName.lower().contains(normalizedQuery) |
               t.productCode.lower().contains(normalizedQuery) |
+              t.barcode.lower().contains(normalizedQuery) |
+              t.hsnCode.lower().contains(normalizedQuery) |
               catT.categoryName.lower().contains(normalizedQuery) |
               subT.subCategoryName.lower().contains(normalizedQuery) |
               brandT.brandName.lower().contains(normalizedQuery) |
@@ -689,6 +798,11 @@ class ProductRepository {
       unitId: t.unitId,
       unitName: unit.unitName,
       sellingPrice: t.sellingPrice,
+      purchasePrice: t.purchasePrice,
+      mrp: t.mrp,
+      wholesalePrice: t.wholesalePrice,
+      barcode: t.barcode,
+      hsnCode: t.hsnCode,
       taxTypeId: t.taxTypeId,
       taxTypeName: tax?.taxTypeName,
       expiryDate: t.expiryDate,
@@ -715,6 +829,11 @@ class ProductRepository {
       productId: row.productId,
       variantName: row.variantName,
       sellingPrice: row.sellingPrice,
+      purchasePrice: row.purchasePrice,
+      mrp: row.mrp,
+      wholesalePrice: row.wholesalePrice,
+      barcode: row.barcode,
+      hsnCode: row.hsnCode,
       expiryDate: row.expiryDate,
       notes: row.notes,
       isActive: row.isActive,
@@ -734,6 +853,11 @@ class ProductRepository {
       productId: row.productId,
       variantName: row.variantName,
       sellingPrice: row.sellingPrice,
+      purchasePrice: row.purchasePrice,
+      mrp: row.mrp,
+      wholesalePrice: row.wholesalePrice,
+      barcode: row.barcode,
+      hsnCode: row.hsnCode,
       expiryDate: row.expiryDate,
       notes: row.notes,
       isActive: row.isActive,

@@ -40,10 +40,15 @@ class ProductDetailDialog extends StatelessWidget {
       return value.trim();
     }
 
+    String currencyOrDash(int? paise) {
+      if (paise == null) return '—';
+      return ProductValidator.formatCurrency(paise);
+    }
+
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 700, maxHeight: 750),
+        constraints: const BoxConstraints(maxWidth: 840, maxHeight: 800),
         child: Padding(
           padding: const EdgeInsets.all(28),
           child: Column(
@@ -127,11 +132,18 @@ class ProductDetailDialog extends StatelessWidget {
                             context, 'Brand', textOrDash(product.brandName)),
                         _buildDetailItem(
                             context, 'Unit', textOrDash(product.unitName)),
+                        _buildDetailItem(context, 'Barcode / SKU',
+                            textOrDash(product.barcode)),
+                        _buildDetailItem(context, 'HSN/SAC Code',
+                            textOrDash(product.hsnCode)),
                       ]),
                       const SizedBox(height: 20),
 
-                      // Selling Information
-                      _buildSectionTitle(context, 'Selling Information'),
+                      // Pricing & Tax Information
+                      _buildSectionTitle(
+                        context,
+                        'Pricing & Tax Information',
+                      ),
                       const SizedBox(height: 12),
                       _buildGrid([
                         _buildDetailItem(
@@ -141,7 +153,25 @@ class ProductDetailDialog extends StatelessWidget {
                           isBold: true,
                         ),
                         _buildDetailItem(
-                            context, 'Tax', textOrDash(product.taxTypeName)),
+                          context,
+                          'Purchase Price',
+                          currencyOrDash(product.purchasePrice),
+                        ),
+                        _buildDetailItem(
+                          context,
+                          'MRP',
+                          currencyOrDash(product.mrp),
+                        ),
+                        _buildDetailItem(
+                          context,
+                          'Wholesale Price',
+                          currencyOrDash(product.wholesalePrice),
+                        ),
+                        _buildDetailItem(
+                          context,
+                          'Tax',
+                          textOrDash(product.taxTypeName),
+                        ),
                       ]),
                       const SizedBox(height: 20),
 
@@ -228,6 +258,11 @@ class ProductDetailDialog extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final colorScheme = Theme.of(context).colorScheme;
 
+    String currencyOrDash(int? paise) {
+      if (paise == null) return '—';
+      return ProductValidator.formatCurrency(paise);
+    }
+
     return Container(
       decoration: BoxDecoration(
         border: Border.all(color: colorScheme.outlineVariant),
@@ -257,9 +292,9 @@ class ProductDetailDialog extends StatelessWidget {
                   ),
                 ),
                 SizedBox(
-                  width: 100,
+                  width: 90,
                   child: Text(
-                    'Price',
+                    'Selling Price',
                     style: textTheme.labelSmall?.copyWith(
                       fontWeight: FontWeight.w600,
                       color: AppTheme.textSecondary,
@@ -267,7 +302,47 @@ class ProductDetailDialog extends StatelessWidget {
                   ),
                 ),
                 SizedBox(
-                  width: 100,
+                  width: 90,
+                  child: Text(
+                    'Purchase Price',
+                    style: textTheme.labelSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.textSecondary,
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: 80,
+                  child: Text(
+                    'MRP',
+                    style: textTheme.labelSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.textSecondary,
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: 90,
+                  child: Text(
+                    'Wholesale',
+                    style: textTheme.labelSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.textSecondary,
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: 90,
+                  child: Text(
+                    'Barcode',
+                    style: textTheme.labelSmall?.copyWith(
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.textSecondary,
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  width: 80,
                   child: Text(
                     'Expiry Date',
                     style: textTheme.labelSmall?.copyWith(
@@ -317,7 +392,7 @@ class ProductDetailDialog extends StatelessWidget {
                     ),
                   ),
                   SizedBox(
-                    width: 100,
+                    width: 90,
                     child: Text(
                       ProductValidator.formatCurrency(
                         variants[i].sellingPrice,
@@ -326,7 +401,35 @@ class ProductDetailDialog extends StatelessWidget {
                     ),
                   ),
                   SizedBox(
-                    width: 100,
+                    width: 90,
+                    child: Text(
+                      currencyOrDash(variants[i].purchasePrice),
+                      style: textTheme.bodySmall,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 80,
+                    child: Text(
+                      currencyOrDash(variants[i].mrp),
+                      style: textTheme.bodySmall,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 90,
+                    child: Text(
+                      currencyOrDash(variants[i].wholesalePrice),
+                      style: textTheme.bodySmall,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 90,
+                    child: Text(
+                      variants[i].barcode ?? '—',
+                      style: textTheme.bodySmall,
+                    ),
+                  ),
+                  SizedBox(
+                    width: 80,
                     child: Text(
                       variants[i].expiryDate != null
                           ? _formatDate(variants[i].expiryDate!)

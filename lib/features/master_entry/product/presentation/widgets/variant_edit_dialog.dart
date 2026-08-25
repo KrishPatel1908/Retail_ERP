@@ -25,10 +25,21 @@ class VariantEditDialog extends StatefulWidget {
 class _VariantEditDialogState extends State<VariantEditDialog> {
   late final TextEditingController _nameController;
   late final TextEditingController _priceController;
+  late final TextEditingController _purchasePriceController;
+  late final TextEditingController _mrpController;
+  late final TextEditingController _wholesalePriceController;
+  late final TextEditingController _barcodeController;
+  late final TextEditingController _hsnCodeController;
   late final TextEditingController _notesController;
   DateTime? _selectedExpiryDate;
+
   String? _nameError;
   String? _priceError;
+  String? _purchasePriceError;
+  String? _mrpError;
+  String? _wholesalePriceError;
+  String? _barcodeError;
+  String? _hsnCodeError;
   bool _isSaving = false;
 
   @override
@@ -40,6 +51,25 @@ class _VariantEditDialogState extends State<VariantEditDialog> {
           ? ''
           : ProductValidator.formatPaise(widget.variant.sellingPrice),
     );
+    _purchasePriceController = TextEditingController(
+      text: widget.variant.purchasePrice == null
+          ? ''
+          : ProductValidator.formatPaise(widget.variant.purchasePrice!),
+    );
+    _mrpController = TextEditingController(
+      text: widget.variant.mrp == null
+          ? ''
+          : ProductValidator.formatPaise(widget.variant.mrp!),
+    );
+    _wholesalePriceController = TextEditingController(
+      text: widget.variant.wholesalePrice == null
+          ? ''
+          : ProductValidator.formatPaise(widget.variant.wholesalePrice!),
+    );
+    _barcodeController =
+        TextEditingController(text: widget.variant.barcode ?? '');
+    _hsnCodeController =
+        TextEditingController(text: widget.variant.hsnCode ?? '');
     _notesController = TextEditingController(text: widget.variant.notes ?? '');
     _selectedExpiryDate = widget.variant.expiryDate;
   }
@@ -48,6 +78,11 @@ class _VariantEditDialogState extends State<VariantEditDialog> {
   void dispose() {
     _nameController.dispose();
     _priceController.dispose();
+    _purchasePriceController.dispose();
+    _mrpController.dispose();
+    _wholesalePriceController.dispose();
+    _barcodeController.dispose();
+    _hsnCodeController.dispose();
     _notesController.dispose();
     super.dispose();
   }
@@ -55,15 +90,38 @@ class _VariantEditDialogState extends State<VariantEditDialog> {
   Future<void> _handleSave() async {
     final name = _nameController.text.trim();
     final price = _priceController.text.trim();
+    final purchasePrice = _purchasePriceController.text.trim();
+    final mrp = _mrpController.text.trim();
+    final wholesalePrice = _wholesalePriceController.text.trim();
+    final barcode = _barcodeController.text.trim();
+    final hsnCode = _hsnCodeController.text.trim();
     final notes = _notesController.text.trim();
 
     final vNameErr = ProductValidator.validateVariantName(name);
     final vPriceErr = ProductValidator.validateVariantSellingPrice(price);
+    final vPurchaseErr =
+        ProductValidator.validatePurchasePrice(purchasePrice);
+    final vMrpErr = ProductValidator.validateMrp(mrp);
+    final vWholesaleErr =
+        ProductValidator.validateWholesalePrice(wholesalePrice);
+    final vBarcodeErr = ProductValidator.validateBarcode(barcode);
+    final vHsnErr = ProductValidator.validateHsnCode(hsnCode);
 
-    if (vNameErr != null || vPriceErr != null) {
+    if (vNameErr != null ||
+        vPriceErr != null ||
+        vPurchaseErr != null ||
+        vMrpErr != null ||
+        vWholesaleErr != null ||
+        vBarcodeErr != null ||
+        vHsnErr != null) {
       setState(() {
         _nameError = vNameErr;
         _priceError = vPriceErr;
+        _purchasePriceError = vPurchaseErr;
+        _mrpError = vMrpErr;
+        _wholesalePriceError = vWholesaleErr;
+        _barcodeError = vBarcodeErr;
+        _hsnCodeError = vHsnErr;
       });
       return;
     }
@@ -71,15 +129,31 @@ class _VariantEditDialogState extends State<VariantEditDialog> {
     setState(() {
       _nameError = null;
       _priceError = null;
+      _purchasePriceError = null;
+      _mrpError = null;
+      _wholesalePriceError = null;
+      _barcodeError = null;
+      _hsnCodeError = null;
       _isSaving = true;
     });
 
     try {
       final parsedPrice = ProductValidator.parseRupeesToPaise(price) ?? 0;
+      final parsedPurchasePrice =
+          ProductValidator.parseRupeesToPaise(purchasePrice);
+      final parsedMrp = ProductValidator.parseRupeesToPaise(mrp);
+      final parsedWholesalePrice =
+          ProductValidator.parseRupeesToPaise(wholesalePrice);
+
       await widget.repository.updateVariant(
         widget.variant.id,
         variantName: name,
         sellingPrice: parsedPrice,
+        purchasePrice: parsedPurchasePrice,
+        mrp: parsedMrp,
+        wholesalePrice: parsedWholesalePrice,
+        barcode: barcode.isEmpty ? null : barcode,
+        hsnCode: hsnCode.isEmpty ? null : hsnCode,
         expiryDate: _selectedExpiryDate,
         notes: notes.isEmpty ? null : notes,
       );
@@ -90,13 +164,19 @@ class _VariantEditDialogState extends State<VariantEditDialog> {
       if (!mounted) return;
       setState(() {
         _isSaving = false;
-        _nameError = error.message;
+        if (error.field == ProductDuplicateField.barcode) {
+          _barcodeError = error.message;
+        } else {
+          _nameError = error.message;
+        }
       });
     } catch (_) {
       if (!mounted) return;
       setState(() => _isSaving = false);
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Failed to update variant. Please try again.')),
+        const SnackBar(
+          content: Text('Failed to update variant. Please try again.'),
+        ),
       );
     }
   }
@@ -120,7 +200,7 @@ class _VariantEditDialogState extends State<VariantEditDialog> {
         ],
       ),
       content: SizedBox(
-        width: 440,
+        width: 480,
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -137,19 +217,127 @@ class _VariantEditDialogState extends State<VariantEditDialog> {
                 textInputAction: TextInputAction.next,
               ),
               const SizedBox(height: 16),
-              TextField(
-                controller: _priceController,
-                keyboardType: const TextInputType.numberWithOptions(decimal: true),
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _priceController,
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(
+                          RegExp(r'^\d*\.?\d{0,2}'),
+                        ),
+                      ],
+                      decoration: InputDecoration(
+                        labelText: 'Selling Price (₹) *',
+                        hintText: 'e.g. 10',
+                        errorText: _priceError,
+                        prefixText: '₹ ',
+                      ),
+                      textInputAction: TextInputAction.next,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: TextField(
+                      controller: _purchasePriceController,
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(
+                          RegExp(r'^\d*\.?\d{0,2}'),
+                        ),
+                      ],
+                      decoration: InputDecoration(
+                        labelText: 'Purchase Price (₹)',
+                        hintText: 'Optional',
+                        errorText: _purchasePriceError,
+                        prefixText: '₹ ',
+                      ),
+                      textInputAction: TextInputAction.next,
+                    ),
+                  ),
                 ],
-                decoration: InputDecoration(
-                  labelText: 'Selling Price (₹) *',
-                  hintText: 'e.g. 10',
-                  errorText: _priceError,
-                  prefixText: '₹ ',
-                ),
-                textInputAction: TextInputAction.next,
+              ),
+              const SizedBox(height: 16),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _mrpController,
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(
+                          RegExp(r'^\d*\.?\d{0,2}'),
+                        ),
+                      ],
+                      decoration: InputDecoration(
+                        labelText: 'MRP (₹)',
+                        hintText: 'Optional',
+                        errorText: _mrpError,
+                        prefixText: '₹ ',
+                      ),
+                      textInputAction: TextInputAction.next,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: TextField(
+                      controller: _wholesalePriceController,
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
+                      inputFormatters: [
+                        FilteringTextInputFormatter.allow(
+                          RegExp(r'^\d*\.?\d{0,2}'),
+                        ),
+                      ],
+                      decoration: InputDecoration(
+                        labelText: 'Wholesale Price (₹)',
+                        hintText: 'Optional',
+                        errorText: _wholesalePriceError,
+                        prefixText: '₹ ',
+                      ),
+                      textInputAction: TextInputAction.next,
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _barcodeController,
+                      decoration: InputDecoration(
+                        labelText: 'Barcode / SKU',
+                        hintText: 'Optional',
+                        errorText: _barcodeError,
+                      ),
+                      textInputAction: TextInputAction.next,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: TextField(
+                      controller: _hsnCodeController,
+                      decoration: InputDecoration(
+                        labelText: 'HSN/SAC Code',
+                        hintText: 'Optional',
+                        errorText: _hsnCodeError,
+                      ),
+                      textInputAction: TextInputAction.next,
+                    ),
+                  ),
+                ],
               ),
               const SizedBox(height: 16),
               InkWell(
@@ -173,7 +361,8 @@ class _VariantEditDialogState extends State<VariantEditDialog> {
                     suffixIcon: _selectedExpiryDate != null
                         ? IconButton(
                             icon: const Icon(Icons.clear_rounded, size: 18),
-                            onPressed: () => setState(() => _selectedExpiryDate = null),
+                            onPressed: () =>
+                                setState(() => _selectedExpiryDate = null),
                             tooltip: 'Clear date',
                           )
                         : const Icon(Icons.calendar_today_rounded, size: 18),

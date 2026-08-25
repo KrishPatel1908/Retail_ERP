@@ -113,10 +113,28 @@ class DatabaseIndexes {
   ];
 
   /// Unique partial indexes that cannot be expressed with `@TableIndex`.
-  static const List<String> _partialUniqueStatements = [
+  static const List<({String table, String statement})>
+  _partialUniqueStatements = [
     // At most one default conversion per product.
-    'CREATE UNIQUE INDEX IF NOT EXISTS idx_product_uom_one_default '
-        'ON product_uom (product_id) WHERE is_default = 1',
+    (
+      table: 'product_uom',
+      statement:
+          'CREATE UNIQUE INDEX IF NOT EXISTS idx_product_uom_one_default '
+          'ON product_uom (product_id) WHERE is_default = 1',
+    ),
+    // Unique barcodes when provided for product and product_variant.
+    (
+      table: 'product',
+      statement:
+          'CREATE UNIQUE INDEX IF NOT EXISTS idx_product_barcode_unique '
+          'ON product (barcode) WHERE barcode IS NOT NULL AND barcode != \'\'',
+    ),
+    (
+      table: 'product_variant',
+      statement:
+          'CREATE UNIQUE INDEX IF NOT EXISTS idx_variant_barcode_unique '
+          'ON product_variant (barcode) WHERE barcode IS NOT NULL AND barcode != \'\'',
+    ),
   ];
 
   /// Creates every index. All statements are idempotent (`IF NOT EXISTS`),
@@ -150,11 +168,9 @@ class DatabaseIndexes {
         'ON ${index.table} (${index.columns.join(', ')})',
       );
     }
-    // Every partial unique index belongs to product_uom.
-    if (onlyTables == null || onlyTables.contains('product_uom')) {
-      for (final statement in _partialUniqueStatements) {
-        await database.customStatement(statement);
-      }
+    for (final item in _partialUniqueStatements) {
+      if (onlyTables != null && !onlyTables.contains(item.table)) continue;
+      await database.customStatement(item.statement);
     }
   }
 }

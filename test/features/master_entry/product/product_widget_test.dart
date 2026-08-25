@@ -98,10 +98,32 @@ void main() {
       'Parle-G Biscuits',
     );
 
-    // Fill Product Selling Price
+    // Fill Barcode & HSN Code
+    await tester.enterText(
+      find.byKey(const ValueKey('product-barcode')),
+      '8901234567890',
+    );
+    await tester.enterText(
+      find.byKey(const ValueKey('product-hsn-code')),
+      '1905',
+    );
+
+    // Fill Product Selling Price, Purchase Price, MRP, Wholesale
     await tester.enterText(
       find.byKey(const ValueKey('product-selling-price')),
       '20',
+    );
+    await tester.enterText(
+      find.byKey(const ValueKey('product-purchase-price')),
+      '15',
+    );
+    await tester.enterText(
+      find.byKey(const ValueKey('product-mrp')),
+      '22',
+    );
+    await tester.enterText(
+      find.byKey(const ValueKey('product-wholesale-price')),
+      '18',
     );
 
     // Select Unit
@@ -121,6 +143,26 @@ void main() {
     await tester.enterText(
       find.byKey(const ValueKey('variant-0-price')),
       '10',
+    );
+    await tester.enterText(
+      find.byKey(const ValueKey('variant-0-purchase-price')),
+      '8',
+    );
+    await tester.enterText(
+      find.byKey(const ValueKey('variant-0-mrp')),
+      '11',
+    );
+    await tester.enterText(
+      find.byKey(const ValueKey('variant-0-wholesale-price')),
+      '9',
+    );
+    await tester.enterText(
+      find.byKey(const ValueKey('variant-0-barcode')),
+      '8901234567891',
+    );
+    await tester.enterText(
+      find.byKey(const ValueKey('variant-0-hsn-code')),
+      '1905',
     );
 
     // Save Product

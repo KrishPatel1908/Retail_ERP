@@ -2,7 +2,8 @@
 enum ProductDuplicateField {
   productCode('productCode'),
   productName('productName'),
-  variantName('variantName');
+  variantName('variantName'),
+  barcode('barcode');
 
   const ProductDuplicateField(this.formField);
 
@@ -10,7 +11,7 @@ enum ProductDuplicateField {
   final String formField;
 }
 
-/// Thrown when creating or updating a product with a code that already exists.
+/// Thrown when creating or updating a product with a code or barcode that already exists.
 class ProductDuplicateException implements Exception {
   const ProductDuplicateException(this.field);
 
@@ -23,6 +24,8 @@ class ProductDuplicateException implements Exception {
       'A product with this name already exists.',
     ProductDuplicateField.variantName =>
       'This variant already exists for this product.',
+    ProductDuplicateField.barcode =>
+      'A product or variant with this barcode already exists.',
   };
 }
 

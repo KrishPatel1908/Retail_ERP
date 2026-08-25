@@ -73,6 +73,11 @@ class _ProductListPageState extends State<ProductListPage> {
   int? _addingVariantForProductId;
   final _variantNameController = TextEditingController();
   final _variantPriceController = TextEditingController();
+  final _variantPurchasePriceController = TextEditingController();
+  final _variantMrpController = TextEditingController();
+  final _variantWholesalePriceController = TextEditingController();
+  final _variantBarcodeController = TextEditingController();
+  final _variantHsnCodeController = TextEditingController();
   DateTime? _variantExpiryDate;
   final _variantNotesController = TextEditingController();
 
@@ -89,6 +94,11 @@ class _ProductListPageState extends State<ProductListPage> {
     _searchDebounce?.cancel();
     _variantNameController.dispose();
     _variantPriceController.dispose();
+    _variantPurchasePriceController.dispose();
+    _variantMrpController.dispose();
+    _variantWholesalePriceController.dispose();
+    _variantBarcodeController.dispose();
+    _variantHsnCodeController.dispose();
     _variantNotesController.dispose();
     super.dispose();
   }
@@ -233,6 +243,11 @@ class _ProductListPageState extends State<ProductListPage> {
   void _clearVariantFields() {
     _variantNameController.clear();
     _variantPriceController.clear();
+    _variantPurchasePriceController.clear();
+    _variantMrpController.clear();
+    _variantWholesalePriceController.clear();
+    _variantBarcodeController.clear();
+    _variantHsnCodeController.clear();
     _variantExpiryDate = null;
     _variantNotesController.clear();
   }
@@ -240,16 +255,36 @@ class _ProductListPageState extends State<ProductListPage> {
   Future<void> _saveInlineVariant(int productId) async {
     final name = _variantNameController.text.trim();
     final price = _variantPriceController.text.trim();
+    final purchasePrice = _variantPurchasePriceController.text.trim();
+    final mrp = _variantMrpController.text.trim();
+    final wholesalePrice = _variantWholesalePriceController.text.trim();
+    final barcode = _variantBarcodeController.text.trim();
+    final hsnCode = _variantHsnCodeController.text.trim();
     final notes = _variantNotesController.text.trim();
 
     final nameErr = ProductValidator.validateVariantName(name);
     final priceErr = ProductValidator.validateVariantSellingPrice(price);
+    final purchaseErr =
+        ProductValidator.validatePurchasePrice(purchasePrice);
+    final mrpErr = ProductValidator.validateMrp(mrp);
+    final wholesaleErr =
+        ProductValidator.validateWholesalePrice(wholesalePrice);
+    final barcodeErr = ProductValidator.validateBarcode(barcode);
+    final hsnErr = ProductValidator.validateHsnCode(hsnCode);
 
-    if (nameErr != null || priceErr != null) {
+    final firstError = nameErr ??
+        priceErr ??
+        purchaseErr ??
+        mrpErr ??
+        wholesaleErr ??
+        barcodeErr ??
+        hsnErr;
+
+    if (firstError != null) {
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
         ..showSnackBar(SnackBar(
-          content: Text(nameErr ?? priceErr!),
+          content: Text(firstError),
         ));
       return;
     }
@@ -259,6 +294,11 @@ class _ProductListPageState extends State<ProductListPage> {
         productId,
         variantName: name,
         sellingPrice: ProductValidator.parseRupeesToPaise(price) ?? 0,
+        purchasePrice: ProductValidator.parseRupeesToPaise(purchasePrice),
+        mrp: ProductValidator.parseRupeesToPaise(mrp),
+        wholesalePrice: ProductValidator.parseRupeesToPaise(wholesalePrice),
+        barcode: barcode.isEmpty ? null : barcode,
+        hsnCode: hsnCode.isEmpty ? null : hsnCode,
         expiryDate: _variantExpiryDate,
         notes: notes.isEmpty ? null : notes,
       );
@@ -551,7 +591,7 @@ class _ProductListPageState extends State<ProductListPage> {
                     : SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: SizedBox(
-                          width: 1280,
+                          width: 1380,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
@@ -960,7 +1000,7 @@ class _ProductListPageState extends State<ProductListPage> {
         ),
       ),
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(100, 0, 0, 0),
+        padding: const EdgeInsets.fromLTRB(60, 0, 0, 0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
@@ -989,7 +1029,7 @@ class _ProductListPageState extends State<ProductListPage> {
                     ),
                   ),
                   SizedBox(
-                    width: 120,
+                    width: 100,
                     child: Text(
                       'Selling Price',
                       style: textTheme.labelSmall?.copyWith(
@@ -999,19 +1039,49 @@ class _ProductListPageState extends State<ProductListPage> {
                     ),
                   ),
                   SizedBox(
-                    width: 120,
+                    width: 100,
                     child: Text(
-                      'Expiry Date',
+                      'Purchase Price',
                       style: textTheme.labelSmall?.copyWith(
                         fontWeight: FontWeight.w600,
                         color: AppTheme.textSecondary,
                       ),
                     ),
                   ),
-                  Expanded(
-                    flex: 1,
+                  SizedBox(
+                    width: 80,
                     child: Text(
-                      'Notes',
+                      'MRP',
+                      style: textTheme.labelSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: AppTheme.textSecondary,
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 90,
+                    child: Text(
+                      'Wholesale',
+                      style: textTheme.labelSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: AppTheme.textSecondary,
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 100,
+                    child: Text(
+                      'Barcode',
+                      style: textTheme.labelSmall?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: AppTheme.textSecondary,
+                      ),
+                    ),
+                  ),
+                  SizedBox(
+                    width: 90,
+                    child: Text(
+                      'Expiry Date',
                       style: textTheme.labelSmall?.copyWith(
                         fontWeight: FontWeight.w600,
                         color: AppTheme.textSecondary,
@@ -1113,7 +1183,7 @@ class _ProductListPageState extends State<ProductListPage> {
             ),
           ),
           SizedBox(
-            width: 120,
+            width: 100,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               child: Text(
@@ -1123,23 +1193,57 @@ class _ProductListPageState extends State<ProductListPage> {
             ),
           ),
           SizedBox(
-            width: 120,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: Text(expiryText, style: textTheme.bodySmall),
-            ),
-          ),
-          Expanded(
-            flex: 1,
+            width: 100,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               child: Text(
-                variant.notes ?? '—',
-                overflow: TextOverflow.ellipsis,
-                style: textTheme.bodySmall?.copyWith(
-                  color: AppTheme.textSecondary,
-                ),
+                variant.purchasePrice != null
+                    ? ProductValidator.formatCurrency(variant.purchasePrice!)
+                    : '—',
+                style: textTheme.bodySmall,
               ),
+            ),
+          ),
+          SizedBox(
+            width: 80,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Text(
+                variant.mrp != null
+                    ? ProductValidator.formatCurrency(variant.mrp!)
+                    : '—',
+                style: textTheme.bodySmall,
+              ),
+            ),
+          ),
+          SizedBox(
+            width: 90,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Text(
+                variant.wholesalePrice != null
+                    ? ProductValidator.formatCurrency(variant.wholesalePrice!)
+                    : '—',
+                style: textTheme.bodySmall,
+              ),
+            ),
+          ),
+          SizedBox(
+            width: 100,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Text(
+                variant.barcode ?? '—',
+                style: textTheme.bodySmall,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ),
+          SizedBox(
+            width: 90,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Text(expiryText, style: textTheme.bodySmall),
             ),
           ),
           SizedBox(
@@ -1209,7 +1313,7 @@ class _ProductListPageState extends State<ProductListPage> {
           const SizedBox(width: 8),
           // Selling Price
           SizedBox(
-            width: 120,
+            width: 90,
             child: SizedBox(
               height: 36,
               child: TextField(
@@ -1222,7 +1326,101 @@ class _ProductListPageState extends State<ProductListPage> {
                   FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
                 ],
                 decoration: const InputDecoration(
-                  hintText: 'Price ₹*',
+                  hintText: 'Sell ₹*',
+                  isDense: true,
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                ),
+                textInputAction: TextInputAction.next,
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          // Purchase Price
+          SizedBox(
+            width: 90,
+            child: SizedBox(
+              height: 36,
+              child: TextField(
+                controller: _variantPurchasePriceController,
+                style: const TextStyle(fontSize: 13),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
+                ],
+                decoration: const InputDecoration(
+                  hintText: 'Buy ₹',
+                  isDense: true,
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                ),
+                textInputAction: TextInputAction.next,
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          // MRP
+          SizedBox(
+            width: 80,
+            child: SizedBox(
+              height: 36,
+              child: TextField(
+                controller: _variantMrpController,
+                style: const TextStyle(fontSize: 13),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
+                ],
+                decoration: const InputDecoration(
+                  hintText: 'MRP ₹',
+                  isDense: true,
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                ),
+                textInputAction: TextInputAction.next,
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          // Wholesale Price
+          SizedBox(
+            width: 90,
+            child: SizedBox(
+              height: 36,
+              child: TextField(
+                controller: _variantWholesalePriceController,
+                style: const TextStyle(fontSize: 13),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
+                ],
+                decoration: const InputDecoration(
+                  hintText: 'Wholesale ₹',
+                  isDense: true,
+                  contentPadding:
+                      EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                ),
+                textInputAction: TextInputAction.next,
+              ),
+            ),
+          ),
+          const SizedBox(width: 8),
+          // Barcode
+          SizedBox(
+            width: 100,
+            child: SizedBox(
+              height: 36,
+              child: TextField(
+                controller: _variantBarcodeController,
+                style: const TextStyle(fontSize: 13),
+                decoration: const InputDecoration(
+                  hintText: 'Barcode',
                   isDense: true,
                   contentPadding:
                       EdgeInsets.symmetric(horizontal: 10, vertical: 8),
@@ -1234,7 +1432,7 @@ class _ProductListPageState extends State<ProductListPage> {
           const SizedBox(width: 8),
           // Expiry Date
           SizedBox(
-            width: 120,
+            width: 90,
             child: InkWell(
               onTap: () async {
                 final picked = await showDatePicker(
@@ -1273,25 +1471,6 @@ class _ProductListPageState extends State<ProductListPage> {
             ),
           ),
           const SizedBox(width: 8),
-          // Notes
-          Expanded(
-            flex: 1,
-            child: SizedBox(
-              height: 36,
-              child: TextField(
-                controller: _variantNotesController,
-                style: const TextStyle(fontSize: 13),
-                decoration: const InputDecoration(
-                  hintText: 'Notes',
-                  isDense: true,
-                  contentPadding:
-                      EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                ),
-                textInputAction: TextInputAction.done,
-              ),
-            ),
-          ),
-          const SizedBox(width: 8),
           // Actions
           SizedBox(
             width: 80,
@@ -1300,17 +1479,19 @@ class _ProductListPageState extends State<ProductListPage> {
               children: [
                 IconButton(
                   icon: const Icon(Icons.check_rounded, size: 18),
-                  tooltip: 'Save variant',
+                  tooltip: 'Save Variant',
                   onPressed: () => _saveInlineVariant(productId),
-                  color: AppTheme.success,
-                  visualDensity: VisualDensity.compact,
+                  color: AppTheme.primary,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
                 ),
                 IconButton(
                   icon: const Icon(Icons.close_rounded, size: 18),
                   tooltip: 'Cancel',
                   onPressed: _cancelInlineVariantCreation,
                   color: AppTheme.textSecondary,
-                  visualDensity: VisualDensity.compact,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
                 ),
               ],
             ),

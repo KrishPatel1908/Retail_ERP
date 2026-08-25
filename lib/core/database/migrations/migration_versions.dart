@@ -42,6 +42,14 @@ abstract final class DatabaseSchemaVersion {
   /// obsolete tracking fields from the product table.
   static const int v8 = 8;
 
+  /// Schema version 9 — adds Purchase module tables: purchase, purchase_item,
+  /// inventory_transaction, and current_stock.
+  static const int v9 = 9;
+
+  /// Schema version 10 — adds purchase_price, mrp, wholesale_price, barcode,
+  /// and hsn_code to product and product_variant tables.
+  static const int v10 = 10;
+
   /// The current schema version of the application.
-  static const int latest = v8;
+  static const int latest = v10;
 }
