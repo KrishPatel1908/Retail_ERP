@@ -5,8 +5,10 @@ import 'package:flutter/services.dart';
 import 'package:retail_erp/core/database/app_database.dart' as db;
 import 'package:retail_erp/core/database/database_provider.dart';
 import 'package:retail_erp/core/database/exceptions/database_exceptions.dart';
+import 'package:retail_erp/features/company_settings/services/company_settings_service.dart';
 import 'package:retail_erp/features/master_entry/product/data/repositories/product_repository.dart';
 import 'package:retail_erp/features/master_entry/product/domain/entities/product.dart';
+import 'package:retail_erp/features/master_entry/product/presentation/pages/create_product_page.dart';
 import 'package:retail_erp/features/master_entry/product/services/product_validator.dart';
 
 import '../../../../app/theme/app_theme.dart';
@@ -17,17 +19,75 @@ import '../../../../shared/widgets/labelled_field.dart';
 import '../../data/repositories/purchase_repository.dart';
 import '../../domain/entities/purchase.dart';
 
+/// How a line's discount value should be interpreted.
+enum _DiscountType { percentage, amount }
+
+/// A single selectable line in the Product dropdown.
+///
+/// A product that has variants contributes one option *per variant*, because the
+/// variant is the actual sellable unit. Its label is the variant name on its own
+/// — parent and variant names are never combined. A product without variants
+/// contributes a single option carrying its own name.
+class _ProductOption {
+  const _ProductOption({
+    required this.product,
+    required this.variant,
+    required this.label,
+    required this.barcode,
+    required this.purchasePrice,
+  });
+
+  _ProductOption.base(ProductEntity product)
+      : this(
+          product: product,
+          variant: null,
+          label: product.productName,
+          barcode: product.barcode,
+          purchasePrice: product.purchasePrice,
+        );
+
+  _ProductOption.forVariant(ProductEntity product, ProductVariantEntity variant)
+      : this(
+          product: product,
+          variant: variant,
+          label: variant.variantName,
+          barcode: variant.barcode ?? product.barcode,
+          purchasePrice: variant.purchasePrice ?? product.purchasePrice,
+        );
+
+  final ProductEntity product;
+  final ProductVariantEntity? variant;
+
+  /// The sellable name shown in the dropdown.
+  final String label;
+  final String? barcode;
+  final int? purchasePrice;
+
+  int get productId => product.id;
+  int? get variantId => variant?.id;
+  String get key => keyFor(product.id, variant?.id);
+
+  /// Stable dropdown value. Uses ':' as the separator and is always resolved by
+  /// map lookup rather than string parsing, so product names containing '-' can
+  /// never be mis-read.
+  static String keyFor(int productId, int? variantId) =>
+      '$productId:${variantId ?? 'base'}';
+}
+
 /// Data model for a product row in the purchase form.
 class _ProductRow {
   _ProductRow({
     required this.productController,
+    required this.barcodeController,
     required this.quantityController,
     required this.priceController,
     required this.discountController,
     required this.taxController,
+    this.discountType = _DiscountType.amount,
   });
 
   final TextEditingController productController;
+  final TextEditingController barcodeController;
   final TextEditingController quantityController;
   final TextEditingController priceController;
   final TextEditingController discountController;
@@ -39,13 +99,31 @@ class _ProductRow {
   int? unitId;
   String? unitName;
 
+  /// Whether [discountController] holds a percentage or a currency amount.
+  _DiscountType discountType;
+
+  /// Set when a scanned barcode matched nothing. Cleared on the next keystroke.
+  String? barcodeError;
+
+  /// Bumped to force the product dropdown's form-field state to be rebuilt from
+  /// [optionKey] — needed after the "Add New Product" dialog, whose sentinel
+  /// value would otherwise stay shown as the selection.
+  int dropdownEpoch = 0;
+
+  /// Dropdown key of the current selection, or null when nothing is selected.
+  String? get optionKey =>
+      productId == null ? null : _ProductOption.keyFor(productId!, variantId);
+
   // Focus nodes.
   late final FocusNode productFocusNode;
+  late final FocusNode barcodeFocusNode;
   late final FocusNode quantityFocusNode;
   late final FocusNode priceFocusNode;
   late final FocusNode discountFocusNode;
+  late final FocusNode discountTypeFocusNode;
   late final FocusNode taxFocusNode;
   late final GlobalKey productContainerKey;
+  late final GlobalKey barcodeContainerKey;
   late final GlobalKey quantityContainerKey;
   late final GlobalKey priceContainerKey;
   late final GlobalKey discountContainerKey;
@@ -57,11 +135,15 @@ class _ProductRow {
     if (_focusInitialized) return;
     _focusInitialized = true;
     productFocusNode = FocusNode(debugLabel: 'purchase-product-$index');
+    barcodeFocusNode = FocusNode(debugLabel: 'purchase-barcode-$index');
     quantityFocusNode = FocusNode(debugLabel: 'purchase-qty-$index');
     priceFocusNode = FocusNode(debugLabel: 'purchase-price-$index');
     discountFocusNode = FocusNode(debugLabel: 'purchase-discount-$index');
+    discountTypeFocusNode =
+        FocusNode(debugLabel: 'purchase-discount-type-$index');
     taxFocusNode = FocusNode(debugLabel: 'purchase-tax-$index');
     productContainerKey = GlobalKey();
+    barcodeContainerKey = GlobalKey();
     quantityContainerKey = GlobalKey();
     priceContainerKey = GlobalKey();
     discountContainerKey = GlobalKey();
@@ -70,15 +152,18 @@ class _ProductRow {
 
   void dispose() {
     productController.dispose();
+    barcodeController.dispose();
     quantityController.dispose();
     priceController.dispose();
     discountController.dispose();
     taxController.dispose();
     if (_focusInitialized) {
       productFocusNode.dispose();
+      barcodeFocusNode.dispose();
       quantityFocusNode.dispose();
       priceFocusNode.dispose();
       discountFocusNode.dispose();
+      discountTypeFocusNode.dispose();
       taxFocusNode.dispose();
     }
   }
@@ -133,6 +218,19 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
   List<db.Supplier> _suppliers = const [];
   List<ProductEntity> _products = const [];
 
+  /// Flattened, variant-level product options in dropdown order.
+  List<_ProductOption> _productOptions = const [];
+
+  /// Same options keyed by [_ProductOption.key], for O(1) selection lookups.
+  Map<String, _ProductOption> _optionsByKey = const {};
+
+  /// Currency symbol from Company Settings, used for every amount on this page.
+  String _currencySymbol = '';
+
+  /// Sentinel dropdown value for the "+ Add New Product" entry. The ':' prefix
+  /// can never collide with a real option key.
+  static const _addNewProductValue = ':add-new-product';
+
   Map<String, String?> _errors = const {};
   bool _saving = false;
 
@@ -159,14 +257,16 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
       _productRows = purchase.items.map((item) {
         final row = _ProductRow(
           productController: TextEditingController(
-            text: _buildProductLabel(item.productName, item.variantName),
+            text: _sellableName(item.productName, item.variantName),
           ),
+          barcodeController: TextEditingController(),
           quantityController: TextEditingController(
             text: '${item.quantity}',
           ),
           priceController: TextEditingController(
             text: ProductValidator.formatPaise(item.purchasePrice),
           ),
+          // Stored discounts are always absolute amounts in paise.
           discountController: TextEditingController(
             text: ProductValidator.formatPaise(item.discount),
           ),
@@ -214,17 +314,102 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
       final productRepository = ProductRepository();
       final allProducts = await productRepository.fetchAllWithVariants();
 
+      String symbol = '';
+      try {
+        final settings = await CompanySettingsService().getSettings();
+        symbol = settings.currencySymbol.trim().isNotEmpty
+            ? settings.currencySymbol.trim()
+            : settings.currencyCode.trim();
+      } catch (_) {
+        // Settings are optional for the purchase form; fall back below.
+      }
+
       if (!mounted) return;
       setState(() {
         _suppliers = suppliers;
         _products = allProducts;
+        _currencySymbol = symbol.isEmpty ? '₹' : symbol;
+        _rebuildProductOptions();
       });
     } catch (_) {}
+  }
+
+  /// Reloads products only, so newly created records show up immediately.
+  Future<void> _reloadProducts() async {
+    try {
+      final allProducts = await ProductRepository().fetchAllWithVariants();
+      if (!mounted) return;
+      setState(() {
+        _products = allProducts;
+        _rebuildProductOptions();
+      });
+    } catch (_) {}
+  }
+
+  /// Flattens [_products] into the variant-level options shown in the dropdown.
+  ///
+  /// A product with variants contributes one option per variant and no option
+  /// for itself — the variant is the sellable unit. A product without variants
+  /// contributes a single option. Any option key already referenced by a row is
+  /// preserved even if the underlying record is no longer listed, so editing an
+  /// older purchase never trips the dropdown's "value must match one item"
+  /// assertion.
+  ///
+  /// Must be called from within [setState].
+  void _rebuildProductOptions() {
+    final options = <_ProductOption>[];
+    final byKey = <String, _ProductOption>{};
+
+    void add(_ProductOption option) {
+      if (byKey.containsKey(option.key)) return;
+      byKey[option.key] = option;
+      options.add(option);
+    }
+
+    for (final product in _products) {
+      if (product.variants.isEmpty) {
+        add(_ProductOption.base(product));
+      } else {
+        for (final variant in product.variants) {
+          add(_ProductOption.forVariant(product, variant));
+        }
+      }
+    }
+
+    // Keep selections made before the catalogue changed selectable.
+    final productsById = {for (final product in _products) product.id: product};
+    for (final row in _productRows) {
+      final key = row.optionKey;
+      if (key == null || byKey.containsKey(key)) continue;
+      final product = productsById[row.productId];
+      if (product == null) continue;
+
+      ProductVariantEntity? variant;
+      for (final candidate in product.variants) {
+        if (candidate.id == row.variantId) {
+          variant = candidate;
+          break;
+        }
+      }
+      // A variant that no longer exists cannot be represented; the dropdown
+      // falls back to its hint for that row while the row keeps its IDs.
+      if (row.variantId != null && variant == null) continue;
+
+      add(
+        variant == null
+            ? _ProductOption.base(product)
+            : _ProductOption.forVariant(product, variant),
+      );
+    }
+
+    _productOptions = options;
+    _optionsByKey = byKey;
   }
 
   void _addProductRow() {
     final row = _ProductRow(
       productController: TextEditingController(),
+      barcodeController: TextEditingController(),
       quantityController: TextEditingController(),
       priceController: TextEditingController(),
       discountController: TextEditingController(text: '0'),
@@ -248,29 +433,149 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
     });
   }
 
-  void _onProductSelected(int index, ProductEntity? product, int? variantId) {
-    if (product == null) return;
+  /// Applies [option] to the row at [index], filling in the unit and — when the
+  /// price field is still untouched — the known purchase price.
+  void _selectOption(int index, _ProductOption option) {
     final row = _productRows[index];
-    row.productId = product.id;
-    row.variantId = variantId;
-    row.unitId = product.unitId;
-    row.unitName = product.unitName;
+    row.productId = option.productId;
+    row.variantId = option.variantId;
+    row.unitId = option.product.unitId;
+    row.unitName = option.product.unitName;
+    row.productController.text = option.label;
+    row.barcodeError = null;
 
-    final variant = variantId != null
-        ? product.variants.firstWhere(
-            (v) => v.id == variantId,
-            orElse: () => product.variants.first,
-          )
-        : null;
+    final price = option.purchasePrice;
+    final priceText = row.priceController.text.trim();
+    if (price != null && (priceText.isEmpty || priceText == '0')) {
+      row.priceController.text = ProductValidator.formatPaise(price);
+    }
 
-    final label = _buildProductLabel(product.productName, variant?.variantName);
-    row.productController.text = label;
-
-    setState(() {});
+    setState(() {
+      final errors = Map<String, String?>.from(_errors);
+      errors.remove('product_$index');
+      _errors = errors;
+    });
   }
 
-  String _buildProductLabel(String productName, String? variantName) {
-    if (variantName != null) return '$productName - $variantName';
+  /// Resolves a scanned/typed barcode to a selectable option.
+  ///
+  /// Only barcodes already registered in Product Master are accepted. Nothing is
+  /// created, and an unknown code leaves the row's product untouched.
+  Future<void> _onBarcodeSubmitted(int index, String rawValue) async {
+    final code = rawValue.trim();
+    if (code.isEmpty) return;
+
+    _ProductOption? match = _findOptionByBarcode(code);
+
+    // A product added elsewhere may not be in memory yet — refresh once.
+    if (match == null) {
+      await _reloadProducts();
+      if (!mounted) return;
+      match = _findOptionByBarcode(code);
+    }
+
+    // A refresh may have happened across an await; make sure the row is still
+    // there before touching it.
+    if (index >= _productRows.length) return;
+    final row = _productRows[index];
+
+    if (match == null) {
+      setState(() {
+        row.barcodeError = 'Barcode not found. Please add this product first.';
+      });
+      // Keep focus here so the next scan replaces the rejected code.
+      row.barcodeFocusNode.requestFocus();
+      row.barcodeController.selection = TextSelection(
+        baseOffset: 0,
+        extentOffset: row.barcodeController.text.length,
+      );
+      return;
+    }
+
+    _selectOption(index, match);
+    // A scan means "one of these" unless the user says otherwise.
+    if (row.quantityController.text.trim().isEmpty) {
+      row.quantityController.text = '1';
+    }
+    // Clear the field so a scanner can fire straight into the next code, and
+    // move on to quantity, which is what the user types next.
+    row.barcodeController.clear();
+    row.quantityFocusNode.requestFocus();
+    row.quantityController.selection = TextSelection(
+      baseOffset: 0,
+      extentOffset: row.quantityController.text.length,
+    );
+  }
+
+  /// Case-insensitive exact barcode match across the selectable options.
+  ///
+  /// Searching the options (rather than raw products) guarantees the result can
+  /// actually be selected, and makes a variant barcode resolve that exact
+  /// variant instead of only its parent product.
+  _ProductOption? _findOptionByBarcode(String code) {
+    final needle = code.toLowerCase();
+    for (final option in _productOptions) {
+      final barcode = option.barcode?.trim();
+      if (barcode != null && barcode.toLowerCase() == needle) return option;
+    }
+    return null;
+  }
+
+  /// Opens Product Master's create form in a dialog.
+  ///
+  /// A dialog — rather than a pushed route — keeps this page mounted, so the
+  /// purchase in progress survives and the new product can be auto-selected on
+  /// return.
+  Future<void> _openAddProductDialog(int index) async {
+    ProductEntity? created;
+
+    await showDialog<void>(
+      context: context,
+      barrierDismissible: false,
+      builder: (dialogContext) {
+        return Dialog(
+          clipBehavior: Clip.antiAlias,
+          insetPadding: const EdgeInsets.symmetric(horizontal: 40, vertical: 32),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 860, maxHeight: 760),
+            child: CreateProductPage(
+              showBreadcrumbs: false,
+              onSaved: (product) => created = product,
+              onSave: () => Navigator.of(dialogContext).pop(),
+              onCancel: () => Navigator.of(dialogContext).pop(),
+            ),
+          ),
+        );
+      },
+    );
+
+    if (!mounted) return;
+
+    // Discard the sentinel selection the dropdown is currently showing.
+    setState(() => _productRows[index].dropdownEpoch++);
+
+    await _reloadProducts();
+    if (!mounted) return;
+
+    final product = created;
+    if (product == null) return;
+
+    // Auto-select the new product so entry can continue without searching.
+    // A product saved with variants is only sellable through those variants, so
+    // pick the first one.
+    final key = product.variants.isEmpty
+        ? _ProductOption.keyFor(product.id, null)
+        : _ProductOption.keyFor(product.id, product.variants.first.id);
+    final option = _optionsByKey[key];
+    if (option != null) _selectOption(index, option);
+  }
+
+  /// The name a product/variant is sold under. Variant names stand alone — they
+  /// are never combined with the parent product name.
+  String _sellableName(String productName, String? variantName) {
+    if (variantName != null && variantName.trim().isNotEmpty) {
+      return variantName;
+    }
     return productName;
   }
 
@@ -282,8 +587,26 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
     return qty * price;
   }
 
+  /// The effective discount for a line, in paise.
+  ///
+  /// Percentage mode multiplies the line subtotal; currency mode uses the entered
+  /// amount directly. Both are clamped to the line subtotal, which is what stops
+  /// a discount from driving the payable amount negative.
   int _calculateLineDiscount(_ProductRow row) {
-    return ProductValidator.parseRupeesToPaise(row.discountController.text) ?? 0;
+    final subtotal = _calculateLineSubtotal(row);
+    if (subtotal <= 0) return 0;
+
+    if (row.discountType == _DiscountType.percentage) {
+      final percent = double.tryParse(row.discountController.text.trim()) ?? 0;
+      if (percent <= 0) return 0;
+      final clamped = percent > 100 ? 100.0 : percent;
+      return (subtotal * clamped / 100).round();
+    }
+
+    final amount =
+        ProductValidator.parseRupeesToPaise(row.discountController.text) ?? 0;
+    if (amount <= 0) return 0;
+    return amount > subtotal ? subtotal : amount;
   }
 
   double _calculateLineTaxRate(_ProductRow row) {
@@ -352,6 +675,28 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
 
   // ─── Validation ───
 
+  /// Rejects a discount that would exceed the line amount, since that would make
+  /// the payable amount negative.
+  String? _validateDiscount(_ProductRow row) {
+    final text = row.discountController.text.trim();
+    if (text.isEmpty || text == '0') return null;
+
+    if (row.discountType == _DiscountType.percentage) {
+      final percent = double.tryParse(text);
+      if (percent == null) return 'Enter a valid discount.';
+      if (percent > 100) return 'Discount cannot exceed 100%.';
+      return null;
+    }
+
+    final amount = ProductValidator.parseRupeesToPaise(text);
+    if (amount == null) return 'Enter a valid discount.';
+    final subtotal = _calculateLineSubtotal(row);
+    if (subtotal > 0 && amount > subtotal) {
+      return 'Discount cannot exceed the line amount.';
+    }
+    return null;
+  }
+
   void _focusFirstError(Map<String, String?> errors) {
     for (final field in _fieldOrder) {
       if (errors[field] != null) {
@@ -373,6 +718,10 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
         _productRows[i].priceFocusNode.requestFocus();
         return;
       }
+      if (errors['discount_$i'] != null) {
+        _productRows[i].discountFocusNode.requestFocus();
+        return;
+      }
     }
   }
 
@@ -382,14 +731,20 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
 
     // Validate product rows.
     final rowErrors = <String, String?>{};
-    final productIds = <int?>[];
+    final seenKeys = <String>{};
 
     for (var i = 0; i < _productRows.length; i++) {
       final row = _productRows[i];
-      if (row.productId == null) {
+
+      final key = row.optionKey;
+      if (key == null) {
         rowErrors['product_$i'] = 'Select a product.';
+      } else if (!seenKeys.add(key)) {
+        // Keyed by product *and* variant, so two variants of the same parent
+        // product are still two legitimate lines.
+        rowErrors['product_$i'] =
+            'This product is already added. Update the existing quantity instead.';
       }
-      productIds.add(row.productId);
 
       final qty = int.tryParse(row.quantityController.text) ?? 0;
       if (qty <= 0) {
@@ -405,16 +760,10 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
           rowErrors['price_$i'] = 'Enter a valid price.';
         }
       }
-    }
 
-    // Check for duplicate products.
-    final validIds = productIds.whereType<int>().toList();
-    final seenIds = <int>{};
-    for (var i = 0; i < validIds.length; i++) {
-      if (!seenIds.add(validIds[i])) {
-        rowErrors['product_$i'] =
-            'This product is already added. Update the existing quantity instead.';
-        break;
+      final discountErr = _validateDiscount(row);
+      if (discountErr != null) {
+        rowErrors['discount_$i'] = discountErr;
       }
     }
 
@@ -442,8 +791,11 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
           variantId: row.variantId,
           quantity: int.parse(row.quantityController.text),
           unitId: row.unitId!,
-          purchasePrice: ProductValidator.parseRupeesToPaise(row.priceController.text)!,
-          discount: ProductValidator.parseRupeesToPaise(row.discountController.text) ?? 0,
+          purchasePrice:
+              ProductValidator.parseRupeesToPaise(row.priceController.text)!,
+          // Percentage discounts are resolved to paise here, so the stored value
+          // always matches the amount shown in the summary.
+          discount: _calculateLineDiscount(row),
           taxRate: double.tryParse(row.taxController.text) ?? 0,
         );
       }).toList();
@@ -640,6 +992,7 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
                                 RegExp(r'^\d*\.?\d{0,2}'),
                               ),
                             ],
+                            onChanged: (_) => setState(() {}),
                           ),
                           _buildPaymentMethodField(textTheme, colorScheme),
                         ]),
@@ -813,66 +1166,84 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
                   style: textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
               const Spacer(),
               if (_productRows.length > 1)
-                IconButton(
-                  icon: const Icon(Icons.close_rounded, size: 18),
-                  tooltip: 'Remove item',
-                  onPressed: () => _removeProductRow(index),
-                  color: colorScheme.error,
+                _rowFocusOrder(
+                  index,
+                  7,
+                  IconButton(
+                    icon: const Icon(Icons.close_rounded, size: 18),
+                    tooltip: 'Remove item',
+                    onPressed: () => _removeProductRow(index),
+                    color: colorScheme.error,
+                  ),
                 ),
             ],
           ),
           const SizedBox(height: 12),
-          _buildProductDropdown(index, row, textTheme, colorScheme),
+          _buildFormRow([
+            _rowFocusOrder(
+              index,
+              0,
+              _buildProductDropdown(index, row, textTheme, colorScheme),
+            ),
+            _rowFocusOrder(index, 1, _buildBarcodeField(index, row)),
+          ]),
           const SizedBox(height: 12),
           _buildFormRow([
-            LabelledField(
-              label: 'Quantity',
-              isRequired: true,
-              hintText: '0',
-              controller: row.quantityController,
-              errorText: _errors['qty_$index'],
-              focusNode: row.quantityFocusNode,
-              containerKey: row.quantityContainerKey,
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            _rowFocusOrder(
+              index,
+              2,
+              LabelledField(
+                label: 'Quantity',
+                isRequired: true,
+                hintText: '0',
+                controller: row.quantityController,
+                errorText: _errors['qty_$index'],
+                focusNode: row.quantityFocusNode,
+                containerKey: row.quantityContainerKey,
+                keyboardType: TextInputType.number,
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                onChanged: (_) => setState(() {}),
+              ),
             ),
-            LabelledField(
-              label: 'Purchase Price',
-              isRequired: true,
-              hintText: '0.00',
-              controller: row.priceController,
-              errorText: _errors['price_$index'],
-              focusNode: row.priceFocusNode,
-              containerKey: row.priceContainerKey,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
-              ],
+            _rowFocusOrder(
+              index,
+              3,
+              LabelledField(
+                label: 'Purchase Price',
+                isRequired: true,
+                hintText: '0.00',
+                controller: row.priceController,
+                errorText: _errors['price_$index'],
+                focusNode: row.priceFocusNode,
+                containerKey: row.priceContainerKey,
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
+                ],
+                onChanged: (_) => setState(() {}),
+              ),
             ),
           ]),
           const SizedBox(height: 12),
           _buildFormRow([
-            LabelledField(
-              label: 'Discount',
-              hintText: '0',
-              controller: row.discountController,
-              focusNode: row.discountFocusNode,
-              containerKey: row.discountContainerKey,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
-              ],
-            ),
-            LabelledField(
-              label: 'Tax Rate (%)',
-              hintText: '0',
-              controller: row.taxController,
-              focusNode: row.taxFocusNode,
-              containerKey: row.taxContainerKey,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
-              ],
+            _buildDiscountField(index, row, textTheme),
+            _rowFocusOrder(
+              index,
+              6,
+              LabelledField(
+                label: 'Tax Rate (%)',
+                hintText: '0',
+                controller: row.taxController,
+                focusNode: row.taxFocusNode,
+                containerKey: row.taxContainerKey,
+                keyboardType:
+                    const TextInputType.numberWithOptions(decimal: true),
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
+                ],
+                onChanged: (_) => setState(() {}),
+              ),
             ),
           ]),
           if (row.unitName != null) ...[
@@ -900,6 +1271,14 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
   Widget _buildProductDropdown(
     int index, _ProductRow row, TextTheme textTheme, ColorScheme colorScheme,
   ) {
+    // Only offer a selected value the dropdown can actually match, otherwise it
+    // asserts. The row keeps its IDs either way.
+    final selectedKey = row.optionKey;
+    final initialValue =
+        selectedKey != null && _optionsByKey.containsKey(selectedKey)
+            ? selectedKey
+            : null;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -916,23 +1295,21 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
         ),
         const SizedBox(height: 8),
         DropdownButtonFormField<String>(
-          key: ValueKey('product-$index-${row.productId}'),
-          initialValue: row.productId != null
-              ? '${row.productId}-${row.variantId ?? 'base'}'
-              : null,
+          key: ValueKey('product-$index-$initialValue-${row.dropdownEpoch}'),
+          initialValue: initialValue,
           focusNode: row.productFocusNode,
           isExpanded: true,
           isDense: true,
           hint: const Text('Search product...'),
-          items: _buildProductItems(),
+          items: _buildProductItems(colorScheme),
           onChanged: (value) {
             if (value == null) return;
-            final parts = value.split('-');
-            final productId = int.parse(parts[0]);
-            final variantId =
-                parts.length > 1 && parts[1] != 'base' ? int.parse(parts[1]) : null;
-            final product = _products.firstWhere((p) => p.id == productId);
-            _onProductSelected(index, product, variantId);
+            if (value == _addNewProductValue) {
+              _openAddProductDialog(index);
+              return;
+            }
+            final option = _optionsByKey[value];
+            if (option != null) _selectOption(index, option);
           },
           decoration: InputDecoration(
             errorText: _errors['product_$index'],
@@ -943,25 +1320,122 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
     );
   }
 
-  List<DropdownMenuItem<String>> _buildProductItems() {
-    final items = <DropdownMenuItem<String>>[];
-    for (final product in _products) {
-      items.add(DropdownMenuItem(
-        value: '${product.id}-base',
-        child: Text(product.productName),
-      ));
-      for (final variant in product.variants) {
-        items.add(DropdownMenuItem(
-          value: '${product.id}-${variant.id}',
-          child: Padding(
-            padding: const EdgeInsets.only(left: 16),
-            child: Text('${product.productName} - ${variant.variantName}',
-                style: const TextStyle(fontSize: 13)),
+  /// One entry per sellable unit, plus the "+ Add New Product" shortcut.
+  ///
+  /// Variants are listed under their own name — never "Parent - Variant" — so the
+  /// list reads as a flat list of things that can actually be purchased.
+  List<DropdownMenuItem<String>> _buildProductItems(ColorScheme colorScheme) {
+    return [
+      DropdownMenuItem(
+        value: _addNewProductValue,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.add_rounded, size: 16, color: colorScheme.primary),
+            const SizedBox(width: 6),
+            Text(
+              'Add New Product',
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                color: colorScheme.primary,
+              ),
+            ),
+          ],
+        ),
+      ),
+      for (final option in _productOptions)
+        DropdownMenuItem(
+          value: option.key,
+          child: Text(option.label, overflow: TextOverflow.ellipsis),
+        ),
+    ];
+  }
+
+  /// Scanner-friendly barcode entry for a line.
+  ///
+  /// Scanners send the code followed by Enter, which lands on [onSubmitted].
+  Widget _buildBarcodeField(int index, _ProductRow row) {
+    return LabelledField(
+      label: 'Barcode',
+      hintText: 'Scan or enter barcode',
+      controller: row.barcodeController,
+      errorText: row.barcodeError,
+      focusNode: row.barcodeFocusNode,
+      containerKey: row.barcodeContainerKey,
+      textInputAction: TextInputAction.done,
+      onChanged: (_) {
+        // Clear the rejection as soon as a new code starts arriving.
+        if (row.barcodeError != null) {
+          setState(() => row.barcodeError = null);
+        }
+      },
+      onSubmitted: (value) => _onBarcodeSubmitted(index, value),
+    );
+  }
+
+  /// Discount value plus a "% / currency" mode selector.
+  Widget _buildDiscountField(int index, _ProductRow row, TextTheme textTheme) {
+    return _rowFocusOrder(
+      index,
+      4,
+      LabelledField(
+        label: 'Discount',
+        hintText: '0',
+        controller: row.discountController,
+        errorText: _errors['discount_$index'],
+        focusNode: row.discountFocusNode,
+        containerKey: row.discountContainerKey,
+        keyboardType: const TextInputType.numberWithOptions(decimal: true),
+        inputFormatters: [
+          FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
+        ],
+        onChanged: (_) {
+          // Keep the live line total and summary in step with typing.
+          setState(() {});
+        },
+        // Sits immediately after the value field in the Tab order.
+        trailing: _rowFocusOrder(
+          index,
+          5,
+          SizedBox(
+            width: 92,
+            child: DropdownButtonFormField<_DiscountType>(
+              key: ValueKey('discount-type-$index'),
+              initialValue: row.discountType,
+              focusNode: row.discountTypeFocusNode,
+              isDense: true,
+              isExpanded: true,
+              style: textTheme.bodyMedium,
+              items: [
+                const DropdownMenuItem(
+                  value: _DiscountType.percentage,
+                  child: Text('%'),
+                ),
+                DropdownMenuItem(
+                  value: _DiscountType.amount,
+                  child: Text(
+                    _currencySymbolOrDefault,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+              onChanged: (value) {
+                if (value == null) return;
+                setState(() {
+                  row.discountType = value;
+                  // Switching modes reinterprets the same number, so a stale
+                  // "exceeds the line amount" message must not linger.
+                  final errors = Map<String, String?>.from(_errors);
+                  errors.remove('discount_$index');
+                  _errors = errors;
+                });
+              },
+            ),
           ),
-        ));
-      }
-    }
-    return items;
+        ),
+      ),
+    );
   }
 
   Widget _buildSummary(TextTheme textTheme, ColorScheme colorScheme) {
@@ -1058,12 +1532,36 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
     );
   }
 
-  static String _formatCurrency(int paise) {
+  /// Formats paise using the currency symbol from Company Settings.
+  String _formatCurrency(int paise) {
     final rupees = paise / 100;
     final text = rupees == rupees.roundToDouble()
         ? rupees.round().toString()
         : rupees.toStringAsFixed(2);
-    return '₹$text';
+    return '$_currencySymbolOrDefault$text';
+  }
+
+  /// Falls back to '₹' only until Company Settings have loaded.
+  String get _currencySymbolOrDefault =>
+      _currencySymbol.isEmpty ? '₹' : _currencySymbol;
+
+  /// Slots a product-row control into the form's traversal order.
+  ///
+  /// Item-row controls own their focus nodes instead of borrowing
+  /// [FormFocusController]'s, so they carry no [NumericFocusOrder] — and
+  /// [OrderedTraversalPolicy] sorts every unordered node *after* the ordered
+  /// ones, which would push the whole Products section past the Save button.
+  /// These fractional orders sit between 'notes' and 'paymentAmount', keeping
+  /// Tab flowing product → barcode → quantity → price → discount → % / currency
+  /// → tax, row after row.
+  Widget _rowFocusOrder(int rowIndex, int fieldIndex, Widget child) {
+    const notesOrder = 4.0; // _fieldOrder.indexOf('notes') + 1
+    return FocusTraversalOrder(
+      order: NumericFocusOrder(
+        notesOrder + (rowIndex * 10 + fieldIndex + 1) / 10000,
+      ),
+      child: child,
+    );
   }
 }
 

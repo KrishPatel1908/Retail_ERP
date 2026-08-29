@@ -1,5 +1,4 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:retail_erp/core/database/exceptions/database_exceptions.dart';
 import 'package:retail_erp/features/master_entry/brand/data/repositories/brand_repository.dart';
 import 'package:retail_erp/features/master_entry/category/data/repositories/category_repository.dart';
 import 'package:retail_erp/features/master_entry/product/data/repositories/product_repository.dart';

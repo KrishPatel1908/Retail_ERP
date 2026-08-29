@@ -50,6 +50,12 @@ abstract final class DatabaseSchemaVersion {
   /// and hsn_code to product and product_variant tables.
   static const int v10 = 10;
 
+  /// Schema version 11 — removes the deferred multi-warehouse feature: drops
+  /// the `warehouse` table and its unique index, and rebuilds
+  /// `inventory_transaction` and `current_stock` without their always-empty
+  /// `warehouse_id` column (existing rows preserved).
+  static const int v11 = 11;
+
   /// The current schema version of the application.
-  static const int latest = v10;
+  static const int latest = v11;
 }

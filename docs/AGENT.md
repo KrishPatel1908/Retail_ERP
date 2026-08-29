@@ -289,16 +289,19 @@ Current modules
 - Brand
 - Tax Type
 - Tax Category
-- HSN Master
-
-Future modules
-
-- Sub Category
-- Warehouse
 - Customer
 - Supplier
 - Company Settings
 - Product Master
+
+Future modules
+
+- Sub Category
+
+Deferred / out of scope
+
+- Warehouse (single-location build; `warehouse` table removed in v11)
+- HSN Master (removed in v3; HSN/SAC is now a field on Product Master and variants)
 
 ---
 

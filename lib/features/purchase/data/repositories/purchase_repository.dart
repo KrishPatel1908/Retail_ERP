@@ -206,7 +206,7 @@ class PurchaseRepository {
       int totalDiscount = 0;
       int totalTax = 0;
 
-      final lineTotals = <int, _LineCalculation>{};
+      final lineTotals = <String, _LineCalculation>{};
 
       for (final item in items) {
         final qty = item.quantity;
@@ -217,7 +217,10 @@ class PurchaseRepository {
         final lineTax = (taxableAmount * item.taxRate / 100).round();
         final lineTotal = taxableAmount + lineTax;
 
-        lineTotals[item.productId] = _LineCalculation(
+        // Keyed by product *and* variant: two variants of the same parent
+        // product are two distinct lines.
+        lineTotals[_itemKey(item.productId, item.variantId)] =
+            _LineCalculation(
           subtotal: lineSubtotal,
           discount: lineDiscount,
           tax: lineTax,
@@ -268,7 +271,7 @@ class PurchaseRepository {
       // 4. Insert purchase items + inventory transactions.
       for (var i = 0; i < items.length; i++) {
         final item = items[i];
-        final calc = lineTotals[item.productId]!;
+        final calc = lineTotals[_itemKey(item.productId, item.variantId)]!;
 
         await _database.into(_database.purchaseItems).insert(
           db.PurchaseItemsCompanion.insert(
@@ -339,7 +342,7 @@ class PurchaseRepository {
       int totalDiscount = 0;
       int totalTax = 0;
 
-      final lineTotals = <int, _LineCalculation>{};
+      final lineTotals = <String, _LineCalculation>{};
 
       for (final item in items) {
         final lineSubtotal = item.quantity * item.purchasePrice;
@@ -348,7 +351,10 @@ class PurchaseRepository {
         final lineTax = (taxableAmount * item.taxRate / 100).round();
         final lineTotal = taxableAmount + lineTax;
 
-        lineTotals[item.productId] = _LineCalculation(
+        // Keyed by product *and* variant: two variants of the same parent
+        // product are two distinct lines.
+        lineTotals[_itemKey(item.productId, item.variantId)] =
+            _LineCalculation(
           subtotal: lineSubtotal,
           discount: lineDiscount,
           tax: lineTax,
@@ -449,7 +455,7 @@ class PurchaseRepository {
 
         if (existingItem != null) {
           // Update existing item.
-          final calc = lineTotals[item.productId]!;
+          final calc = lineTotals[key]!;
           await (_database.update(_database.purchaseItems)
                 ..where((t) => t.id.equals(existingItem.id)))
               .write(
@@ -490,7 +496,7 @@ class PurchaseRepository {
           }
         } else {
           // New item — insert.
-          final calc = lineTotals[item.productId]!;
+          final calc = lineTotals[key]!;
           await _database.into(_database.purchaseItems).insert(
             db.PurchaseItemsCompanion.insert(
               purchaseId: id,

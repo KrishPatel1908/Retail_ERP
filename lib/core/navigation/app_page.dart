@@ -30,12 +30,6 @@ enum AppPage {
   customer('Customer', Icons.group_outlined, Icons.group),
   supplier('Supplier', Icons.local_shipping_outlined, Icons.local_shipping),
   product('Product Master', Icons.inventory_2_outlined, Icons.inventory_2),
-  productTracking(
-    'Product Tracking',
-    Icons.show_chart_outlined,
-    Icons.show_chart,
-  ),
-  purchase('Purchase', Icons.shopping_cart_outlined, Icons.shopping_cart),
   purchaseEntry('Purchase Entry', Icons.add_shopping_cart_outlined, Icons.add_shopping_cart),
   purchaseHistory('Purchase History', Icons.receipt_long_outlined, Icons.receipt_long),
   purchaseReturns('Purchase Returns', Icons.assignment_return_outlined, Icons.assignment_return),

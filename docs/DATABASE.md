@@ -370,6 +370,7 @@ repository/service layer only ever read and write `id = 1`.
 - **v7 → v8 (`upgradeToV8`)**: Added `expiry_date` to `product`, removed obsolete tracking flags, and introduced `product_variant` table.
 - **v8 → v9 (`upgradeToV9`)**: Added Purchase module tables (`purchase`, `purchase_item`, `inventory_transaction`, `current_stock`).
 - **v9 → v10 (`upgradeToV10`)**: Added `purchase_price`, `mrp`, `wholesale_price`, `barcode`, and `hsn_code` to both `product` and `product_variant` tables; created partial unique indexes on non-empty barcodes.
+- **v10 → v11 (`upgradeToV11`)**: Removed the deferred multi-warehouse feature — dropped the `warehouse` table and its unique index, and rebuilt `inventory_transaction` and `current_stock` without their always-empty `warehouse_id` column. Every existing row is preserved. The rebuilt `current_stock` uses a unique index on `(product_id, variant_id)` in place of the inline `UNIQUE` constraint, so upgraded and freshly-created databases converge on an identical shape.
 
 ## UI and keyboard behavior
 

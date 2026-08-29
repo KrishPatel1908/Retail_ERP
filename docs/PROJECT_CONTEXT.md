@@ -51,7 +51,6 @@ The ERP should allow businesses to manage:
 - Suppliers
 - Purchases
 - Sales
-- Warehouses
 - Taxes
 - Barcode Scanning
 - Reports
@@ -127,11 +126,12 @@ Completed
 - Tax Category
 - Customer Master
 - Supplier Master
+- Company Settings
 - Product Master
 
-Pending
+Removed / Deferred
 
-- Warehouse Master
+- Warehouse Master (single-location build; `warehouse` table removed in v11)
 
 ---
 
@@ -168,14 +168,6 @@ Tax Category
 ↓
 
 Tax Type
-
-↓
-
-HSN
-
-↓
-
-Warehouse
 
 For this reason Product Master is intentionally implemented near the end of Master Entry.
 
@@ -340,10 +332,6 @@ Role Management
 ↓
 
 Backup & Restore
-
-↓
-
-AI Assistant
 
 ---
 

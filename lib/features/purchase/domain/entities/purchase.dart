@@ -178,7 +178,6 @@ class InventoryTransactionEntity {
     this.productName,
     this.variantId,
     this.variantName,
-    this.warehouseId,
     required this.transactionType,
     required this.quantity,
     this.purchaseId,
@@ -194,7 +193,6 @@ class InventoryTransactionEntity {
   final String? productName;
   final int? variantId;
   final String? variantName;
-  final int? warehouseId;
 
   /// PURCHASE, PURCHASE_RETURN, MANUAL_ADJUSTMENT, SALE.
   final String transactionType;

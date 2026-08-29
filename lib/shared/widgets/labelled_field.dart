@@ -19,6 +19,8 @@ class LabelledField extends StatefulWidget {
     this.focusNode,
     this.nextFocusNode,
     this.onSubmitted,
+    this.onChanged,
+    this.trailing,
     this.inputFormatters,
     this.keyboardType,
     this.textInputAction,
@@ -49,6 +51,14 @@ class LabelledField extends StatefulWidget {
   final FocusNode? focusNode;
   final FocusNode? nextFocusNode;
   final ValueChanged<String>? onSubmitted;
+
+  /// Called on every keystroke, so callers can clear stale validation state.
+  final ValueChanged<String>? onChanged;
+
+  /// Optional control rendered beside the input (e.g. a unit or type selector).
+  /// It shares the field's label and sits on the same baseline as the input.
+  final Widget? trailing;
+
   final List<TextInputFormatter>? inputFormatters;
   final TextInputType? keyboardType;
   final TextInputAction? textInputAction;
@@ -122,6 +132,27 @@ class _LabelledFieldState extends State<LabelledField> {
         widget.textInputAction ??
         (isSingleLine ? TextInputAction.next : TextInputAction.newline);
 
+    final Widget input = TextField(
+      key: widget.fieldKey,
+      controller: widget.controller,
+      focusNode: _effectiveFocusNode,
+      maxLines: widget.maxLines,
+      enabled: widget.enabled,
+      readOnly: widget.readOnly,
+      autofocus: widget.autofocus,
+      keyboardType: widget.keyboardType,
+      inputFormatters: widget.inputFormatters,
+      textInputAction: effectiveInputAction,
+      onChanged: widget.onChanged,
+      onSubmitted: isSingleLine ? _handleSubmitted : widget.onSubmitted,
+      style: const TextStyle(fontSize: 14),
+      decoration: InputDecoration(
+        hintText: widget.hintText,
+        errorText: widget.errorText,
+        errorMaxLines: 2,
+      ),
+    );
+
     return FormFocusController.applyOrder(
       _effectiveFocusNode,
       Column(
@@ -153,25 +184,17 @@ class _LabelledFieldState extends State<LabelledField> {
             ],
           ),
           const SizedBox(height: 8),
-          TextField(
-            key: widget.fieldKey,
-            controller: widget.controller,
-            focusNode: _effectiveFocusNode,
-            maxLines: widget.maxLines,
-            enabled: widget.enabled,
-            readOnly: widget.readOnly,
-            autofocus: widget.autofocus,
-            keyboardType: widget.keyboardType,
-            inputFormatters: widget.inputFormatters,
-            textInputAction: effectiveInputAction,
-            onSubmitted: isSingleLine ? _handleSubmitted : widget.onSubmitted,
-            style: const TextStyle(fontSize: 14),
-            decoration: InputDecoration(
-              hintText: widget.hintText,
-              errorText: widget.errorText,
-              errorMaxLines: 2,
+          if (widget.trailing == null)
+            input
+          else
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(child: input),
+                const SizedBox(width: 8),
+                widget.trailing!,
+              ],
             ),
-          ),
         ],
       ),
     );

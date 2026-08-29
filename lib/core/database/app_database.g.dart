@@ -9557,809 +9557,6 @@ class SuppliersCompanion extends UpdateCompanion<Supplier> {
   }
 }
 
-class $WarehousesTable extends Warehouses
-    with TableInfo<$WarehousesTable, Warehouse> {
-  @override
-  final GeneratedDatabase attachedDatabase;
-  final String? _alias;
-  $WarehousesTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _idMeta = const VerificationMeta('id');
-  @override
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
-    'id',
-    aliasedName,
-    false,
-    hasAutoIncrement: true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'PRIMARY KEY AUTOINCREMENT',
-    ),
-  );
-  static const VerificationMeta _warehouseCodeMeta = const VerificationMeta(
-    'warehouseCode',
-  );
-  @override
-  late final GeneratedColumn<String> warehouseCode = GeneratedColumn<String>(
-    'warehouse_code',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-    defaultConstraints: GeneratedColumn.constraintIsAlways('UNIQUE'),
-  );
-  static const VerificationMeta _warehouseNameMeta = const VerificationMeta(
-    'warehouseName',
-  );
-  @override
-  late final GeneratedColumn<String> warehouseName = GeneratedColumn<String>(
-    'warehouse_name',
-    aliasedName,
-    false,
-    type: DriftSqlType.string,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _addressMeta = const VerificationMeta(
-    'address',
-  );
-  @override
-  late final GeneratedColumn<String> address = GeneratedColumn<String>(
-    'address',
-    aliasedName,
-    true,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-  );
-  static const VerificationMeta _cityMeta = const VerificationMeta('city');
-  @override
-  late final GeneratedColumn<String> city = GeneratedColumn<String>(
-    'city',
-    aliasedName,
-    true,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-  );
-  static const VerificationMeta _stateMeta = const VerificationMeta('state');
-  @override
-  late final GeneratedColumn<String> state = GeneratedColumn<String>(
-    'state',
-    aliasedName,
-    true,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-  );
-  static const VerificationMeta _stateCodeMeta = const VerificationMeta(
-    'stateCode',
-  );
-  @override
-  late final GeneratedColumn<String> stateCode = GeneratedColumn<String>(
-    'state_code',
-    aliasedName,
-    true,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-  );
-  static const VerificationMeta _countryMeta = const VerificationMeta(
-    'country',
-  );
-  @override
-  late final GeneratedColumn<String> country = GeneratedColumn<String>(
-    'country',
-    aliasedName,
-    true,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-  );
-  static const VerificationMeta _contactPersonMeta = const VerificationMeta(
-    'contactPerson',
-  );
-  @override
-  late final GeneratedColumn<String> contactPerson = GeneratedColumn<String>(
-    'contact_person',
-    aliasedName,
-    true,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-  );
-  static const VerificationMeta _mobileMeta = const VerificationMeta('mobile');
-  @override
-  late final GeneratedColumn<String> mobile = GeneratedColumn<String>(
-    'mobile',
-    aliasedName,
-    true,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-  );
-  static const VerificationMeta _emailMeta = const VerificationMeta('email');
-  @override
-  late final GeneratedColumn<String> email = GeneratedColumn<String>(
-    'email',
-    aliasedName,
-    true,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-  );
-  static const VerificationMeta _isActiveMeta = const VerificationMeta(
-    'isActive',
-  );
-  @override
-  late final GeneratedColumn<bool> isActive = GeneratedColumn<bool>(
-    'is_active',
-    aliasedName,
-    false,
-    type: DriftSqlType.bool,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'CHECK ("is_active" IN (0, 1))',
-    ),
-    defaultValue: const Constant(true),
-  );
-  static const VerificationMeta _createdAtMeta = const VerificationMeta(
-    'createdAt',
-  );
-  @override
-  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
-    'created_at',
-    aliasedName,
-    false,
-    type: DriftSqlType.dateTime,
-    requiredDuringInsert: false,
-    defaultValue: currentDateAndTime,
-  );
-  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
-    'updatedAt',
-  );
-  @override
-  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
-    'updated_at',
-    aliasedName,
-    false,
-    type: DriftSqlType.dateTime,
-    requiredDuringInsert: false,
-    defaultValue: currentDateAndTime,
-  );
-  @override
-  List<GeneratedColumn> get $columns => [
-    id,
-    warehouseCode,
-    warehouseName,
-    address,
-    city,
-    state,
-    stateCode,
-    country,
-    contactPerson,
-    mobile,
-    email,
-    isActive,
-    createdAt,
-    updatedAt,
-  ];
-  @override
-  String get aliasedName => _alias ?? actualTableName;
-  @override
-  String get actualTableName => $name;
-  static const String $name = 'warehouse';
-  @override
-  VerificationContext validateIntegrity(
-    Insertable<Warehouse> instance, {
-    bool isInserting = false,
-  }) {
-    final context = VerificationContext();
-    final data = instance.toColumns(true);
-    if (data.containsKey('id')) {
-      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
-    }
-    if (data.containsKey('warehouse_code')) {
-      context.handle(
-        _warehouseCodeMeta,
-        warehouseCode.isAcceptableOrUnknown(
-          data['warehouse_code']!,
-          _warehouseCodeMeta,
-        ),
-      );
-    } else if (isInserting) {
-      context.missing(_warehouseCodeMeta);
-    }
-    if (data.containsKey('warehouse_name')) {
-      context.handle(
-        _warehouseNameMeta,
-        warehouseName.isAcceptableOrUnknown(
-          data['warehouse_name']!,
-          _warehouseNameMeta,
-        ),
-      );
-    } else if (isInserting) {
-      context.missing(_warehouseNameMeta);
-    }
-    if (data.containsKey('address')) {
-      context.handle(
-        _addressMeta,
-        address.isAcceptableOrUnknown(data['address']!, _addressMeta),
-      );
-    }
-    if (data.containsKey('city')) {
-      context.handle(
-        _cityMeta,
-        city.isAcceptableOrUnknown(data['city']!, _cityMeta),
-      );
-    }
-    if (data.containsKey('state')) {
-      context.handle(
-        _stateMeta,
-        state.isAcceptableOrUnknown(data['state']!, _stateMeta),
-      );
-    }
-    if (data.containsKey('state_code')) {
-      context.handle(
-        _stateCodeMeta,
-        stateCode.isAcceptableOrUnknown(data['state_code']!, _stateCodeMeta),
-      );
-    }
-    if (data.containsKey('country')) {
-      context.handle(
-        _countryMeta,
-        country.isAcceptableOrUnknown(data['country']!, _countryMeta),
-      );
-    }
-    if (data.containsKey('contact_person')) {
-      context.handle(
-        _contactPersonMeta,
-        contactPerson.isAcceptableOrUnknown(
-          data['contact_person']!,
-          _contactPersonMeta,
-        ),
-      );
-    }
-    if (data.containsKey('mobile')) {
-      context.handle(
-        _mobileMeta,
-        mobile.isAcceptableOrUnknown(data['mobile']!, _mobileMeta),
-      );
-    }
-    if (data.containsKey('email')) {
-      context.handle(
-        _emailMeta,
-        email.isAcceptableOrUnknown(data['email']!, _emailMeta),
-      );
-    }
-    if (data.containsKey('is_active')) {
-      context.handle(
-        _isActiveMeta,
-        isActive.isAcceptableOrUnknown(data['is_active']!, _isActiveMeta),
-      );
-    }
-    if (data.containsKey('created_at')) {
-      context.handle(
-        _createdAtMeta,
-        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
-      );
-    }
-    if (data.containsKey('updated_at')) {
-      context.handle(
-        _updatedAtMeta,
-        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
-      );
-    }
-    return context;
-  }
-
-  @override
-  Set<GeneratedColumn> get $primaryKey => {id};
-  @override
-  Warehouse map(Map<String, dynamic> data, {String? tablePrefix}) {
-    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return Warehouse(
-      id: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}id'],
-      )!,
-      warehouseCode: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}warehouse_code'],
-      )!,
-      warehouseName: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}warehouse_name'],
-      )!,
-      address: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}address'],
-      ),
-      city: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}city'],
-      ),
-      state: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}state'],
-      ),
-      stateCode: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}state_code'],
-      ),
-      country: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}country'],
-      ),
-      contactPerson: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}contact_person'],
-      ),
-      mobile: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}mobile'],
-      ),
-      email: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}email'],
-      ),
-      isActive: attachedDatabase.typeMapping.read(
-        DriftSqlType.bool,
-        data['${effectivePrefix}is_active'],
-      )!,
-      createdAt: attachedDatabase.typeMapping.read(
-        DriftSqlType.dateTime,
-        data['${effectivePrefix}created_at'],
-      )!,
-      updatedAt: attachedDatabase.typeMapping.read(
-        DriftSqlType.dateTime,
-        data['${effectivePrefix}updated_at'],
-      )!,
-    );
-  }
-
-  @override
-  $WarehousesTable createAlias(String alias) {
-    return $WarehousesTable(attachedDatabase, alias);
-  }
-}
-
-class Warehouse extends DataClass implements Insertable<Warehouse> {
-  final int id;
-  final String warehouseCode;
-  final String warehouseName;
-  final String? address;
-  final String? city;
-  final String? state;
-  final String? stateCode;
-  final String? country;
-  final String? contactPerson;
-  final String? mobile;
-  final String? email;
-  final bool isActive;
-  final DateTime createdAt;
-  final DateTime updatedAt;
-  const Warehouse({
-    required this.id,
-    required this.warehouseCode,
-    required this.warehouseName,
-    this.address,
-    this.city,
-    this.state,
-    this.stateCode,
-    this.country,
-    this.contactPerson,
-    this.mobile,
-    this.email,
-    required this.isActive,
-    required this.createdAt,
-    required this.updatedAt,
-  });
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
-    map['warehouse_code'] = Variable<String>(warehouseCode);
-    map['warehouse_name'] = Variable<String>(warehouseName);
-    if (!nullToAbsent || address != null) {
-      map['address'] = Variable<String>(address);
-    }
-    if (!nullToAbsent || city != null) {
-      map['city'] = Variable<String>(city);
-    }
-    if (!nullToAbsent || state != null) {
-      map['state'] = Variable<String>(state);
-    }
-    if (!nullToAbsent || stateCode != null) {
-      map['state_code'] = Variable<String>(stateCode);
-    }
-    if (!nullToAbsent || country != null) {
-      map['country'] = Variable<String>(country);
-    }
-    if (!nullToAbsent || contactPerson != null) {
-      map['contact_person'] = Variable<String>(contactPerson);
-    }
-    if (!nullToAbsent || mobile != null) {
-      map['mobile'] = Variable<String>(mobile);
-    }
-    if (!nullToAbsent || email != null) {
-      map['email'] = Variable<String>(email);
-    }
-    map['is_active'] = Variable<bool>(isActive);
-    map['created_at'] = Variable<DateTime>(createdAt);
-    map['updated_at'] = Variable<DateTime>(updatedAt);
-    return map;
-  }
-
-  WarehousesCompanion toCompanion(bool nullToAbsent) {
-    return WarehousesCompanion(
-      id: Value(id),
-      warehouseCode: Value(warehouseCode),
-      warehouseName: Value(warehouseName),
-      address: address == null && nullToAbsent
-          ? const Value.absent()
-          : Value(address),
-      city: city == null && nullToAbsent ? const Value.absent() : Value(city),
-      state: state == null && nullToAbsent
-          ? const Value.absent()
-          : Value(state),
-      stateCode: stateCode == null && nullToAbsent
-          ? const Value.absent()
-          : Value(stateCode),
-      country: country == null && nullToAbsent
-          ? const Value.absent()
-          : Value(country),
-      contactPerson: contactPerson == null && nullToAbsent
-          ? const Value.absent()
-          : Value(contactPerson),
-      mobile: mobile == null && nullToAbsent
-          ? const Value.absent()
-          : Value(mobile),
-      email: email == null && nullToAbsent
-          ? const Value.absent()
-          : Value(email),
-      isActive: Value(isActive),
-      createdAt: Value(createdAt),
-      updatedAt: Value(updatedAt),
-    );
-  }
-
-  factory Warehouse.fromJson(
-    Map<String, dynamic> json, {
-    ValueSerializer? serializer,
-  }) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return Warehouse(
-      id: serializer.fromJson<int>(json['id']),
-      warehouseCode: serializer.fromJson<String>(json['warehouseCode']),
-      warehouseName: serializer.fromJson<String>(json['warehouseName']),
-      address: serializer.fromJson<String?>(json['address']),
-      city: serializer.fromJson<String?>(json['city']),
-      state: serializer.fromJson<String?>(json['state']),
-      stateCode: serializer.fromJson<String?>(json['stateCode']),
-      country: serializer.fromJson<String?>(json['country']),
-      contactPerson: serializer.fromJson<String?>(json['contactPerson']),
-      mobile: serializer.fromJson<String?>(json['mobile']),
-      email: serializer.fromJson<String?>(json['email']),
-      isActive: serializer.fromJson<bool>(json['isActive']),
-      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
-      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
-    );
-  }
-  @override
-  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
-      'warehouseCode': serializer.toJson<String>(warehouseCode),
-      'warehouseName': serializer.toJson<String>(warehouseName),
-      'address': serializer.toJson<String?>(address),
-      'city': serializer.toJson<String?>(city),
-      'state': serializer.toJson<String?>(state),
-      'stateCode': serializer.toJson<String?>(stateCode),
-      'country': serializer.toJson<String?>(country),
-      'contactPerson': serializer.toJson<String?>(contactPerson),
-      'mobile': serializer.toJson<String?>(mobile),
-      'email': serializer.toJson<String?>(email),
-      'isActive': serializer.toJson<bool>(isActive),
-      'createdAt': serializer.toJson<DateTime>(createdAt),
-      'updatedAt': serializer.toJson<DateTime>(updatedAt),
-    };
-  }
-
-  Warehouse copyWith({
-    int? id,
-    String? warehouseCode,
-    String? warehouseName,
-    Value<String?> address = const Value.absent(),
-    Value<String?> city = const Value.absent(),
-    Value<String?> state = const Value.absent(),
-    Value<String?> stateCode = const Value.absent(),
-    Value<String?> country = const Value.absent(),
-    Value<String?> contactPerson = const Value.absent(),
-    Value<String?> mobile = const Value.absent(),
-    Value<String?> email = const Value.absent(),
-    bool? isActive,
-    DateTime? createdAt,
-    DateTime? updatedAt,
-  }) => Warehouse(
-    id: id ?? this.id,
-    warehouseCode: warehouseCode ?? this.warehouseCode,
-    warehouseName: warehouseName ?? this.warehouseName,
-    address: address.present ? address.value : this.address,
-    city: city.present ? city.value : this.city,
-    state: state.present ? state.value : this.state,
-    stateCode: stateCode.present ? stateCode.value : this.stateCode,
-    country: country.present ? country.value : this.country,
-    contactPerson: contactPerson.present
-        ? contactPerson.value
-        : this.contactPerson,
-    mobile: mobile.present ? mobile.value : this.mobile,
-    email: email.present ? email.value : this.email,
-    isActive: isActive ?? this.isActive,
-    createdAt: createdAt ?? this.createdAt,
-    updatedAt: updatedAt ?? this.updatedAt,
-  );
-  Warehouse copyWithCompanion(WarehousesCompanion data) {
-    return Warehouse(
-      id: data.id.present ? data.id.value : this.id,
-      warehouseCode: data.warehouseCode.present
-          ? data.warehouseCode.value
-          : this.warehouseCode,
-      warehouseName: data.warehouseName.present
-          ? data.warehouseName.value
-          : this.warehouseName,
-      address: data.address.present ? data.address.value : this.address,
-      city: data.city.present ? data.city.value : this.city,
-      state: data.state.present ? data.state.value : this.state,
-      stateCode: data.stateCode.present ? data.stateCode.value : this.stateCode,
-      country: data.country.present ? data.country.value : this.country,
-      contactPerson: data.contactPerson.present
-          ? data.contactPerson.value
-          : this.contactPerson,
-      mobile: data.mobile.present ? data.mobile.value : this.mobile,
-      email: data.email.present ? data.email.value : this.email,
-      isActive: data.isActive.present ? data.isActive.value : this.isActive,
-      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
-      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
-    );
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('Warehouse(')
-          ..write('id: $id, ')
-          ..write('warehouseCode: $warehouseCode, ')
-          ..write('warehouseName: $warehouseName, ')
-          ..write('address: $address, ')
-          ..write('city: $city, ')
-          ..write('state: $state, ')
-          ..write('stateCode: $stateCode, ')
-          ..write('country: $country, ')
-          ..write('contactPerson: $contactPerson, ')
-          ..write('mobile: $mobile, ')
-          ..write('email: $email, ')
-          ..write('isActive: $isActive, ')
-          ..write('createdAt: $createdAt, ')
-          ..write('updatedAt: $updatedAt')
-          ..write(')'))
-        .toString();
-  }
-
-  @override
-  int get hashCode => Object.hash(
-    id,
-    warehouseCode,
-    warehouseName,
-    address,
-    city,
-    state,
-    stateCode,
-    country,
-    contactPerson,
-    mobile,
-    email,
-    isActive,
-    createdAt,
-    updatedAt,
-  );
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is Warehouse &&
-          other.id == this.id &&
-          other.warehouseCode == this.warehouseCode &&
-          other.warehouseName == this.warehouseName &&
-          other.address == this.address &&
-          other.city == this.city &&
-          other.state == this.state &&
-          other.stateCode == this.stateCode &&
-          other.country == this.country &&
-          other.contactPerson == this.contactPerson &&
-          other.mobile == this.mobile &&
-          other.email == this.email &&
-          other.isActive == this.isActive &&
-          other.createdAt == this.createdAt &&
-          other.updatedAt == this.updatedAt);
-}
-
-class WarehousesCompanion extends UpdateCompanion<Warehouse> {
-  final Value<int> id;
-  final Value<String> warehouseCode;
-  final Value<String> warehouseName;
-  final Value<String?> address;
-  final Value<String?> city;
-  final Value<String?> state;
-  final Value<String?> stateCode;
-  final Value<String?> country;
-  final Value<String?> contactPerson;
-  final Value<String?> mobile;
-  final Value<String?> email;
-  final Value<bool> isActive;
-  final Value<DateTime> createdAt;
-  final Value<DateTime> updatedAt;
-  const WarehousesCompanion({
-    this.id = const Value.absent(),
-    this.warehouseCode = const Value.absent(),
-    this.warehouseName = const Value.absent(),
-    this.address = const Value.absent(),
-    this.city = const Value.absent(),
-    this.state = const Value.absent(),
-    this.stateCode = const Value.absent(),
-    this.country = const Value.absent(),
-    this.contactPerson = const Value.absent(),
-    this.mobile = const Value.absent(),
-    this.email = const Value.absent(),
-    this.isActive = const Value.absent(),
-    this.createdAt = const Value.absent(),
-    this.updatedAt = const Value.absent(),
-  });
-  WarehousesCompanion.insert({
-    this.id = const Value.absent(),
-    required String warehouseCode,
-    required String warehouseName,
-    this.address = const Value.absent(),
-    this.city = const Value.absent(),
-    this.state = const Value.absent(),
-    this.stateCode = const Value.absent(),
-    this.country = const Value.absent(),
-    this.contactPerson = const Value.absent(),
-    this.mobile = const Value.absent(),
-    this.email = const Value.absent(),
-    this.isActive = const Value.absent(),
-    this.createdAt = const Value.absent(),
-    this.updatedAt = const Value.absent(),
-  }) : warehouseCode = Value(warehouseCode),
-       warehouseName = Value(warehouseName);
-  static Insertable<Warehouse> custom({
-    Expression<int>? id,
-    Expression<String>? warehouseCode,
-    Expression<String>? warehouseName,
-    Expression<String>? address,
-    Expression<String>? city,
-    Expression<String>? state,
-    Expression<String>? stateCode,
-    Expression<String>? country,
-    Expression<String>? contactPerson,
-    Expression<String>? mobile,
-    Expression<String>? email,
-    Expression<bool>? isActive,
-    Expression<DateTime>? createdAt,
-    Expression<DateTime>? updatedAt,
-  }) {
-    return RawValuesInsertable({
-      if (id != null) 'id': id,
-      if (warehouseCode != null) 'warehouse_code': warehouseCode,
-      if (warehouseName != null) 'warehouse_name': warehouseName,
-      if (address != null) 'address': address,
-      if (city != null) 'city': city,
-      if (state != null) 'state': state,
-      if (stateCode != null) 'state_code': stateCode,
-      if (country != null) 'country': country,
-      if (contactPerson != null) 'contact_person': contactPerson,
-      if (mobile != null) 'mobile': mobile,
-      if (email != null) 'email': email,
-      if (isActive != null) 'is_active': isActive,
-      if (createdAt != null) 'created_at': createdAt,
-      if (updatedAt != null) 'updated_at': updatedAt,
-    });
-  }
-
-  WarehousesCompanion copyWith({
-    Value<int>? id,
-    Value<String>? warehouseCode,
-    Value<String>? warehouseName,
-    Value<String?>? address,
-    Value<String?>? city,
-    Value<String?>? state,
-    Value<String?>? stateCode,
-    Value<String?>? country,
-    Value<String?>? contactPerson,
-    Value<String?>? mobile,
-    Value<String?>? email,
-    Value<bool>? isActive,
-    Value<DateTime>? createdAt,
-    Value<DateTime>? updatedAt,
-  }) {
-    return WarehousesCompanion(
-      id: id ?? this.id,
-      warehouseCode: warehouseCode ?? this.warehouseCode,
-      warehouseName: warehouseName ?? this.warehouseName,
-      address: address ?? this.address,
-      city: city ?? this.city,
-      state: state ?? this.state,
-      stateCode: stateCode ?? this.stateCode,
-      country: country ?? this.country,
-      contactPerson: contactPerson ?? this.contactPerson,
-      mobile: mobile ?? this.mobile,
-      email: email ?? this.email,
-      isActive: isActive ?? this.isActive,
-      createdAt: createdAt ?? this.createdAt,
-      updatedAt: updatedAt ?? this.updatedAt,
-    );
-  }
-
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    if (id.present) {
-      map['id'] = Variable<int>(id.value);
-    }
-    if (warehouseCode.present) {
-      map['warehouse_code'] = Variable<String>(warehouseCode.value);
-    }
-    if (warehouseName.present) {
-      map['warehouse_name'] = Variable<String>(warehouseName.value);
-    }
-    if (address.present) {
-      map['address'] = Variable<String>(address.value);
-    }
-    if (city.present) {
-      map['city'] = Variable<String>(city.value);
-    }
-    if (state.present) {
-      map['state'] = Variable<String>(state.value);
-    }
-    if (stateCode.present) {
-      map['state_code'] = Variable<String>(stateCode.value);
-    }
-    if (country.present) {
-      map['country'] = Variable<String>(country.value);
-    }
-    if (contactPerson.present) {
-      map['contact_person'] = Variable<String>(contactPerson.value);
-    }
-    if (mobile.present) {
-      map['mobile'] = Variable<String>(mobile.value);
-    }
-    if (email.present) {
-      map['email'] = Variable<String>(email.value);
-    }
-    if (isActive.present) {
-      map['is_active'] = Variable<bool>(isActive.value);
-    }
-    if (createdAt.present) {
-      map['created_at'] = Variable<DateTime>(createdAt.value);
-    }
-    if (updatedAt.present) {
-      map['updated_at'] = Variable<DateTime>(updatedAt.value);
-    }
-    return map;
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('WarehousesCompanion(')
-          ..write('id: $id, ')
-          ..write('warehouseCode: $warehouseCode, ')
-          ..write('warehouseName: $warehouseName, ')
-          ..write('address: $address, ')
-          ..write('city: $city, ')
-          ..write('state: $state, ')
-          ..write('stateCode: $stateCode, ')
-          ..write('country: $country, ')
-          ..write('contactPerson: $contactPerson, ')
-          ..write('mobile: $mobile, ')
-          ..write('email: $email, ')
-          ..write('isActive: $isActive, ')
-          ..write('createdAt: $createdAt, ')
-          ..write('updatedAt: $updatedAt')
-          ..write(')'))
-        .toString();
-  }
-}
-
 class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
   @override
   final GeneratedDatabase attachedDatabase;
@@ -15377,20 +14574,6 @@ class $InventoryTransactionsTable extends InventoryTransactions
       'REFERENCES product_variant (id)',
     ),
   );
-  static const VerificationMeta _warehouseIdMeta = const VerificationMeta(
-    'warehouseId',
-  );
-  @override
-  late final GeneratedColumn<int> warehouseId = GeneratedColumn<int>(
-    'warehouse_id',
-    aliasedName,
-    true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES warehouse (id)',
-    ),
-  );
   static const VerificationMeta _transactionTypeMeta = const VerificationMeta(
     'transactionType',
   );
@@ -15476,7 +14659,6 @@ class $InventoryTransactionsTable extends InventoryTransactions
     id,
     productId,
     variantId,
-    warehouseId,
     transactionType,
     quantity,
     purchaseId,
@@ -15512,15 +14694,6 @@ class $InventoryTransactionsTable extends InventoryTransactions
       context.handle(
         _variantIdMeta,
         variantId.isAcceptableOrUnknown(data['variant_id']!, _variantIdMeta),
-      );
-    }
-    if (data.containsKey('warehouse_id')) {
-      context.handle(
-        _warehouseIdMeta,
-        warehouseId.isAcceptableOrUnknown(
-          data['warehouse_id']!,
-          _warehouseIdMeta,
-        ),
       );
     }
     if (data.containsKey('transaction_type')) {
@@ -15601,10 +14774,6 @@ class $InventoryTransactionsTable extends InventoryTransactions
         DriftSqlType.int,
         data['${effectivePrefix}variant_id'],
       ),
-      warehouseId: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}warehouse_id'],
-      ),
       transactionType: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}transaction_type'],
@@ -15647,7 +14816,6 @@ class InventoryTransaction extends DataClass
   final int id;
   final int productId;
   final int? variantId;
-  final int? warehouseId;
 
   /// PURCHASE, PURCHASE_RETURN, MANUAL_ADJUSTMENT, SALE.
   final String transactionType;
@@ -15665,7 +14833,6 @@ class InventoryTransaction extends DataClass
     required this.id,
     required this.productId,
     this.variantId,
-    this.warehouseId,
     required this.transactionType,
     required this.quantity,
     this.purchaseId,
@@ -15681,9 +14848,6 @@ class InventoryTransaction extends DataClass
     map['product_id'] = Variable<int>(productId);
     if (!nullToAbsent || variantId != null) {
       map['variant_id'] = Variable<int>(variantId);
-    }
-    if (!nullToAbsent || warehouseId != null) {
-      map['warehouse_id'] = Variable<int>(warehouseId);
     }
     map['transaction_type'] = Variable<String>(transactionType);
     map['quantity'] = Variable<int>(quantity);
@@ -15708,9 +14872,6 @@ class InventoryTransaction extends DataClass
       variantId: variantId == null && nullToAbsent
           ? const Value.absent()
           : Value(variantId),
-      warehouseId: warehouseId == null && nullToAbsent
-          ? const Value.absent()
-          : Value(warehouseId),
       transactionType: Value(transactionType),
       quantity: Value(quantity),
       purchaseId: purchaseId == null && nullToAbsent
@@ -15736,7 +14897,6 @@ class InventoryTransaction extends DataClass
       id: serializer.fromJson<int>(json['id']),
       productId: serializer.fromJson<int>(json['productId']),
       variantId: serializer.fromJson<int?>(json['variantId']),
-      warehouseId: serializer.fromJson<int?>(json['warehouseId']),
       transactionType: serializer.fromJson<String>(json['transactionType']),
       quantity: serializer.fromJson<int>(json['quantity']),
       purchaseId: serializer.fromJson<int?>(json['purchaseId']),
@@ -15753,7 +14913,6 @@ class InventoryTransaction extends DataClass
       'id': serializer.toJson<int>(id),
       'productId': serializer.toJson<int>(productId),
       'variantId': serializer.toJson<int?>(variantId),
-      'warehouseId': serializer.toJson<int?>(warehouseId),
       'transactionType': serializer.toJson<String>(transactionType),
       'quantity': serializer.toJson<int>(quantity),
       'purchaseId': serializer.toJson<int?>(purchaseId),
@@ -15768,7 +14927,6 @@ class InventoryTransaction extends DataClass
     int? id,
     int? productId,
     Value<int?> variantId = const Value.absent(),
-    Value<int?> warehouseId = const Value.absent(),
     String? transactionType,
     int? quantity,
     Value<int?> purchaseId = const Value.absent(),
@@ -15780,7 +14938,6 @@ class InventoryTransaction extends DataClass
     id: id ?? this.id,
     productId: productId ?? this.productId,
     variantId: variantId.present ? variantId.value : this.variantId,
-    warehouseId: warehouseId.present ? warehouseId.value : this.warehouseId,
     transactionType: transactionType ?? this.transactionType,
     quantity: quantity ?? this.quantity,
     purchaseId: purchaseId.present ? purchaseId.value : this.purchaseId,
@@ -15796,9 +14953,6 @@ class InventoryTransaction extends DataClass
       id: data.id.present ? data.id.value : this.id,
       productId: data.productId.present ? data.productId.value : this.productId,
       variantId: data.variantId.present ? data.variantId.value : this.variantId,
-      warehouseId: data.warehouseId.present
-          ? data.warehouseId.value
-          : this.warehouseId,
       transactionType: data.transactionType.present
           ? data.transactionType.value
           : this.transactionType,
@@ -15823,7 +14977,6 @@ class InventoryTransaction extends DataClass
           ..write('id: $id, ')
           ..write('productId: $productId, ')
           ..write('variantId: $variantId, ')
-          ..write('warehouseId: $warehouseId, ')
           ..write('transactionType: $transactionType, ')
           ..write('quantity: $quantity, ')
           ..write('purchaseId: $purchaseId, ')
@@ -15840,7 +14993,6 @@ class InventoryTransaction extends DataClass
     id,
     productId,
     variantId,
-    warehouseId,
     transactionType,
     quantity,
     purchaseId,
@@ -15856,7 +15008,6 @@ class InventoryTransaction extends DataClass
           other.id == this.id &&
           other.productId == this.productId &&
           other.variantId == this.variantId &&
-          other.warehouseId == this.warehouseId &&
           other.transactionType == this.transactionType &&
           other.quantity == this.quantity &&
           other.purchaseId == this.purchaseId &&
@@ -15871,7 +15022,6 @@ class InventoryTransactionsCompanion
   final Value<int> id;
   final Value<int> productId;
   final Value<int?> variantId;
-  final Value<int?> warehouseId;
   final Value<String> transactionType;
   final Value<int> quantity;
   final Value<int?> purchaseId;
@@ -15883,7 +15033,6 @@ class InventoryTransactionsCompanion
     this.id = const Value.absent(),
     this.productId = const Value.absent(),
     this.variantId = const Value.absent(),
-    this.warehouseId = const Value.absent(),
     this.transactionType = const Value.absent(),
     this.quantity = const Value.absent(),
     this.purchaseId = const Value.absent(),
@@ -15896,7 +15045,6 @@ class InventoryTransactionsCompanion
     this.id = const Value.absent(),
     required int productId,
     this.variantId = const Value.absent(),
-    this.warehouseId = const Value.absent(),
     required String transactionType,
     required int quantity,
     this.purchaseId = const Value.absent(),
@@ -15912,7 +15060,6 @@ class InventoryTransactionsCompanion
     Expression<int>? id,
     Expression<int>? productId,
     Expression<int>? variantId,
-    Expression<int>? warehouseId,
     Expression<String>? transactionType,
     Expression<int>? quantity,
     Expression<int>? purchaseId,
@@ -15925,7 +15072,6 @@ class InventoryTransactionsCompanion
       if (id != null) 'id': id,
       if (productId != null) 'product_id': productId,
       if (variantId != null) 'variant_id': variantId,
-      if (warehouseId != null) 'warehouse_id': warehouseId,
       if (transactionType != null) 'transaction_type': transactionType,
       if (quantity != null) 'quantity': quantity,
       if (purchaseId != null) 'purchase_id': purchaseId,
@@ -15940,7 +15086,6 @@ class InventoryTransactionsCompanion
     Value<int>? id,
     Value<int>? productId,
     Value<int?>? variantId,
-    Value<int?>? warehouseId,
     Value<String>? transactionType,
     Value<int>? quantity,
     Value<int?>? purchaseId,
@@ -15953,7 +15098,6 @@ class InventoryTransactionsCompanion
       id: id ?? this.id,
       productId: productId ?? this.productId,
       variantId: variantId ?? this.variantId,
-      warehouseId: warehouseId ?? this.warehouseId,
       transactionType: transactionType ?? this.transactionType,
       quantity: quantity ?? this.quantity,
       purchaseId: purchaseId ?? this.purchaseId,
@@ -15975,9 +15119,6 @@ class InventoryTransactionsCompanion
     }
     if (variantId.present) {
       map['variant_id'] = Variable<int>(variantId.value);
-    }
-    if (warehouseId.present) {
-      map['warehouse_id'] = Variable<int>(warehouseId.value);
     }
     if (transactionType.present) {
       map['transaction_type'] = Variable<String>(transactionType.value);
@@ -16009,7 +15150,6 @@ class InventoryTransactionsCompanion
           ..write('id: $id, ')
           ..write('productId: $productId, ')
           ..write('variantId: $variantId, ')
-          ..write('warehouseId: $warehouseId, ')
           ..write('transactionType: $transactionType, ')
           ..write('quantity: $quantity, ')
           ..write('purchaseId: $purchaseId, ')
@@ -16069,20 +15209,6 @@ class $CurrentStocksTable extends CurrentStocks
       'REFERENCES product_variant (id)',
     ),
   );
-  static const VerificationMeta _warehouseIdMeta = const VerificationMeta(
-    'warehouseId',
-  );
-  @override
-  late final GeneratedColumn<int> warehouseId = GeneratedColumn<int>(
-    'warehouse_id',
-    aliasedName,
-    true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES warehouse (id)',
-    ),
-  );
   static const VerificationMeta _quantityMeta = const VerificationMeta(
     'quantity',
   );
@@ -16112,7 +15238,6 @@ class $CurrentStocksTable extends CurrentStocks
     id,
     productId,
     variantId,
-    warehouseId,
     quantity,
     updatedAt,
   ];
@@ -16143,15 +15268,6 @@ class $CurrentStocksTable extends CurrentStocks
       context.handle(
         _variantIdMeta,
         variantId.isAcceptableOrUnknown(data['variant_id']!, _variantIdMeta),
-      );
-    }
-    if (data.containsKey('warehouse_id')) {
-      context.handle(
-        _warehouseIdMeta,
-        warehouseId.isAcceptableOrUnknown(
-          data['warehouse_id']!,
-          _warehouseIdMeta,
-        ),
       );
     }
     if (data.containsKey('quantity')) {
@@ -16187,10 +15303,6 @@ class $CurrentStocksTable extends CurrentStocks
         DriftSqlType.int,
         data['${effectivePrefix}variant_id'],
       ),
-      warehouseId: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}warehouse_id'],
-      ),
       quantity: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}quantity'],
@@ -16212,7 +15324,6 @@ class CurrentStock extends DataClass implements Insertable<CurrentStock> {
   final int id;
   final int productId;
   final int? variantId;
-  final int? warehouseId;
 
   /// Current quantity on hand.
   final int quantity;
@@ -16221,7 +15332,6 @@ class CurrentStock extends DataClass implements Insertable<CurrentStock> {
     required this.id,
     required this.productId,
     this.variantId,
-    this.warehouseId,
     required this.quantity,
     required this.updatedAt,
   });
@@ -16232,9 +15342,6 @@ class CurrentStock extends DataClass implements Insertable<CurrentStock> {
     map['product_id'] = Variable<int>(productId);
     if (!nullToAbsent || variantId != null) {
       map['variant_id'] = Variable<int>(variantId);
-    }
-    if (!nullToAbsent || warehouseId != null) {
-      map['warehouse_id'] = Variable<int>(warehouseId);
     }
     map['quantity'] = Variable<int>(quantity);
     map['updated_at'] = Variable<DateTime>(updatedAt);
@@ -16248,9 +15355,6 @@ class CurrentStock extends DataClass implements Insertable<CurrentStock> {
       variantId: variantId == null && nullToAbsent
           ? const Value.absent()
           : Value(variantId),
-      warehouseId: warehouseId == null && nullToAbsent
-          ? const Value.absent()
-          : Value(warehouseId),
       quantity: Value(quantity),
       updatedAt: Value(updatedAt),
     );
@@ -16265,7 +15369,6 @@ class CurrentStock extends DataClass implements Insertable<CurrentStock> {
       id: serializer.fromJson<int>(json['id']),
       productId: serializer.fromJson<int>(json['productId']),
       variantId: serializer.fromJson<int?>(json['variantId']),
-      warehouseId: serializer.fromJson<int?>(json['warehouseId']),
       quantity: serializer.fromJson<int>(json['quantity']),
       updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
     );
@@ -16277,7 +15380,6 @@ class CurrentStock extends DataClass implements Insertable<CurrentStock> {
       'id': serializer.toJson<int>(id),
       'productId': serializer.toJson<int>(productId),
       'variantId': serializer.toJson<int?>(variantId),
-      'warehouseId': serializer.toJson<int?>(warehouseId),
       'quantity': serializer.toJson<int>(quantity),
       'updatedAt': serializer.toJson<DateTime>(updatedAt),
     };
@@ -16287,14 +15389,12 @@ class CurrentStock extends DataClass implements Insertable<CurrentStock> {
     int? id,
     int? productId,
     Value<int?> variantId = const Value.absent(),
-    Value<int?> warehouseId = const Value.absent(),
     int? quantity,
     DateTime? updatedAt,
   }) => CurrentStock(
     id: id ?? this.id,
     productId: productId ?? this.productId,
     variantId: variantId.present ? variantId.value : this.variantId,
-    warehouseId: warehouseId.present ? warehouseId.value : this.warehouseId,
     quantity: quantity ?? this.quantity,
     updatedAt: updatedAt ?? this.updatedAt,
   );
@@ -16303,9 +15403,6 @@ class CurrentStock extends DataClass implements Insertable<CurrentStock> {
       id: data.id.present ? data.id.value : this.id,
       productId: data.productId.present ? data.productId.value : this.productId,
       variantId: data.variantId.present ? data.variantId.value : this.variantId,
-      warehouseId: data.warehouseId.present
-          ? data.warehouseId.value
-          : this.warehouseId,
       quantity: data.quantity.present ? data.quantity.value : this.quantity,
       updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
     );
@@ -16317,7 +15414,6 @@ class CurrentStock extends DataClass implements Insertable<CurrentStock> {
           ..write('id: $id, ')
           ..write('productId: $productId, ')
           ..write('variantId: $variantId, ')
-          ..write('warehouseId: $warehouseId, ')
           ..write('quantity: $quantity, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
@@ -16326,7 +15422,7 @@ class CurrentStock extends DataClass implements Insertable<CurrentStock> {
 
   @override
   int get hashCode =>
-      Object.hash(id, productId, variantId, warehouseId, quantity, updatedAt);
+      Object.hash(id, productId, variantId, quantity, updatedAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
@@ -16334,7 +15430,6 @@ class CurrentStock extends DataClass implements Insertable<CurrentStock> {
           other.id == this.id &&
           other.productId == this.productId &&
           other.variantId == this.variantId &&
-          other.warehouseId == this.warehouseId &&
           other.quantity == this.quantity &&
           other.updatedAt == this.updatedAt);
 }
@@ -16343,14 +15438,12 @@ class CurrentStocksCompanion extends UpdateCompanion<CurrentStock> {
   final Value<int> id;
   final Value<int> productId;
   final Value<int?> variantId;
-  final Value<int?> warehouseId;
   final Value<int> quantity;
   final Value<DateTime> updatedAt;
   const CurrentStocksCompanion({
     this.id = const Value.absent(),
     this.productId = const Value.absent(),
     this.variantId = const Value.absent(),
-    this.warehouseId = const Value.absent(),
     this.quantity = const Value.absent(),
     this.updatedAt = const Value.absent(),
   });
@@ -16358,7 +15451,6 @@ class CurrentStocksCompanion extends UpdateCompanion<CurrentStock> {
     this.id = const Value.absent(),
     required int productId,
     this.variantId = const Value.absent(),
-    this.warehouseId = const Value.absent(),
     this.quantity = const Value.absent(),
     this.updatedAt = const Value.absent(),
   }) : productId = Value(productId);
@@ -16366,7 +15458,6 @@ class CurrentStocksCompanion extends UpdateCompanion<CurrentStock> {
     Expression<int>? id,
     Expression<int>? productId,
     Expression<int>? variantId,
-    Expression<int>? warehouseId,
     Expression<int>? quantity,
     Expression<DateTime>? updatedAt,
   }) {
@@ -16374,7 +15465,6 @@ class CurrentStocksCompanion extends UpdateCompanion<CurrentStock> {
       if (id != null) 'id': id,
       if (productId != null) 'product_id': productId,
       if (variantId != null) 'variant_id': variantId,
-      if (warehouseId != null) 'warehouse_id': warehouseId,
       if (quantity != null) 'quantity': quantity,
       if (updatedAt != null) 'updated_at': updatedAt,
     });
@@ -16384,7 +15474,6 @@ class CurrentStocksCompanion extends UpdateCompanion<CurrentStock> {
     Value<int>? id,
     Value<int>? productId,
     Value<int?>? variantId,
-    Value<int?>? warehouseId,
     Value<int>? quantity,
     Value<DateTime>? updatedAt,
   }) {
@@ -16392,7 +15481,6 @@ class CurrentStocksCompanion extends UpdateCompanion<CurrentStock> {
       id: id ?? this.id,
       productId: productId ?? this.productId,
       variantId: variantId ?? this.variantId,
-      warehouseId: warehouseId ?? this.warehouseId,
       quantity: quantity ?? this.quantity,
       updatedAt: updatedAt ?? this.updatedAt,
     );
@@ -16410,9 +15498,6 @@ class CurrentStocksCompanion extends UpdateCompanion<CurrentStock> {
     if (variantId.present) {
       map['variant_id'] = Variable<int>(variantId.value);
     }
-    if (warehouseId.present) {
-      map['warehouse_id'] = Variable<int>(warehouseId.value);
-    }
     if (quantity.present) {
       map['quantity'] = Variable<int>(quantity.value);
     }
@@ -16428,7 +15513,6 @@ class CurrentStocksCompanion extends UpdateCompanion<CurrentStock> {
           ..write('id: $id, ')
           ..write('productId: $productId, ')
           ..write('variantId: $variantId, ')
-          ..write('warehouseId: $warehouseId, ')
           ..write('quantity: $quantity, ')
           ..write('updatedAt: $updatedAt')
           ..write(')'))
@@ -16453,7 +15537,6 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   );
   late final $CustomersTable customers = $CustomersTable(this);
   late final $SuppliersTable suppliers = $SuppliersTable(this);
-  late final $WarehousesTable warehouses = $WarehousesTable(this);
   late final $ProductsTable products = $ProductsTable(this);
   late final $ProductVariantsTable productVariants = $ProductVariantsTable(
     this,
@@ -16602,7 +15685,6 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     taxCategoryRates,
     customers,
     suppliers,
-    warehouses,
     products,
     productVariants,
     productUoms,
@@ -22882,588 +21964,6 @@ typedef $$SuppliersTableProcessedTableManager =
       Supplier,
       PrefetchHooks Function({bool purchasesRefs})
     >;
-typedef $$WarehousesTableCreateCompanionBuilder =
-    WarehousesCompanion Function({
-      Value<int> id,
-      required String warehouseCode,
-      required String warehouseName,
-      Value<String?> address,
-      Value<String?> city,
-      Value<String?> state,
-      Value<String?> stateCode,
-      Value<String?> country,
-      Value<String?> contactPerson,
-      Value<String?> mobile,
-      Value<String?> email,
-      Value<bool> isActive,
-      Value<DateTime> createdAt,
-      Value<DateTime> updatedAt,
-    });
-typedef $$WarehousesTableUpdateCompanionBuilder =
-    WarehousesCompanion Function({
-      Value<int> id,
-      Value<String> warehouseCode,
-      Value<String> warehouseName,
-      Value<String?> address,
-      Value<String?> city,
-      Value<String?> state,
-      Value<String?> stateCode,
-      Value<String?> country,
-      Value<String?> contactPerson,
-      Value<String?> mobile,
-      Value<String?> email,
-      Value<bool> isActive,
-      Value<DateTime> createdAt,
-      Value<DateTime> updatedAt,
-    });
-
-final class $$WarehousesTableReferences
-    extends BaseReferences<_$AppDatabase, $WarehousesTable, Warehouse> {
-  $$WarehousesTableReferences(super.$_db, super.$_table, super.$_typedResult);
-
-  static MultiTypedResultKey<
-    $InventoryTransactionsTable,
-    List<InventoryTransaction>
-  >
-  _inventoryTransactionsRefsTable(_$AppDatabase db) =>
-      MultiTypedResultKey.fromTable(
-        db.inventoryTransactions,
-        aliasName: 'warehouse__id__inventory_transaction__warehouse_id',
-      );
-
-  $$InventoryTransactionsTableProcessedTableManager
-  get inventoryTransactionsRefs {
-    final manager = $$InventoryTransactionsTableTableManager(
-      $_db,
-      $_db.inventoryTransactions,
-    ).filter((f) => f.warehouseId.id.sqlEquals($_itemColumn<int>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(
-      _inventoryTransactionsRefsTable($_db),
-    );
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
-
-  static MultiTypedResultKey<$CurrentStocksTable, List<CurrentStock>>
-  _currentStocksRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
-    db.currentStocks,
-    aliasName: 'warehouse__id__current_stock__warehouse_id',
-  );
-
-  $$CurrentStocksTableProcessedTableManager get currentStocksRefs {
-    final manager = $$CurrentStocksTableTableManager(
-      $_db,
-      $_db.currentStocks,
-    ).filter((f) => f.warehouseId.id.sqlEquals($_itemColumn<int>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(_currentStocksRefsTable($_db));
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
-}
-
-class $$WarehousesTableFilterComposer
-    extends Composer<_$AppDatabase, $WarehousesTable> {
-  $$WarehousesTableFilterComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  ColumnFilters<int> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get warehouseCode => $composableBuilder(
-    column: $table.warehouseCode,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get warehouseName => $composableBuilder(
-    column: $table.warehouseName,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get address => $composableBuilder(
-    column: $table.address,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get city => $composableBuilder(
-    column: $table.city,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get state => $composableBuilder(
-    column: $table.state,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get stateCode => $composableBuilder(
-    column: $table.stateCode,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get country => $composableBuilder(
-    column: $table.country,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get contactPerson => $composableBuilder(
-    column: $table.contactPerson,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get mobile => $composableBuilder(
-    column: $table.mobile,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get email => $composableBuilder(
-    column: $table.email,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<bool> get isActive => $composableBuilder(
-    column: $table.isActive,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<DateTime> get createdAt => $composableBuilder(
-    column: $table.createdAt,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
-    column: $table.updatedAt,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  Expression<bool> inventoryTransactionsRefs(
-    Expression<bool> Function($$InventoryTransactionsTableFilterComposer f) f,
-  ) {
-    final $$InventoryTransactionsTableFilterComposer composer =
-        $composerBuilder(
-          composer: this,
-          getCurrentColumn: (t) => t.id,
-          referencedTable: $db.inventoryTransactions,
-          getReferencedColumn: (t) => t.warehouseId,
-          builder:
-              (
-                joinBuilder, {
-                $addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer,
-              }) => $$InventoryTransactionsTableFilterComposer(
-                $db: $db,
-                $table: $db.inventoryTransactions,
-                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-                joinBuilder: joinBuilder,
-                $removeJoinBuilderFromRootComposer:
-                    $removeJoinBuilderFromRootComposer,
-              ),
-        );
-    return f(composer);
-  }
-
-  Expression<bool> currentStocksRefs(
-    Expression<bool> Function($$CurrentStocksTableFilterComposer f) f,
-  ) {
-    final $$CurrentStocksTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.currentStocks,
-      getReferencedColumn: (t) => t.warehouseId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$CurrentStocksTableFilterComposer(
-            $db: $db,
-            $table: $db.currentStocks,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-}
-
-class $$WarehousesTableOrderingComposer
-    extends Composer<_$AppDatabase, $WarehousesTable> {
-  $$WarehousesTableOrderingComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  ColumnOrderings<int> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get warehouseCode => $composableBuilder(
-    column: $table.warehouseCode,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get warehouseName => $composableBuilder(
-    column: $table.warehouseName,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get address => $composableBuilder(
-    column: $table.address,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get city => $composableBuilder(
-    column: $table.city,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get state => $composableBuilder(
-    column: $table.state,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get stateCode => $composableBuilder(
-    column: $table.stateCode,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get country => $composableBuilder(
-    column: $table.country,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get contactPerson => $composableBuilder(
-    column: $table.contactPerson,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get mobile => $composableBuilder(
-    column: $table.mobile,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get email => $composableBuilder(
-    column: $table.email,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<bool> get isActive => $composableBuilder(
-    column: $table.isActive,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
-    column: $table.createdAt,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
-    column: $table.updatedAt,
-    builder: (column) => ColumnOrderings(column),
-  );
-}
-
-class $$WarehousesTableAnnotationComposer
-    extends Composer<_$AppDatabase, $WarehousesTable> {
-  $$WarehousesTableAnnotationComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  GeneratedColumn<int> get id =>
-      $composableBuilder(column: $table.id, builder: (column) => column);
-
-  GeneratedColumn<String> get warehouseCode => $composableBuilder(
-    column: $table.warehouseCode,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<String> get warehouseName => $composableBuilder(
-    column: $table.warehouseName,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<String> get address =>
-      $composableBuilder(column: $table.address, builder: (column) => column);
-
-  GeneratedColumn<String> get city =>
-      $composableBuilder(column: $table.city, builder: (column) => column);
-
-  GeneratedColumn<String> get state =>
-      $composableBuilder(column: $table.state, builder: (column) => column);
-
-  GeneratedColumn<String> get stateCode =>
-      $composableBuilder(column: $table.stateCode, builder: (column) => column);
-
-  GeneratedColumn<String> get country =>
-      $composableBuilder(column: $table.country, builder: (column) => column);
-
-  GeneratedColumn<String> get contactPerson => $composableBuilder(
-    column: $table.contactPerson,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<String> get mobile =>
-      $composableBuilder(column: $table.mobile, builder: (column) => column);
-
-  GeneratedColumn<String> get email =>
-      $composableBuilder(column: $table.email, builder: (column) => column);
-
-  GeneratedColumn<bool> get isActive =>
-      $composableBuilder(column: $table.isActive, builder: (column) => column);
-
-  GeneratedColumn<DateTime> get createdAt =>
-      $composableBuilder(column: $table.createdAt, builder: (column) => column);
-
-  GeneratedColumn<DateTime> get updatedAt =>
-      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
-
-  Expression<T> inventoryTransactionsRefs<T extends Object>(
-    Expression<T> Function($$InventoryTransactionsTableAnnotationComposer a) f,
-  ) {
-    final $$InventoryTransactionsTableAnnotationComposer composer =
-        $composerBuilder(
-          composer: this,
-          getCurrentColumn: (t) => t.id,
-          referencedTable: $db.inventoryTransactions,
-          getReferencedColumn: (t) => t.warehouseId,
-          builder:
-              (
-                joinBuilder, {
-                $addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer,
-              }) => $$InventoryTransactionsTableAnnotationComposer(
-                $db: $db,
-                $table: $db.inventoryTransactions,
-                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-                joinBuilder: joinBuilder,
-                $removeJoinBuilderFromRootComposer:
-                    $removeJoinBuilderFromRootComposer,
-              ),
-        );
-    return f(composer);
-  }
-
-  Expression<T> currentStocksRefs<T extends Object>(
-    Expression<T> Function($$CurrentStocksTableAnnotationComposer a) f,
-  ) {
-    final $$CurrentStocksTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.currentStocks,
-      getReferencedColumn: (t) => t.warehouseId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$CurrentStocksTableAnnotationComposer(
-            $db: $db,
-            $table: $db.currentStocks,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
-}
-
-class $$WarehousesTableTableManager
-    extends
-        RootTableManager<
-          _$AppDatabase,
-          $WarehousesTable,
-          Warehouse,
-          $$WarehousesTableFilterComposer,
-          $$WarehousesTableOrderingComposer,
-          $$WarehousesTableAnnotationComposer,
-          $$WarehousesTableCreateCompanionBuilder,
-          $$WarehousesTableUpdateCompanionBuilder,
-          (Warehouse, $$WarehousesTableReferences),
-          Warehouse,
-          PrefetchHooks Function({
-            bool inventoryTransactionsRefs,
-            bool currentStocksRefs,
-          })
-        > {
-  $$WarehousesTableTableManager(_$AppDatabase db, $WarehousesTable table)
-    : super(
-        TableManagerState(
-          db: db,
-          table: table,
-          createFilteringComposer: () =>
-              $$WarehousesTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$WarehousesTableOrderingComposer($db: db, $table: table),
-          createComputedFieldComposer: () =>
-              $$WarehousesTableAnnotationComposer($db: db, $table: table),
-          updateCompanionCallback:
-              ({
-                Value<int> id = const Value.absent(),
-                Value<String> warehouseCode = const Value.absent(),
-                Value<String> warehouseName = const Value.absent(),
-                Value<String?> address = const Value.absent(),
-                Value<String?> city = const Value.absent(),
-                Value<String?> state = const Value.absent(),
-                Value<String?> stateCode = const Value.absent(),
-                Value<String?> country = const Value.absent(),
-                Value<String?> contactPerson = const Value.absent(),
-                Value<String?> mobile = const Value.absent(),
-                Value<String?> email = const Value.absent(),
-                Value<bool> isActive = const Value.absent(),
-                Value<DateTime> createdAt = const Value.absent(),
-                Value<DateTime> updatedAt = const Value.absent(),
-              }) => WarehousesCompanion(
-                id: id,
-                warehouseCode: warehouseCode,
-                warehouseName: warehouseName,
-                address: address,
-                city: city,
-                state: state,
-                stateCode: stateCode,
-                country: country,
-                contactPerson: contactPerson,
-                mobile: mobile,
-                email: email,
-                isActive: isActive,
-                createdAt: createdAt,
-                updatedAt: updatedAt,
-              ),
-          createCompanionCallback:
-              ({
-                Value<int> id = const Value.absent(),
-                required String warehouseCode,
-                required String warehouseName,
-                Value<String?> address = const Value.absent(),
-                Value<String?> city = const Value.absent(),
-                Value<String?> state = const Value.absent(),
-                Value<String?> stateCode = const Value.absent(),
-                Value<String?> country = const Value.absent(),
-                Value<String?> contactPerson = const Value.absent(),
-                Value<String?> mobile = const Value.absent(),
-                Value<String?> email = const Value.absent(),
-                Value<bool> isActive = const Value.absent(),
-                Value<DateTime> createdAt = const Value.absent(),
-                Value<DateTime> updatedAt = const Value.absent(),
-              }) => WarehousesCompanion.insert(
-                id: id,
-                warehouseCode: warehouseCode,
-                warehouseName: warehouseName,
-                address: address,
-                city: city,
-                state: state,
-                stateCode: stateCode,
-                country: country,
-                contactPerson: contactPerson,
-                mobile: mobile,
-                email: email,
-                isActive: isActive,
-                createdAt: createdAt,
-                updatedAt: updatedAt,
-              ),
-          withReferenceMapper: (p0) => p0
-              .map(
-                (e) => (
-                  e.readTable(table),
-                  $$WarehousesTableReferences(db, table, e),
-                ),
-              )
-              .toList(),
-          prefetchHooksCallback:
-              ({inventoryTransactionsRefs = false, currentStocksRefs = false}) {
-                return PrefetchHooks(
-                  db: db,
-                  explicitlyWatchedTables: [
-                    if (inventoryTransactionsRefs) db.inventoryTransactions,
-                    if (currentStocksRefs) db.currentStocks,
-                  ],
-                  addJoins: null,
-                  getPrefetchedDataCallback: (items) async {
-                    return [
-                      if (inventoryTransactionsRefs)
-                        await $_getPrefetchedData<
-                          Warehouse,
-                          $WarehousesTable,
-                          InventoryTransaction
-                        >(
-                          currentTable: table,
-                          referencedTable: $$WarehousesTableReferences
-                              ._inventoryTransactionsRefsTable(db),
-                          managerFromTypedResult: (p0) =>
-                              $$WarehousesTableReferences(
-                                db,
-                                table,
-                                p0,
-                              ).inventoryTransactionsRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.warehouseId == item.id,
-                              ),
-                          typedResults: items,
-                        ),
-                      if (currentStocksRefs)
-                        await $_getPrefetchedData<
-                          Warehouse,
-                          $WarehousesTable,
-                          CurrentStock
-                        >(
-                          currentTable: table,
-                          referencedTable: $$WarehousesTableReferences
-                              ._currentStocksRefsTable(db),
-                          managerFromTypedResult: (p0) =>
-                              $$WarehousesTableReferences(
-                                db,
-                                table,
-                                p0,
-                              ).currentStocksRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.warehouseId == item.id,
-                              ),
-                          typedResults: items,
-                        ),
-                    ];
-                  },
-                );
-              },
-        ),
-      );
-}
-
-typedef $$WarehousesTableProcessedTableManager =
-    ProcessedTableManager<
-      _$AppDatabase,
-      $WarehousesTable,
-      Warehouse,
-      $$WarehousesTableFilterComposer,
-      $$WarehousesTableOrderingComposer,
-      $$WarehousesTableAnnotationComposer,
-      $$WarehousesTableCreateCompanionBuilder,
-      $$WarehousesTableUpdateCompanionBuilder,
-      (Warehouse, $$WarehousesTableReferences),
-      Warehouse,
-      PrefetchHooks Function({
-        bool inventoryTransactionsRefs,
-        bool currentStocksRefs,
-      })
-    >;
 typedef $$ProductsTableCreateCompanionBuilder =
     ProductsCompanion Function({
       Value<int> id,
@@ -28152,7 +26652,6 @@ typedef $$InventoryTransactionsTableCreateCompanionBuilder =
       Value<int> id,
       required int productId,
       Value<int?> variantId,
-      Value<int?> warehouseId,
       required String transactionType,
       required int quantity,
       Value<int?> purchaseId,
@@ -28166,7 +26665,6 @@ typedef $$InventoryTransactionsTableUpdateCompanionBuilder =
       Value<int> id,
       Value<int> productId,
       Value<int?> variantId,
-      Value<int?> warehouseId,
       Value<String> transactionType,
       Value<int> quantity,
       Value<int?> purchaseId,
@@ -28218,23 +26716,6 @@ final class $$InventoryTransactionsTableReferences
       $_db.productVariants,
     ).filter((f) => f.id.sqlEquals($_column));
     final item = $_typedResult.readTableOrNull(_variantIdTable($_db));
-    if (item == null) return manager;
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: [item]),
-    );
-  }
-
-  static $WarehousesTable _warehouseIdTable(_$AppDatabase db) => db.warehouses
-      .createAlias('inventory_transaction__warehouse_id__warehouse__id');
-
-  $$WarehousesTableProcessedTableManager? get warehouseId {
-    final $_column = $_itemColumn<int>('warehouse_id');
-    if ($_column == null) return null;
-    final manager = $$WarehousesTableTableManager(
-      $_db,
-      $_db.warehouses,
-    ).filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_warehouseIdTable($_db));
     if (item == null) return manager;
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: [item]),
@@ -28340,29 +26821,6 @@ class $$InventoryTransactionsTableFilterComposer
           }) => $$ProductVariantsTableFilterComposer(
             $db: $db,
             $table: $db.productVariants,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-
-  $$WarehousesTableFilterComposer get warehouseId {
-    final $$WarehousesTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.warehouseId,
-      referencedTable: $db.warehouses,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$WarehousesTableFilterComposer(
-            $db: $db,
-            $table: $db.warehouses,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -28486,29 +26944,6 @@ class $$InventoryTransactionsTableOrderingComposer
     return composer;
   }
 
-  $$WarehousesTableOrderingComposer get warehouseId {
-    final $$WarehousesTableOrderingComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.warehouseId,
-      referencedTable: $db.warehouses,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$WarehousesTableOrderingComposer(
-            $db: $db,
-            $table: $db.warehouses,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-
   $$PurchasesTableOrderingComposer get purchaseId {
     final $$PurchasesTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -28615,29 +27050,6 @@ class $$InventoryTransactionsTableAnnotationComposer
     return composer;
   }
 
-  $$WarehousesTableAnnotationComposer get warehouseId {
-    final $$WarehousesTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.warehouseId,
-      referencedTable: $db.warehouses,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$WarehousesTableAnnotationComposer(
-            $db: $db,
-            $table: $db.warehouses,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-
   $$PurchasesTableAnnotationComposer get purchaseId {
     final $$PurchasesTableAnnotationComposer composer = $composerBuilder(
       composer: this,
@@ -28678,7 +27090,6 @@ class $$InventoryTransactionsTableTableManager
           PrefetchHooks Function({
             bool productId,
             bool variantId,
-            bool warehouseId,
             bool purchaseId,
           })
         > {
@@ -28709,7 +27120,6 @@ class $$InventoryTransactionsTableTableManager
                 Value<int> id = const Value.absent(),
                 Value<int> productId = const Value.absent(),
                 Value<int?> variantId = const Value.absent(),
-                Value<int?> warehouseId = const Value.absent(),
                 Value<String> transactionType = const Value.absent(),
                 Value<int> quantity = const Value.absent(),
                 Value<int?> purchaseId = const Value.absent(),
@@ -28721,7 +27131,6 @@ class $$InventoryTransactionsTableTableManager
                 id: id,
                 productId: productId,
                 variantId: variantId,
-                warehouseId: warehouseId,
                 transactionType: transactionType,
                 quantity: quantity,
                 purchaseId: purchaseId,
@@ -28735,7 +27144,6 @@ class $$InventoryTransactionsTableTableManager
                 Value<int> id = const Value.absent(),
                 required int productId,
                 Value<int?> variantId = const Value.absent(),
-                Value<int?> warehouseId = const Value.absent(),
                 required String transactionType,
                 required int quantity,
                 Value<int?> purchaseId = const Value.absent(),
@@ -28747,7 +27155,6 @@ class $$InventoryTransactionsTableTableManager
                 id: id,
                 productId: productId,
                 variantId: variantId,
-                warehouseId: warehouseId,
                 transactionType: transactionType,
                 quantity: quantity,
                 purchaseId: purchaseId,
@@ -28765,12 +27172,7 @@ class $$InventoryTransactionsTableTableManager
               )
               .toList(),
           prefetchHooksCallback:
-              ({
-                productId = false,
-                variantId = false,
-                warehouseId = false,
-                purchaseId = false,
-              }) {
+              ({productId = false, variantId = false, purchaseId = false}) {
                 return PrefetchHooks(
                   db: db,
                   explicitlyWatchedTables: [],
@@ -28820,21 +27222,6 @@ class $$InventoryTransactionsTableTableManager
                                   )
                                   as T;
                         }
-                        if (warehouseId) {
-                          state =
-                              state.withJoin(
-                                    currentTable: table,
-                                    currentColumn: table.warehouseId,
-                                    referencedTable:
-                                        $$InventoryTransactionsTableReferences
-                                            ._warehouseIdTable(db),
-                                    referencedColumn:
-                                        $$InventoryTransactionsTableReferences
-                                            ._warehouseIdTable(db)
-                                            .id,
-                                  )
-                                  as T;
-                        }
                         if (purchaseId) {
                           state =
                               state.withJoin(
@@ -28874,19 +27261,13 @@ typedef $$InventoryTransactionsTableProcessedTableManager =
       $$InventoryTransactionsTableUpdateCompanionBuilder,
       (InventoryTransaction, $$InventoryTransactionsTableReferences),
       InventoryTransaction,
-      PrefetchHooks Function({
-        bool productId,
-        bool variantId,
-        bool warehouseId,
-        bool purchaseId,
-      })
+      PrefetchHooks Function({bool productId, bool variantId, bool purchaseId})
     >;
 typedef $$CurrentStocksTableCreateCompanionBuilder =
     CurrentStocksCompanion Function({
       Value<int> id,
       required int productId,
       Value<int?> variantId,
-      Value<int?> warehouseId,
       Value<int> quantity,
       Value<DateTime> updatedAt,
     });
@@ -28895,7 +27276,6 @@ typedef $$CurrentStocksTableUpdateCompanionBuilder =
       Value<int> id,
       Value<int> productId,
       Value<int?> variantId,
-      Value<int?> warehouseId,
       Value<int> quantity,
       Value<DateTime> updatedAt,
     });
@@ -28937,23 +27317,6 @@ final class $$CurrentStocksTableReferences
       $_db.productVariants,
     ).filter((f) => f.id.sqlEquals($_column));
     final item = $_typedResult.readTableOrNull(_variantIdTable($_db));
-    if (item == null) return manager;
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: [item]),
-    );
-  }
-
-  static $WarehousesTable _warehouseIdTable(_$AppDatabase db) =>
-      db.warehouses.createAlias('current_stock__warehouse_id__warehouse__id');
-
-  $$WarehousesTableProcessedTableManager? get warehouseId {
-    final $_column = $_itemColumn<int>('warehouse_id');
-    if ($_column == null) return null;
-    final manager = $$WarehousesTableTableManager(
-      $_db,
-      $_db.warehouses,
-    ).filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_warehouseIdTable($_db));
     if (item == null) return manager;
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: [item]),
@@ -29022,29 +27385,6 @@ class $$CurrentStocksTableFilterComposer
           }) => $$ProductVariantsTableFilterComposer(
             $db: $db,
             $table: $db.productVariants,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-
-  $$WarehousesTableFilterComposer get warehouseId {
-    final $$WarehousesTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.warehouseId,
-      referencedTable: $db.warehouses,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$WarehousesTableFilterComposer(
-            $db: $db,
-            $table: $db.warehouses,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -29124,29 +27464,6 @@ class $$CurrentStocksTableOrderingComposer
     );
     return composer;
   }
-
-  $$WarehousesTableOrderingComposer get warehouseId {
-    final $$WarehousesTableOrderingComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.warehouseId,
-      referencedTable: $db.warehouses,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$WarehousesTableOrderingComposer(
-            $db: $db,
-            $table: $db.warehouses,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
 }
 
 class $$CurrentStocksTableAnnotationComposer
@@ -29212,29 +27529,6 @@ class $$CurrentStocksTableAnnotationComposer
     );
     return composer;
   }
-
-  $$WarehousesTableAnnotationComposer get warehouseId {
-    final $$WarehousesTableAnnotationComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.warehouseId,
-      referencedTable: $db.warehouses,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$WarehousesTableAnnotationComposer(
-            $db: $db,
-            $table: $db.warehouses,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
 }
 
 class $$CurrentStocksTableTableManager
@@ -29250,11 +27544,7 @@ class $$CurrentStocksTableTableManager
           $$CurrentStocksTableUpdateCompanionBuilder,
           (CurrentStock, $$CurrentStocksTableReferences),
           CurrentStock,
-          PrefetchHooks Function({
-            bool productId,
-            bool variantId,
-            bool warehouseId,
-          })
+          PrefetchHooks Function({bool productId, bool variantId})
         > {
   $$CurrentStocksTableTableManager(_$AppDatabase db, $CurrentStocksTable table)
     : super(
@@ -29272,14 +27562,12 @@ class $$CurrentStocksTableTableManager
                 Value<int> id = const Value.absent(),
                 Value<int> productId = const Value.absent(),
                 Value<int?> variantId = const Value.absent(),
-                Value<int?> warehouseId = const Value.absent(),
                 Value<int> quantity = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
               }) => CurrentStocksCompanion(
                 id: id,
                 productId: productId,
                 variantId: variantId,
-                warehouseId: warehouseId,
                 quantity: quantity,
                 updatedAt: updatedAt,
               ),
@@ -29288,14 +27576,12 @@ class $$CurrentStocksTableTableManager
                 Value<int> id = const Value.absent(),
                 required int productId,
                 Value<int?> variantId = const Value.absent(),
-                Value<int?> warehouseId = const Value.absent(),
                 Value<int> quantity = const Value.absent(),
                 Value<DateTime> updatedAt = const Value.absent(),
               }) => CurrentStocksCompanion.insert(
                 id: id,
                 productId: productId,
                 variantId: variantId,
-                warehouseId: warehouseId,
                 quantity: quantity,
                 updatedAt: updatedAt,
               ),
@@ -29307,80 +27593,60 @@ class $$CurrentStocksTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback:
-              ({productId = false, variantId = false, warehouseId = false}) {
-                return PrefetchHooks(
-                  db: db,
-                  explicitlyWatchedTables: [],
-                  addJoins:
-                      <
-                        T extends TableManagerState<
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic
-                        >
-                      >(state) {
-                        if (productId) {
-                          state =
-                              state.withJoin(
-                                    currentTable: table,
-                                    currentColumn: table.productId,
-                                    referencedTable:
-                                        $$CurrentStocksTableReferences
-                                            ._productIdTable(db),
-                                    referencedColumn:
-                                        $$CurrentStocksTableReferences
-                                            ._productIdTable(db)
-                                            .id,
-                                  )
-                                  as T;
-                        }
-                        if (variantId) {
-                          state =
-                              state.withJoin(
-                                    currentTable: table,
-                                    currentColumn: table.variantId,
-                                    referencedTable:
-                                        $$CurrentStocksTableReferences
-                                            ._variantIdTable(db),
-                                    referencedColumn:
-                                        $$CurrentStocksTableReferences
-                                            ._variantIdTable(db)
-                                            .id,
-                                  )
-                                  as T;
-                        }
-                        if (warehouseId) {
-                          state =
-                              state.withJoin(
-                                    currentTable: table,
-                                    currentColumn: table.warehouseId,
-                                    referencedTable:
-                                        $$CurrentStocksTableReferences
-                                            ._warehouseIdTable(db),
-                                    referencedColumn:
-                                        $$CurrentStocksTableReferences
-                                            ._warehouseIdTable(db)
-                                            .id,
-                                  )
-                                  as T;
-                        }
+          prefetchHooksCallback: ({productId = false, variantId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (productId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.productId,
+                                referencedTable: $$CurrentStocksTableReferences
+                                    ._productIdTable(db),
+                                referencedColumn: $$CurrentStocksTableReferences
+                                    ._productIdTable(db)
+                                    .id,
+                              )
+                              as T;
+                    }
+                    if (variantId) {
+                      state =
+                          state.withJoin(
+                                currentTable: table,
+                                currentColumn: table.variantId,
+                                referencedTable: $$CurrentStocksTableReferences
+                                    ._variantIdTable(db),
+                                referencedColumn: $$CurrentStocksTableReferences
+                                    ._variantIdTable(db)
+                                    .id,
+                              )
+                              as T;
+                    }
 
-                        return state;
-                      },
-                  getPrefetchedDataCallback: (items) async {
-                    return [];
+                    return state;
                   },
-                );
+              getPrefetchedDataCallback: (items) async {
+                return [];
               },
+            );
+          },
         ),
       );
 }
@@ -29397,7 +27663,7 @@ typedef $$CurrentStocksTableProcessedTableManager =
       $$CurrentStocksTableUpdateCompanionBuilder,
       (CurrentStock, $$CurrentStocksTableReferences),
       CurrentStock,
-      PrefetchHooks Function({bool productId, bool variantId, bool warehouseId})
+      PrefetchHooks Function({bool productId, bool variantId})
     >;
 
 class $AppDatabaseManager {
@@ -29425,8 +27691,6 @@ class $AppDatabaseManager {
       $$CustomersTableTableManager(_db, _db.customers);
   $$SuppliersTableTableManager get suppliers =>
       $$SuppliersTableTableManager(_db, _db.suppliers);
-  $$WarehousesTableTableManager get warehouses =>
-      $$WarehousesTableTableManager(_db, _db.warehouses);
   $$ProductsTableTableManager get products =>
       $$ProductsTableTableManager(_db, _db.products);
   $$ProductVariantsTableTableManager get productVariants =>

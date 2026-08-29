@@ -68,11 +68,6 @@ class DatabaseIndexes {
       table: 'supplier',
       columns: ['email'],
     ),
-    (
-      name: 'idx_warehouse_name_nocase_unique',
-      table: 'warehouse',
-      columns: ['warehouse_name'],
-    ),
   ];
 
   /// Ordinary (non-unique) lookup indexes for the rebuilt tables.

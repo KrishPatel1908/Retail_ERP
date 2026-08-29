@@ -119,11 +119,22 @@ class CreateProductPage extends StatefulWidget {
     required this.onSave,
     required this.onCancel,
     this.product,
+    this.onSaved,
+    this.showBreadcrumbs = true,
   });
 
   final VoidCallback onSave;
   final VoidCallback onCancel;
   final ProductEntity? product;
+
+  /// Called with the saved product just before [onSave], so callers that need
+  /// the created/updated record (e.g. Purchase Entry auto-selecting a brand new
+  /// product) do not have to guess which one it was.
+  final ValueChanged<ProductEntity>? onSaved;
+
+  /// Hidden when the form is hosted somewhere that already has its own
+  /// context, such as the "Add New Product" dialog inside Purchase Entry.
+  final bool showBreadcrumbs;
 
   @override
   State<CreateProductPage> createState() => _CreateProductPageState();
@@ -569,8 +580,9 @@ class _CreateProductPageState extends State<CreateProductPage> {
         ProductValidator.parseRupeesToPaise(wholesalePriceText);
 
     try {
+      ProductEntity saved;
       if (_isEditing) {
-        await _repository.updateProduct(
+        saved = await _repository.updateProduct(
           widget.product!.id,
           productName: name,
           categoryId: _categoryId,
@@ -591,7 +603,7 @@ class _CreateProductPageState extends State<CreateProductPage> {
         // Sync variants: add new, update existing, remove deleted.
         await _syncVariants();
       } else {
-        await _repository.createProduct(
+        saved = await _repository.createProduct(
           productName: name,
           productCode: code.isNotEmpty ? code : null,
           categoryId: _categoryId,
@@ -623,6 +635,7 @@ class _CreateProductPageState extends State<CreateProductPage> {
             ),
           ),
         );
+      widget.onSaved?.call(saved);
       widget.onSave();
     } on ProductDuplicateException catch (exception) {
       if (!mounted) return;
@@ -752,10 +765,12 @@ class _CreateProductPageState extends State<CreateProductPage> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Breadcrumbs(
-                    items: ['Master Entry', 'Product Master', title],
-                  ),
-                  const SizedBox(height: 12),
+                  if (widget.showBreadcrumbs) ...[
+                    Breadcrumbs(
+                      items: ['Master Entry', 'Product Master', title],
+                    ),
+                    const SizedBox(height: 12),
+                  ],
                   Text(
                     title,
                     style: textTheme.headlineMedium?.copyWith(

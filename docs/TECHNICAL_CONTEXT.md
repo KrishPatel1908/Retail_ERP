@@ -429,8 +429,6 @@ Product Master
 
 Sub Category
 
-Warehouse Master
-
 Inventory
 
 Purchase
@@ -443,7 +441,24 @@ Dashboard
 
 Accounting
 
+---
+
+# Deferred / Out of Scope
+
+The following are deferred for the current version and have been removed from
+the UI, navigation, and (where applicable) the database:
+
+Warehouse Master (single-location build; `warehouse` table removed in v11)
+
 AI Assistant
+
+Advanced GST filing (GSTR-1 / 2B / 3B), e-Invoice / e-Way Bill
+
+Loyalty, Coupons & Rewards
+
+Advanced Serial Number and Batch / Lot / FEFO tracking
+
+Cloud / Multi-terminal sync
 
 ---
 

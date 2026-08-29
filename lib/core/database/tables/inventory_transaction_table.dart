@@ -2,7 +2,6 @@ import 'package:drift/drift.dart';
 
 import 'product_table.dart';
 import 'purchase_table.dart';
-import 'warehouse_table.dart';
 
 /// Inventory transaction — records every stock change with its cause.
 ///
@@ -24,8 +23,6 @@ class InventoryTransactions extends Table {
   IntColumn get productId => integer().references(Products, #id)();
   IntColumn get variantId =>
       integer().nullable().references(ProductVariants, #id)();
-  IntColumn get warehouseId =>
-      integer().nullable().references(Warehouses, #id)();
 
   /// PURCHASE, PURCHASE_RETURN, MANUAL_ADJUSTMENT, SALE.
   TextColumn get transactionType => text()();

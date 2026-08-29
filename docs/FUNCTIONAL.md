@@ -14,6 +14,33 @@ Each module contains:
 
 ---
 
+# CURRENT VERSION SCOPE
+
+This version of the Retail ERP is intentionally focused on the core retail
+workflow — **Master Entry → Product → Purchase → Inventory → Sales
+foundations** — with GST-aware tax modelling and customer/supplier management.
+
+To keep the product small, fast, and maintainable, the features below are
+**deferred / out of scope** for the current version. They have been removed
+from the UI, navigation, and (where applicable) the database, and are recorded
+here so the roadmap stays clear:
+
+- **AI Assistant** — natural-language search, voice commands, business insights.
+- **Separate Product Tracking module** — the standalone tracking page was removed. Expiry, barcode, HSN, and stock fields remain on Product Master where Product / Purchase / Inventory use them.
+- **Warehouse Master / multi-warehouse** — the app is single-location; the `warehouse` table and the `warehouse_id` columns on the inventory tables were removed (schema v11).
+- **Purchase Order** — the Purchase module keeps Purchase Entry, Purchase History, and Purchase Return; formal Purchase Orders are deferred.
+- **Advanced GST filing** (GSTR-1 / 2B / 3B) — basic GST / Tax Type / Tax Category remain; return filing is deferred.
+- **GST e-Invoice / e-Way Bill (IRN)** — deferred.
+- **Loyalty, Coupons & Rewards** (and premium POS) — deferred; basic discounts on Purchase / Sales remain.
+- **Advanced Serial Number tracking** — deferred.
+- **Advanced Batch / Lot / FEFO** — deferred; the basic product Expiry Date field remains.
+- **Cloud / Multi-terminal sync** — deferred; the app remains local-only on Drift / SQLite.
+- **Standalone HSN Master** — HSN/SAC is captured as an optional field on Product Master and variants; the separate HSN master table was removed (schema v3).
+
+Global UOM Conversion and Product UOM Conversion are **retained** in full.
+
+---
+
 # MASTER ENTRY
 
 Master Entry stores the fundamental information used throughout the ERP.
@@ -393,37 +420,23 @@ Product Master
 
 Status
 
-Completed
+Removed as a standalone master. HSN/SAC is now captured as an optional
+`hsn_code` field on Product Master and product variants; the separate
+`hsn_master` table was removed in schema v3. The CRUD features listed above are
+not part of the current version. See "Current Version Scope".
 
 ---
 
 # Warehouse Master
 
-Purpose
-
-Stores warehouse information.
-
-Features
-
-Warehouse Name
-
-Address
-
-Contact
-
-Used By
-
-Inventory
-
-Purchase
-
-Sales
-
-Product
-
 Status
 
-Pending
+Removed (deferred) — see "Current Version Scope" above.
+
+The current version is single-location, so the `warehouse` table and the
+`warehouse_id` columns on `inventory_transaction` and `current_stock` were
+removed in schema v11. Multi-warehouse support can be reintroduced in a future
+version without affecting the current single-location inventory.
 
 ---
 
@@ -606,17 +619,23 @@ Purchase products from suppliers.
 
 Features
 
-Purchase Order
-
 Purchase Entry
+
+Purchase History
 
 Purchase Return
 
 Supplier Ledger
 
+Note
+
+Formal Purchase Orders are deferred for the current version (see "Current
+Version Scope").
+
 Status
 
-Pending
+Implemented: Purchase Entry, Purchase History, Purchase Return. Supplier Ledger
+is pending.
 
 ---
 
@@ -760,7 +779,7 @@ Sales Analysis
 
 Status
 
-Future
+Deferred — out of scope for the current version (see "Current Version Scope").
 
 ---
 
@@ -812,7 +831,7 @@ AI Assistant
 
 # CURRENT PROGRESS
 
-Completed
+Completed (Master Entry)
 
 ✅ Category
 
@@ -836,14 +855,20 @@ Completed
 
 ✅ Company Settings
 
+✅ Product Master
+
 Customer and Supplier list pages provide a single combined search-and-filter
 panel. Their forms validate before saving and move focus/scroll position to
 the first invalid field in their explicit keyboard sequence.
 
-Pending
+In Progress / Next
 
-⬜ Warehouse Master
+Purchase (Entry, History, Return) and Inventory transactions build on the
+completed Master Entry foundation.
 
-⬜ Product Master
+Removed / Deferred
+
+Warehouse Master has been removed (single-location build). See "Current Version
+Scope" for the full list of deferred features.
 
 The ERP follows a dependency-first approach, meaning foundational modules are completed before dependent modules to minimize future refactoring.

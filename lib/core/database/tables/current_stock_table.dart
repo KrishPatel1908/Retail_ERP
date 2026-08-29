@@ -1,9 +1,8 @@
 import 'package:drift/drift.dart';
 
 import 'product_table.dart';
-import 'warehouse_table.dart';
 
-/// Current stock levels per product/variant/warehouse.
+/// Current stock levels per product/variant.
 ///
 /// This is a cached/materialized view maintained by the inventory transaction
 /// engine. It is updated atomically alongside inventory transactions.
@@ -21,8 +20,6 @@ class CurrentStocks extends Table {
   IntColumn get productId => integer().references(Products, #id)();
   IntColumn get variantId =>
       integer().nullable().references(ProductVariants, #id)();
-  IntColumn get warehouseId =>
-      integer().nullable().references(Warehouses, #id)();
 
   /// Current quantity on hand.
   IntColumn get quantity => integer().withDefault(const Constant(0))();
