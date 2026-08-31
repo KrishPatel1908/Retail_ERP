@@ -24,10 +24,11 @@ enum _DiscountType { percentage, amount }
 
 /// A single selectable line in the Product dropdown.
 ///
-/// A product that has variants contributes one option *per variant*, because the
-/// variant is the actual sellable unit. Its label is the variant name on its own
-/// — parent and variant names are never combined. A product without variants
-/// contributes a single option carrying its own name.
+/// Every sellable unit is its own option: a product with no variants
+/// contributes one option carrying its own name, and a product with variants
+/// contributes one option for the main product plus one per variant. Its label
+/// is the product/variant name on its own — parent and variant names are never
+/// combined.
 class _ProductOption {
   const _ProductOption({
     required this.product,
@@ -35,24 +36,30 @@ class _ProductOption {
     required this.label,
     required this.barcode,
     required this.purchasePrice,
+    this.taxRate,
   });
 
-  _ProductOption.base(ProductEntity product)
+  _ProductOption.base(ProductEntity product, {double? taxRate})
       : this(
           product: product,
           variant: null,
           label: product.productName,
           barcode: product.barcode,
           purchasePrice: product.purchasePrice,
+          taxRate: taxRate,
         );
 
-  _ProductOption.forVariant(ProductEntity product, ProductVariantEntity variant)
-      : this(
+  _ProductOption.forVariant(
+    ProductEntity product,
+    ProductVariantEntity variant, {
+    double? taxRate,
+  }) : this(
           product: product,
           variant: variant,
           label: variant.variantName,
           barcode: variant.barcode ?? product.barcode,
           purchasePrice: variant.purchasePrice ?? product.purchasePrice,
+          taxRate: taxRate,
         );
 
   final ProductEntity product;
@@ -62,6 +69,11 @@ class _ProductOption {
   final String label;
   final String? barcode;
   final int? purchasePrice;
+
+  /// Default purchase tax rate (%) for this option, resolved from Product
+  /// Master's tax configuration when unambiguous. Null means the user enters
+  /// the rate manually.
+  final double? taxRate;
 
   int get productId => product.id;
   int? get variantId => variant?.id;
@@ -227,6 +239,11 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
   /// Currency symbol from Company Settings, used for every amount on this page.
   String _currencySymbol = '';
 
+  /// Default purchase tax rate (in %) per Tax Category, resolved from Product
+  /// Master's `tax_category_rate` rows. It is the category's configured total
+  /// (the sum of its component percentages), e.g. GST 18% = 9 + 9.
+  Map<int, double> _taxRateByCategory = const {};
+
   /// Sentinel dropdown value for the "+ Add New Product" entry. The ':' prefix
   /// can never collide with a real option key.
   static const _addNewProductValue = ':add-new-product';
@@ -314,6 +331,8 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
       final productRepository = ProductRepository();
       final allProducts = await productRepository.fetchAllWithVariants();
 
+      final taxRates = await _loadTaxRates();
+
       String symbol = '';
       try {
         final settings = await CompanySettingsService().getSettings();
@@ -328,6 +347,7 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
       setState(() {
         _suppliers = suppliers;
         _products = allProducts;
+        _taxRateByCategory = taxRates;
         _currencySymbol = symbol.isEmpty ? '₹' : symbol;
         _rebuildProductOptions();
       });
@@ -338,22 +358,49 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
   Future<void> _reloadProducts() async {
     try {
       final allProducts = await ProductRepository().fetchAllWithVariants();
+      final taxRates = await _loadTaxRates();
       if (!mounted) return;
       setState(() {
         _products = allProducts;
+        _taxRateByCategory = taxRates;
         _rebuildProductOptions();
       });
     } catch (_) {}
   }
 
-  /// Flattens [_products] into the variant-level options shown in the dropdown.
+  /// Resolves the configured total tax rate (%) for each Tax Category from
+  /// Product Master's `tax_category_rate` table.
   ///
-  /// A product with variants contributes one option per variant and no option
-  /// for itself — the variant is the sellable unit. A product without variants
-  /// contributes a single option. Any option key already referenced by a row is
-  /// preserved even if the underlying record is no longer listed, so editing an
-  /// older purchase never trips the dropdown's "value must match one item"
-  /// assertion.
+  /// A category's total is the sum of its active component rates (e.g.
+  /// GST 18% = CGST 9 + SGST 9). This matches the "total tax %" shown in the
+  /// Tax Category master and the seeded reference data.
+  Future<Map<int, double>> _loadTaxRates() async {
+    final database = DatabaseProvider.instance.database;
+    try {
+      final rows = await (database.select(database.taxCategoryRates)
+            ..where((t) => t.isActive.equals(true)))
+          .get();
+      final result = <int, double>{};
+      for (final row in rows) {
+        result[row.taxCategoryId] =
+            (result[row.taxCategoryId] ?? 0) + row.ratePercent;
+      }
+      return result;
+    } catch (_) {
+      return const {};
+    }
+  }
+
+  /// Flattens [_products] into the options shown in the dropdown.
+  ///
+  /// Every sellable unit appears as its own option: a product with no variants
+  /// contributes a single option carrying its own name, while a product with
+  /// variants contributes **both** the main product *and* every variant. Each
+  /// is an independent, selectable item. Variants inherit the parent's Tax
+  /// Category, so a parent and its variants resolve to the same default tax
+  /// rate. Any option key already referenced by a row is preserved even if the
+  /// underlying record is no longer listed, so editing an older purchase never
+  /// trips the dropdown's "value must match one item" assertion.
   ///
   /// Must be called from within [setState].
   void _rebuildProductOptions() {
@@ -367,12 +414,10 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
     }
 
     for (final product in _products) {
-      if (product.variants.isEmpty) {
-        add(_ProductOption.base(product));
-      } else {
-        for (final variant in product.variants) {
-          add(_ProductOption.forVariant(product, variant));
-        }
+      final rate = _taxRateFor(product);
+      add(_ProductOption.base(product, taxRate: rate));
+      for (final variant in product.variants) {
+        add(_ProductOption.forVariant(product, variant, taxRate: rate));
       }
     }
 
@@ -395,15 +440,24 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
       // falls back to its hint for that row while the row keeps its IDs.
       if (row.variantId != null && variant == null) continue;
 
+      final rate = _taxRateFor(product);
       add(
         variant == null
-            ? _ProductOption.base(product)
-            : _ProductOption.forVariant(product, variant),
+            ? _ProductOption.base(product, taxRate: rate)
+            : _ProductOption.forVariant(product, variant, taxRate: rate),
       );
     }
 
     _productOptions = options;
     _optionsByKey = byKey;
+  }
+
+  /// The configured total purchase tax rate (%) for [product]'s Tax Category,
+  /// or null when the product has no Tax Category configured.
+  double? _taxRateFor(ProductEntity product) {
+    final categoryId = product.taxCategoryId;
+    if (categoryId == null) return null;
+    return _taxRateByCategory[categoryId];
   }
 
   void _addProductRow() {
@@ -433,8 +487,8 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
     });
   }
 
-  /// Applies [option] to the row at [index], filling in the unit and — when the
-  /// price field is still untouched — the known purchase price.
+  /// Applies [option] to the row at [index], replacing all product details:
+  /// unit, barcode, purchase price, tax rate, and resetting quantity to 1 and discount to 0.
   void _selectOption(int index, _ProductOption option) {
     final row = _productRows[index];
     row.productId = option.productId;
@@ -444,15 +498,40 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
     row.productController.text = option.label;
     row.barcodeError = null;
 
-    final price = option.purchasePrice;
-    final priceText = row.priceController.text.trim();
-    if (price != null && (priceText.isEmpty || priceText == '0')) {
-      row.priceController.text = ProductValidator.formatPaise(price);
+    // Keep the barcode field in sync with the selected variant, so the value
+    // shown always belongs to the product on the line.
+    if (option.barcode != null && option.barcode!.trim().isNotEmpty) {
+      row.barcodeController.text = option.barcode!.trim();
     }
 
+    final price = option.purchasePrice;
+    if (price != null) {
+      row.priceController.text = ProductValidator.formatPaise(price);
+    } else {
+      row.priceController.text = '';
+    }
+
+    final taxRate = option.taxRate;
+    if (taxRate != null) {
+      row.taxController.text =
+          taxRate == taxRate.roundToDouble()
+              ? taxRate.round().toString()
+              : taxRate.toStringAsFixed(1);
+    } else {
+      row.taxController.text = '0';
+    }
+
+    row.quantityController.text = '1';
+    row.discountController.text = '0';
+    row.discountType = _DiscountType.amount;
+
     setState(() {
+      row.dropdownEpoch++;
       final errors = Map<String, String?>.from(_errors);
       errors.remove('product_$index');
+      errors.remove('qty_$index');
+      errors.remove('price_$index');
+      errors.remove('discount_$index');
       _errors = errors;
     });
   }
@@ -493,13 +572,15 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
     }
 
     _selectOption(index, match);
-    // A scan means "one of these" unless the user says otherwise.
-    if (row.quantityController.text.trim().isEmpty) {
-      row.quantityController.text = '1';
+
+    // Keep the scanned barcode visible in the field so the user can confirm
+    // which product was matched, then move focus to quantity for the next input.
+    if (match.barcode != null && match.barcode!.trim().isNotEmpty) {
+      row.barcodeController.text = match.barcode!.trim();
+    } else {
+      row.barcodeController.text = code;
     }
-    // Clear the field so a scanner can fire straight into the next code, and
-    // move on to quantity, which is what the user types next.
-    row.barcodeController.clear();
+
     row.quantityFocusNode.requestFocus();
     row.quantityController.selection = TextSelection(
       baseOffset: 0,
@@ -560,12 +641,9 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
     final product = created;
     if (product == null) return;
 
-    // Auto-select the new product so entry can continue without searching.
-    // A product saved with variants is only sellable through those variants, so
-    // pick the first one.
-    final key = product.variants.isEmpty
-        ? _ProductOption.keyFor(product.id, null)
-        : _ProductOption.keyFor(product.id, product.variants.first.id);
+    // Auto-select the new product so entry can continue without searching. The
+    // main product is always a selectable option, so select it directly.
+    final key = _ProductOption.keyFor(product.id, null);
     final option = _optionsByKey[key];
     if (option != null) _selectOption(index, option);
   }
@@ -979,7 +1057,7 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
                         const SizedBox(height: 16),
                         _buildFormRow([
                           LabelledField(
-                            label: 'Paid Amount',
+                            label: 'Debit Amount',
                             hintText: '0',
                             controller: _paidAmountController,
                             errorText: _errors['paidAmount'],
@@ -1475,9 +1553,13 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _SummaryRow(label: 'Grand Total', value: _formatCurrency(_grandTotal)),
-          _SummaryRow(label: 'Paid Amount', value: _formatCurrency(_paidAmount)),
           _SummaryRow(
-            label: 'Due Amount',
+            label: 'Debit Amount',
+            value: _formatCurrency(_paidAmount),
+            valueColor: _paidAmount > 0 ? AppTheme.success : AppTheme.textPrimary,
+          ),
+          _SummaryRow(
+            label: 'Credit Amount',
             value: _formatCurrency(_dueAmount),
             valueColor: _dueAmount > 0 ? AppTheme.danger : AppTheme.success,
           ),

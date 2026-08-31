@@ -423,15 +423,13 @@ Company Settings
 
 Product Master
 
+Purchase (Purchase Entry, Purchase History, Purchase Return implemented; barcode scanning automatically replaces previous line details when a new barcode is scanned)
+
 ---
 
 # Pending Modules
 
-Sub Category
-
 Inventory
-
-Purchase
 
 Sales POS
 
@@ -440,6 +438,8 @@ Reports
 Dashboard
 
 Accounting
+
+Supplier Ledger
 
 ---
 

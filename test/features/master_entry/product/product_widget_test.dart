@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:retail_erp/app/retail_erp_app.dart';
+import 'package:retail_erp/core/database/database_provider.dart';
 import 'package:retail_erp/features/master_entry/brand/data/repositories/brand_repository.dart';
 import 'package:retail_erp/features/master_entry/category/data/repositories/category_repository.dart';
 import 'package:retail_erp/features/master_entry/product/data/repositories/product_repository.dart';
@@ -173,6 +174,86 @@ void main() {
     expect(find.text('Parle-G Biscuits'), findsOneWidget);
     expect(find.text('₹20'), findsOneWidget);
   });
+
+  testWidgets('Tax dropdown lists Tax Categories, not Tax Types', (
+    tester,
+  ) async {
+    await seedPrerequisites();
+    await openProductPage(tester);
+
+    await tester.tap(find.text('Add Product'));
+    await tester.pumpAndSettle();
+
+    // The Tax dropdown offers existing Tax Categories (created in Tax Category
+    // Master) by their exact name.
+    await tester.ensureVisible(find.byKey(const ValueKey('product-tax-int')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('product-tax-int')));
+    await tester.pumpAndSettle();
+
+    expect(find.text('GST 5%'), findsOneWidget);
+    expect(find.text('GST 12%'), findsOneWidget);
+    expect(find.text('GST 18%'), findsOneWidget);
+    expect(find.text('GST 28%'), findsOneWidget);
+    expect(find.text('Tax Free'), findsOneWidget);
+
+    // Atomic Tax Types must NOT be offered in the product form.
+    expect(find.text('IGST'), findsNothing);
+    expect(find.text('CGST'), findsNothing);
+    expect(find.text('SGST'), findsNothing);
+  });
+
+  testWidgets('selecting a Tax Category saves it and reflects its name', (
+    tester,
+  ) async {
+    await seedPrerequisites();
+    await openProductPage(tester);
+
+    await tester.tap(find.text('Add Product'));
+    await tester.pumpAndSettle();
+
+    await tester.enterText(
+      find.byKey(const ValueKey('product-name')),
+      'Parle-G Biscuits',
+    );
+    await tester.enterText(
+      find.byKey(const ValueKey('product-selling-price')),
+      '20',
+    );
+    await tester.tap(find.byKey(const ValueKey('product-unit-int')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Pieces (pcs)').last);
+    await tester.pumpAndSettle();
+
+    // Pick GST 18% (seeded tax category id 4).
+    await tester.ensureVisible(find.byKey(const ValueKey('product-tax-int')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.byKey(const ValueKey('product-tax-int')));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('GST 18%').last);
+    await tester.pumpAndSettle();
+
+    await tester.ensureVisible(find.text('Save Product'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Save Product'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Product created successfully.'), findsOneWidget);
+
+    final products = await ProductRepository().fetchAllWithVariants();
+    final product = products.single;
+    // The selected Tax Category is stored and its name displayed exactly.
+    expect(product.taxCategoryId, 4);
+    expect(product.taxCategoryName, 'GST 18%');
+    // And its configured total (CGST 9 + SGST 9) resolves to 18%.
+    final db = DatabaseProvider.instance.database;
+    final rates = await db.select(db.taxCategoryRates).get();
+    final total = rates
+        .where((r) => r.taxCategoryId == 4)
+        .fold<double>(0, (sum, r) => sum + r.ratePercent);
+    expect(total, 18.0);
+  });
+
 
   testWidgets('validates required fields on Save Product', (tester) async {
     await openProductPage(tester);

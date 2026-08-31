@@ -65,6 +65,7 @@ class PurchaseEntity {
     required this.createdAt,
     required this.updatedAt,
     this.items = const [],
+    this.runningBalance,
   });
 
   final int id;
@@ -104,6 +105,11 @@ class PurchaseEntity {
 
   /// Line items. Populated when fetching purchase details.
   final List<PurchaseItemEntity> items;
+
+  /// Running balance (cumulative Credit − cumulative Debit) for this
+  /// purchase's supplier up to and including this purchase. Only populated by
+  /// the list/fetch path, in paise. Positive = we owe the supplier.
+  final int? runningBalance;
 
   /// Whether this is a return purchase.
   bool get isReturnPurchase => isReturn;

@@ -133,7 +133,44 @@ class PurchaseRepository {
     final rows = await rowsQuery.get();
     final items = rows.map(_fromTypedResult).toList();
 
-    return PurchasePage(items: items, totalCount: total);
+    // Compute the running balance (cumulative Credit − cumulative Debit) per
+    // supplier, ordered chronologically. The balance for each row reflects the
+    // state after that purchase's financial effect.
+    final balances = <int, int>{};
+    for (final p in items) {
+      balances[p.id] = await _runningBalanceFor(p);
+    }
+
+    return PurchasePage(
+      items: [
+        for (final p in items)
+          PurchaseEntity(
+            id: p.id,
+            purchaseNumber: p.purchaseNumber,
+            supplierId: p.supplierId,
+            supplierName: p.supplierName,
+            supplierCode: p.supplierCode,
+            purchaseDate: p.purchaseDate,
+            invoiceNumber: p.invoiceNumber,
+            subtotal: p.subtotal,
+            discount: p.discount,
+            tax: p.tax,
+            total: p.total,
+            paidAmount: p.paidAmount,
+            dueAmount: p.dueAmount,
+            paymentStatus: p.paymentStatus,
+            paymentMethod: p.paymentMethod,
+            notes: p.notes,
+            isReturn: p.isReturn,
+            originalPurchaseId: p.originalPurchaseId,
+            isActive: p.isActive,
+            createdAt: p.createdAt,
+            updatedAt: p.updatedAt,
+            runningBalance: balances[p.id],
+          ),
+      ],
+      totalCount: total,
+    );
   }
 
   // ──────────────────── GET BY ID ────────────────────
@@ -814,6 +851,111 @@ class PurchaseRepository {
     );
   }
 
+  /// Running balance for [purchase]'s supplier after [purchase]'s effect.
+  ///
+  /// Credit is the purchase total payable to the supplier; Debit is the amount
+  /// paid. The running balance is the cumulative (Credit − Debit) of every
+  /// purchase from the same supplier up to and including [purchase], ordered
+  /// by date then id. Returns paise (may be negative when the supplier owes
+  /// the business).
+  Future<int> _runningBalanceFor(PurchaseEntity purchase) async {
+    final t = _database.purchases;
+    final expr = (t.total - t.paidAmount).sum();
+    final query = _database.selectOnly(_database.purchases)..addColumns([expr]);
+    query.where(
+      t.supplierId.equals(purchase.supplierId) &
+          t.isReturn.equals(false) &
+          (t.purchaseDate.isSmallerThanValue(purchase.purchaseDate) |
+              (t.purchaseDate.equals(purchase.purchaseDate) &
+                  t.id.isSmallerOrEqualValue(purchase.id))),
+    );
+    final row = await query.getSingle();
+    return row.read(expr) ?? 0;
+  }
+
+  // ──────────────────── DELETE ────────────────────
+
+  /// Deletes a purchase and fully reverses its financial and inventory effect.
+  ///
+  /// Runs atomically:
+  /// - Reverses the supplier's payable balance by the purchase's net effect.
+  /// - Reverses stock for every line item (purchase − returned).
+  /// - Removes the purchase's inventory transactions, line items and header.
+  ///
+  /// A purchase that is the source of a purchase return (or whose items have
+  /// been partially returned) cannot be safely deleted and is rejected.
+  Future<void> deletePurchase(int id) async {
+    await _database.transaction(() async {
+      final existing = await getById(id);
+
+      if (existing.isReturn) {
+        throw const PurchaseDeletionException(
+          'This is a purchase return and cannot be deleted directly. '
+          'Reverse the corresponding transaction instead.',
+        );
+      }
+
+      if (existing.originalPurchaseId != null) {
+        throw const PurchaseDeletionException(
+          'This purchase is linked to a return and cannot be deleted.',
+        );
+      }
+
+      final hasReturns = await (_database.select(_database.purchases)
+            ..where((t) => t.originalPurchaseId.equals(id)))
+          .get();
+      if (hasReturns.isNotEmpty) {
+        throw const PurchaseDeletionException(
+          'This purchase has returns against it. Delete those returns first.',
+        );
+      }
+
+      final returnedItem = existing.items
+          .where((item) => item.returnedQuantity > 0)
+          .toList();
+      if (returnedItem.isNotEmpty) {
+        throw const PurchaseDeletionException(
+          'This purchase has items that were returned and cannot be deleted '
+          'while returns exist.',
+        );
+      }
+
+      // Reverse inventory: unbuy what was purchased (minus returned amounts,
+      // which are already handled by the return transactions).
+      for (final item in existing.items) {
+        final effectiveQty = item.quantity - item.returnedQuantity;
+        if (effectiveQty > 0) {
+          await _upsertStock(
+            productId: item.productId,
+            variantId: item.variantId,
+            delta: -effectiveQty,
+          );
+        }
+      }
+
+      // Remove the purchase's inventory transactions (PURCHASE + adjustments).
+      await (_database.delete(_database.inventoryTransactions)
+            ..where((t) => t.purchaseId.equals(id)))
+          .go();
+
+      // Remove the purchase's line items.
+      await (_database.delete(_database.purchaseItems)
+            ..where((t) => t.purchaseId.equals(id)))
+          .go();
+
+      // Reverse the supplier's payable balance for this purchase's net effect.
+      await _updateSupplierPayable(
+        existing.supplierId,
+        delta: -(existing.total - existing.paidAmount),
+      );
+
+      // Finally, remove the purchase header.
+      await (_database.delete(_database.purchases)
+            ..where((t) => t.id.equals(id)))
+          .go();
+    });
+  }
+
   PurchasePaymentStatus _derivePaymentStatus(int paid, int total) {
     if (total <= 0 || paid <= 0) return PurchasePaymentStatus.unpaid;
     if (paid >= total) return PurchasePaymentStatus.paid;
@@ -1036,4 +1178,13 @@ class PurchaseValidationException implements Exception {
 
   @override
   String toString() => 'PurchaseValidationException: $message';
+}
+
+class PurchaseDeletionException implements Exception {
+  const PurchaseDeletionException(this.message);
+
+  final String message;
+
+  @override
+  String toString() => 'PurchaseDeletionException: $message';
 }

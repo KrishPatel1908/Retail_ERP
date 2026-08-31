@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../../../app/theme/app_theme.dart';
 import '../../../../shared/widgets/content_panel.dart';
+import '../../../../shared/widgets/description_preview.dart';
 import '../../../../shared/widgets/empty_state.dart';
 import '../../../../shared/widgets/page_header.dart';
 import '../../../../shared/widgets/search_field.dart';
@@ -189,22 +190,22 @@ class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
 
   int get _sortColumnIndex => switch (_sortColumn) {
         PurchaseSortColumn.purchaseNumber => 1,
-        PurchaseSortColumn.supplierName => 2,
-        PurchaseSortColumn.purchaseDate => 3,
-        PurchaseSortColumn.totalAmount => 5,
-        PurchaseSortColumn.dueAmount => 6,
-        PurchaseSortColumn.paymentStatus => 7,
-        PurchaseSortColumn.createdAt => 8,
+        PurchaseSortColumn.supplierName => 3,
+        PurchaseSortColumn.purchaseDate => 7,
+        PurchaseSortColumn.totalAmount => 6,
+        PurchaseSortColumn.dueAmount => 4,
+        PurchaseSortColumn.paymentStatus => 8,
+        PurchaseSortColumn.createdAt => 9,
       };
 
   static PurchaseSortColumn _sortForIndex(int index) => switch (index) {
         1 => PurchaseSortColumn.purchaseNumber,
-        2 => PurchaseSortColumn.supplierName,
-        3 => PurchaseSortColumn.purchaseDate,
-        5 => PurchaseSortColumn.totalAmount,
-        6 => PurchaseSortColumn.dueAmount,
-        7 => PurchaseSortColumn.paymentStatus,
-        8 => PurchaseSortColumn.createdAt,
+        3 => PurchaseSortColumn.supplierName,
+        6 => PurchaseSortColumn.totalAmount,
+        4 => PurchaseSortColumn.dueAmount,
+        7 => PurchaseSortColumn.purchaseDate,
+        8 => PurchaseSortColumn.paymentStatus,
+        9 => PurchaseSortColumn.createdAt,
         _ => PurchaseSortColumn.purchaseDate,
       };
 
@@ -219,6 +220,72 @@ class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
         widget.onEditPurchase(full);
       },
     );
+  }
+
+  /// Loads the full purchase (with line items) and opens it in edit mode.
+  Future<void> _editPurchase(PurchaseEntity purchase) async {
+    try {
+      final full = await _repository.getById(purchase.id);
+      if (!mounted) return;
+      widget.onEditPurchase(full);
+    } catch (_) {
+      _showFailure('Could not load the purchase for editing.');
+    }
+  }
+
+  Future<void> _confirmDelete(PurchaseEntity purchase) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Delete Purchase'),
+          content: Text(
+            'Are you sure you want to delete purchase ${purchase.purchaseNumber}'
+            ' for ${purchase.supplierName}?\n\n'
+            'This will permanently remove the purchase and reverse its '
+            'inventory and financial effect.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(dialogContext).pop(false),
+              child: const Text('Cancel'),
+            ),
+            FilledButton(
+              style: FilledButton.styleFrom(
+                backgroundColor: AppTheme.danger,
+                foregroundColor: Colors.white,
+              ),
+              onPressed: () => Navigator.of(dialogContext).pop(true),
+              child: const Text('Delete'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed != true || !mounted) return;
+
+    try {
+      await _repository.deletePurchase(purchase.id);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(SnackBar(
+          content: Text('Purchase ${purchase.purchaseNumber} deleted.'),
+        ));
+      _load();
+    } on PurchaseDeletionException catch (e) {
+      _showFailure(e.message);
+    } catch (_) {
+      _showFailure('Failed to delete the purchase. Please try again.');
+    }
+  }
+
+  void _showFailure(String message) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -365,7 +432,7 @@ class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
                     : SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: SizedBox(
-                          width: 1200,
+                          width: 1300,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
@@ -417,27 +484,17 @@ class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
           ),
           // Purchase No.
           SizedBox(
-            width: 140,
+            width: 130,
             child: _buildSortableHeader(1, 'Purchase No.', textTheme),
           ),
-          // Supplier
-          Expanded(
-            flex: 2,
-            child: _buildSortableHeader(2, 'Supplier', textTheme),
-          ),
-          // Purchase Date
-          SizedBox(
-            width: 110,
-            child: _buildSortableHeader(3, 'Date', textTheme),
-          ),
           // Invoice No.
-          SizedBox(
-            width: 120,
+          const SizedBox(
+            width: 110,
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
+              padding: EdgeInsets.symmetric(horizontal: 12),
               child: Text(
                 'Invoice No.',
-                style: textTheme.labelSmall?.copyWith(
+                style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                   letterSpacing: 0.3,
@@ -446,19 +503,24 @@ class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
               ),
             ),
           ),
-          // Total
+          // Supplier
+          Expanded(
+            flex: 2,
+            child: _buildSortableHeader(3, 'Supplier', textTheme),
+          ),
+          // Credit
           SizedBox(
             width: 110,
-            child: _buildSortableHeader(5, 'Total', textTheme, numeric: true),
+            child: _buildSortableHeader(4, 'Credit', textTheme, numeric: true),
           ),
-          // Paid
-          SizedBox(
+          // Debit
+          const SizedBox(
             width: 110,
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
+              padding: EdgeInsets.symmetric(horizontal: 12),
               child: Text(
-                'Paid',
-                style: textTheme.labelSmall?.copyWith(
+                'Debit',
+                style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                   letterSpacing: 0.3,
@@ -468,15 +530,36 @@ class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
               ),
             ),
           ),
-          // Due
+          // Total (running balance)
           SizedBox(
-            width: 110,
-            child: _buildSortableHeader(6, 'Due', textTheme, numeric: true),
+            width: 130,
+            child: _buildSortableHeader(6, 'Total', textTheme, numeric: true),
+          ),
+          // Date
+          SizedBox(
+            width: 100,
+            child: _buildSortableHeader(7, 'Date', textTheme),
           ),
           // Status
           SizedBox(
             width: 100,
-            child: _buildSortableHeader(7, 'Status', textTheme),
+            child: _buildSortableHeader(8, 'Status', textTheme),
+          ),
+          // Note
+          const SizedBox(
+            width: 140,
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 12),
+              child: Text(
+                'Note',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.3,
+                  color: AppTheme.textSecondary,
+                ),
+              ),
+            ),
           ),
         ],
       ),
@@ -545,6 +628,10 @@ class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
       PurchasePaymentStatus.unpaid => AppTheme.danger,
     };
 
+    final credit = purchase.dueAmount;
+    final debit = purchase.paidAmount;
+    final balance = purchase.runningBalance ?? credit - debit;
+
     String formatDate(DateTime date) {
       final local = date.toLocal();
       return '${local.day.toString().padLeft(2, '0')}/${local.month.toString().padLeft(2, '0')}/${local.year}';
@@ -576,7 +663,14 @@ class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
                   _ActionIcon(
                     icon: Icons.edit_outlined,
                     tooltip: 'Edit',
-                    onTap: () => widget.onEditPurchase(purchase),
+                    onTap: () => _editPurchase(purchase),
+                  ),
+                  const SizedBox(width: 2),
+                  _ActionIcon(
+                    icon: Icons.delete_outline_rounded,
+                    tooltip: 'Delete',
+                    color: AppTheme.danger,
+                    onTap: () => _confirmDelete(purchase),
                   ),
                 ],
               ),
@@ -584,7 +678,7 @@ class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
           ),
           // Purchase No.
           SizedBox(
-            width: 140,
+            width: 130,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               child: Text(
@@ -592,6 +686,18 @@ class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
                 style: textTheme.bodyMedium?.copyWith(
                   fontWeight: FontWeight.w600,
                 ),
+              ),
+            ),
+          ),
+          // Invoice No.
+          SizedBox(
+            width: 110,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Text(
+                purchase.invoiceNumber ?? '—',
+                style: textTheme.bodySmall,
+                overflow: TextOverflow.ellipsis,
               ),
             ),
           ),
@@ -607,67 +713,61 @@ class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
               ),
             ),
           ),
-          // Date
+          // Credit (was Due)
           SizedBox(
             width: 110,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Text(
+                _formatCurrency(credit),
+                style: TextStyle(
+                  fontWeight: FontWeight.w500,
+                  color: credit > 0 ? AppTheme.danger : AppTheme.textPrimary,
+                ),
+                textAlign: TextAlign.right,
+              ),
+            ),
+          ),
+          // Debit (was Paid)
+          SizedBox(
+            width: 110,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Text(
+                _formatCurrency(debit),
+                style: TextStyle(
+                  fontWeight: FontWeight.w500,
+                  color: debit > 0 ? AppTheme.success : AppTheme.textPrimary,
+                ),
+                textAlign: TextAlign.right,
+              ),
+            ),
+          ),
+          // Total (running balance)
+          SizedBox(
+            width: 130,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: Text(
+                _formatSignedCurrency(balance),
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
+                  color: balance > 0
+                      ? AppTheme.primary
+                      : (balance < 0 ? AppTheme.danger : AppTheme.textPrimary),
+                ),
+                textAlign: TextAlign.right,
+              ),
+            ),
+          ),
+          // Date
+          SizedBox(
+            width: 100,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               child: Text(
                 formatDate(purchase.purchaseDate),
                 style: textTheme.bodySmall,
-              ),
-            ),
-          ),
-          // Invoice No.
-          SizedBox(
-            width: 120,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: Text(
-                purchase.invoiceNumber ?? '—',
-                style: textTheme.bodySmall,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
-          ),
-          // Total
-          SizedBox(
-            width: 110,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: Text(
-                _formatCurrency(purchase.total),
-                style: const TextStyle(fontWeight: FontWeight.w600),
-                textAlign: TextAlign.right,
-              ),
-            ),
-          ),
-          // Paid
-          SizedBox(
-            width: 110,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: Text(
-                _formatCurrency(purchase.paidAmount),
-                style: const TextStyle(fontWeight: FontWeight.w500),
-                textAlign: TextAlign.right,
-              ),
-            ),
-          ),
-          // Due
-          SizedBox(
-            width: 110,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12),
-              child: Text(
-                _formatCurrency(purchase.dueAmount),
-                style: TextStyle(
-                  fontWeight: FontWeight.w500,
-                  color: purchase.dueAmount > 0
-                      ? AppTheme.danger
-                      : AppTheme.textPrimary,
-                ),
-                textAlign: TextAlign.right,
               ),
             ),
           ),
@@ -689,7 +789,20 @@ class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
                     color: statusColor,
                     fontSize: 11,
                   ),
+                  overflow: TextOverflow.ellipsis,
                 ),
+              ),
+            ),
+          ),
+          // Note
+          SizedBox(
+            width: 140,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              child: DescriptionPreview(
+                description: purchase.notes,
+                maxLines: 1,
+                style: textTheme.bodySmall,
               ),
             ),
           ),
@@ -761,6 +874,70 @@ class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
                 },
               ),
             ],
+          ),
+        ),
+        SizedBox(
+          width: 170,
+          child: _buildDateFilterField(
+            label: 'From',
+            value: _purchaseDateFrom,
+            onPicked: (d) {
+              setState(() => _purchaseDateFrom = d);
+              _applyFilters();
+            },
+          ),
+        ),
+        SizedBox(
+          width: 170,
+          child: _buildDateFilterField(
+            label: 'To',
+            value: _purchaseDateTo,
+            onPicked: (d) {
+              setState(() => _purchaseDateTo = d);
+              _applyFilters();
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDateFilterField({
+    required String label,
+    required DateTime? value,
+    required ValueChanged<DateTime?> onPicked,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: const TextStyle(fontWeight: FontWeight.w600)),
+        const SizedBox(height: 6),
+        InkWell(
+          onTap: () async {
+            final now = DateTime.now();
+            final picked = await showDatePicker(
+              context: context,
+              initialDate: value ?? now,
+              firstDate: DateTime(2000),
+              lastDate: DateTime(2100),
+              helpText: 'Select $label date',
+            );
+            if (picked != null) onPicked(picked);
+          },
+          borderRadius: BorderRadius.circular(10),
+          child: InputDecorator(
+            decoration: const InputDecoration(),
+            isEmpty: value == null,
+            child: Text(
+              value == null
+                  ? label
+                  : '${value.day.toString().padLeft(2, '0')}/${value.month.toString().padLeft(2, '0')}/${value.year}',
+              style: TextStyle(
+                color: value == null
+                    ? AppTheme.textMuted
+                    : AppTheme.textPrimary,
+              ),
+            ),
           ),
         ),
       ],
@@ -852,6 +1029,18 @@ class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
         : rupees.toStringAsFixed(2);
     return '₹$text';
   }
+
+  /// Formats the running balance with an explicit sign: "+₹20,000", "-₹5,000",
+  /// or "₹0" for a settled account.
+  static String _formatSignedCurrency(int paise) {
+    if (paise == 0) return '₹0';
+    final rupees = paise.abs() / 100;
+    final text = rupees == rupees.roundToDouble()
+        ? rupees.round().toString()
+        : rupees.toStringAsFixed(2);
+    final sign = paise > 0 ? '+' : '-';
+    return '$sign₹$text';
+  }
 }
 
 /// Action icon button for the table.
@@ -860,11 +1049,13 @@ class _ActionIcon extends StatefulWidget {
     required this.icon,
     required this.tooltip,
     required this.onTap,
+    this.color,
   });
 
   final IconData icon;
   final String tooltip;
   final VoidCallback onTap;
+  final Color? color;
 
   @override
   State<_ActionIcon> createState() => _ActionIconState();
@@ -875,6 +1066,9 @@ class _ActionIconState extends State<_ActionIcon> {
 
   @override
   Widget build(BuildContext context) {
+    final baseColor = widget.color ?? AppTheme.textSecondary;
+    final activeColor = widget.color ?? AppTheme.primary;
+
     return Tooltip(
       message: widget.tooltip,
       child: MouseRegion(
@@ -886,7 +1080,7 @@ class _ActionIconState extends State<_ActionIcon> {
           height: 32,
           decoration: BoxDecoration(
             color: _hovered
-                ? AppTheme.primary.withValues(alpha: 0.1)
+                ? (widget.color ?? AppTheme.primary).withValues(alpha: 0.1)
                 : Colors.transparent,
             borderRadius: BorderRadius.circular(8),
           ),
@@ -896,9 +1090,7 @@ class _ActionIconState extends State<_ActionIcon> {
             icon: Icon(
               widget.icon,
               size: 18,
-              color: _hovered
-                  ? AppTheme.primary
-                  : AppTheme.textSecondary,
+              color: _hovered ? activeColor : baseColor,
             ),
             onPressed: widget.onTap,
           ),

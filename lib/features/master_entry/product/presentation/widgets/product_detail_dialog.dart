@@ -170,7 +170,7 @@ class ProductDetailDialog extends StatelessWidget {
                         _buildDetailItem(
                           context,
                           'Tax',
-                          textOrDash(product.taxTypeName),
+                          textOrDash(product.taxCategoryName),
                         ),
                       ]),
                       const SizedBox(height: 20),

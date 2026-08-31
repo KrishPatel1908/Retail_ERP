@@ -24,6 +24,8 @@ class ProductEntity {
     this.hsnCode,
     this.taxTypeId,
     this.taxTypeName,
+    this.taxCategoryId,
+    this.taxCategoryName,
     this.expiryDate,
     this.notes,
     required this.isActive,
@@ -68,6 +70,13 @@ class ProductEntity {
 
   final int? taxTypeId;
   final String? taxTypeName;
+
+  /// Reference to the Tax Category (e.g. "GST 18%") that governs this product.
+  ///
+  /// This is the canonical tax source for a product (used by Purchase Entry to
+  /// auto-fill the tax rate from the category's configured total).
+  final int? taxCategoryId;
+  final String? taxCategoryName;
 
   /// Optional expiry date for the parent product.
   final DateTime? expiryDate;

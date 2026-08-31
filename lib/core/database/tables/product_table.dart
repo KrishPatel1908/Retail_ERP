@@ -3,6 +3,7 @@ import 'package:drift/drift.dart';
 import 'brand_table.dart';
 import 'category_table.dart';
 import 'sub_category_table.dart';
+import 'tax_category_table.dart';
 import 'tax_type_table.dart';
 import 'unit_table.dart';
 
@@ -38,6 +39,8 @@ class Products extends Table {
   TextColumn get barcode => text().nullable()();
   TextColumn get hsnCode => text().nullable()();
   IntColumn get taxTypeId => integer().nullable().references(TaxTypes, #id)();
+  IntColumn get taxCategoryId =>
+      integer().nullable().references(TaxCategories, #id)();
 
   /// Optional expiry date for the parent product (e.g. food, medicine).
   DateTimeColumn get expiryDate => dateTime().nullable()();

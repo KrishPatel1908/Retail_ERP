@@ -621,7 +621,18 @@ Features
 
 Purchase Entry
 
+- Supplier selection, invoice / bill number, purchase date, and notes.
+- Line item entry via barcode scanner or searchable product/variant dropdown.
+- Scanning a barcode auto-populates product name, variant, unit, default purchase price, and configured tax rate.
+- Scanning a different barcode on an existing line item completely clears the previous product's details and applies the newly scanned product's details (product name, variant, unit, barcode, purchase price, and tax rate), resetting quantity to 1 and discount to 0.
+- Manual inline override of quantity, purchase price, discount (% or fixed amount), and tax rate per line.
+- Automatic computation of line totals, subtotal, total discount, total tax, grand total, paid amount, and due amount.
+
 Purchase History
+
+- Chronological purchase transactions with search, date filters, sorting, and pagination.
+- Displays Purchase No., Invoice No., Supplier, Credit (due), Debit (paid), Total (calculated as debit - credit, with signed formatting), Date, Status, and Note.
+- View details dialog and direct edit/delete actions per row.
 
 Purchase Return
 

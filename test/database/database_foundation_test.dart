@@ -101,11 +101,11 @@ void main() {
       final db = AppDatabase(NativeDatabase.memory());
       addTearDown(db.close);
 
-      expect(db.schemaVersion, 11);
+      expect(db.schemaVersion, 12);
       await db.customSelect('SELECT 1').get();
 
       final row = (await db.customSelect('PRAGMA user_version').get()).single;
-      expect(row.read<int>('user_version'), 11);
+      expect(row.read<int>('user_version'), 12);
     });
 
     test('creates the case-insensitive unique indexes', () async {
@@ -130,7 +130,9 @@ void main() {
       expect((await db.select(db.uomConversions).get()).length, 7);
       expect((await db.select(db.taxTypes).get()).length, 5);
       expect((await db.select(db.taxCategories).get()).length, 5);
-      expect((await db.select(db.taxCategoryRates).get()).length, 15);
+      // Each seeded category stores only its CGST+SGST split (no redundant IGST
+      // component), so their sums match their names: 0, 5, 12, 18, 28.
+      expect((await db.select(db.taxCategoryRates).get()).length, 10);
 
       final generic = await (db.select(
         db.brands,
@@ -514,10 +516,10 @@ void main() {
         addTearDown(db.close);
         await db.customSelect('SELECT 1').get();
 
-        expect(db.schemaVersion, 11);
+        expect(db.schemaVersion, 12);
         final versionRow =
             (await db.customSelect('PRAGMA user_version').get()).single;
-        expect(versionRow.read<int>('user_version'), 11);
+        expect(versionRow.read<int>('user_version'), 12);
 
         // The old columns are gone and the new ones are present.
         final unitColumns = await db
@@ -689,10 +691,10 @@ void main() {
       final db = AppDatabase(NativeDatabase(file));
       addTearDown(db.close);
       await db.customSelect('SELECT 1').get();
-      expect(db.schemaVersion, 11);
+      expect(db.schemaVersion, 12);
       final versionRow =
           (await db.customSelect('PRAGMA user_version').get()).single;
-      expect(versionRow.read<int>('user_version'), 11);
+      expect(versionRow.read<int>('user_version'), 12);
 
         // Customer gained the new columns and `address` became line 1.
       final customerColumns = await db
@@ -787,7 +789,7 @@ void main() {
       final db = AppDatabase(NativeDatabase(file));
       addTearDown(db.close);
       await db.customSelect('SELECT 1').get();
-      expect(db.schemaVersion, 11);
+      expect(db.schemaVersion, 12);
 
         final customerCols = (await db.customSelect("SELECT name FROM pragma_table_info('customer')").get())
           .map((r) => r.read<String>('name'))
@@ -865,10 +867,10 @@ void main() {
       final db = AppDatabase(NativeDatabase(file));
       addTearDown(db.close);
       await db.customSelect('SELECT 1').get();
-      expect(db.schemaVersion, 11);
+      expect(db.schemaVersion, 12);
       final versionRow =
           (await db.customSelect('PRAGMA user_version').get()).single;
-      expect(versionRow.read<int>('user_version'), 11);
+      expect(versionRow.read<int>('user_version'), 12);
 
         final columns = (await db
               .customSelect("SELECT name FROM pragma_table_info('company_settings')")

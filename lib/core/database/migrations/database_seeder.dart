@@ -283,9 +283,16 @@ class DatabaseSeeder {
     ),
   ];
 
-  /// Rate breakdown per category: (category, CGST, SGST, IGST).
+  /// Rate breakdown per category.
+  ///
+  /// Each category stores its intra-state split only: CGST + SGST. The IGST
+  /// component is intentionally omitted so that "sum of components" equals the
+  /// category's total rate and matches its name (e.g. GST 18% = 9 + 9 = 18).
+  /// Ids are preserved (1, 2, 3 ...) so fresh-create and migrated databases
+  /// converge on the same reference data; the deleted IGST gaps are simply
+  /// unused ids.
   static final List<TaxCategoryRatesCompanion> _taxCategoryRates = [
-    // Tax Free.
+    // Tax Free: 0 + 0 = 0.
     TaxCategoryRatesCompanion.insert(
       id: Value(1),
       taxCategoryId: 1,
@@ -298,13 +305,7 @@ class DatabaseSeeder {
       taxTypeId: 3,
       ratePercent: 0,
     ),
-    TaxCategoryRatesCompanion.insert(
-      id: Value(3),
-      taxCategoryId: 1,
-      taxTypeId: 4,
-      ratePercent: 0,
-    ),
-    // GST 5%: 2.5 + 2.5 / 5.
+    // GST 5%: 2.5 + 2.5 = 5.
     TaxCategoryRatesCompanion.insert(
       id: Value(4),
       taxCategoryId: 2,
@@ -317,13 +318,7 @@ class DatabaseSeeder {
       taxTypeId: 3,
       ratePercent: 2.5,
     ),
-    TaxCategoryRatesCompanion.insert(
-      id: Value(6),
-      taxCategoryId: 2,
-      taxTypeId: 4,
-      ratePercent: 5,
-    ),
-    // GST 12%: 6 + 6 / 12.
+    // GST 12%: 6 + 6 = 12.
     TaxCategoryRatesCompanion.insert(
       id: Value(7),
       taxCategoryId: 3,
@@ -336,13 +331,7 @@ class DatabaseSeeder {
       taxTypeId: 3,
       ratePercent: 6,
     ),
-    TaxCategoryRatesCompanion.insert(
-      id: Value(9),
-      taxCategoryId: 3,
-      taxTypeId: 4,
-      ratePercent: 12,
-    ),
-    // GST 18%: 9 + 9 / 18.
+    // GST 18%: 9 + 9 = 18.
     TaxCategoryRatesCompanion.insert(
       id: Value(10),
       taxCategoryId: 4,
@@ -355,13 +344,7 @@ class DatabaseSeeder {
       taxTypeId: 3,
       ratePercent: 9,
     ),
-    TaxCategoryRatesCompanion.insert(
-      id: Value(12),
-      taxCategoryId: 4,
-      taxTypeId: 4,
-      ratePercent: 18,
-    ),
-    // GST 28%: 14 + 14 / 28.
+    // GST 28%: 14 + 14 = 28.
     TaxCategoryRatesCompanion.insert(
       id: Value(13),
       taxCategoryId: 5,
@@ -373,12 +356,6 @@ class DatabaseSeeder {
       taxCategoryId: 5,
       taxTypeId: 3,
       ratePercent: 14,
-    ),
-    TaxCategoryRatesCompanion.insert(
-      id: Value(15),
-      taxCategoryId: 5,
-      taxTypeId: 4,
-      ratePercent: 28,
     ),
   ];
 

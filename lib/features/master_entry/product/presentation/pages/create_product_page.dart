@@ -182,7 +182,7 @@ class _CreateProductPageState extends State<CreateProductPage> {
   int? _subCategoryId;
   int? _brandId;
   int? _unitId;
-  int? _taxTypeId;
+  int? _taxCategoryId;
 
   // Expiry date
   DateTime? _expiryDate;
@@ -195,7 +195,7 @@ class _CreateProductPageState extends State<CreateProductPage> {
   List<db.SubCategory> _subCategories = const [];
   List<db.Brand> _brands = const [];
   List<db.Unit> _units = const [];
-  List<db.TaxType> _taxTypes = const [];
+  List<db.TaxCategory> _taxCategories = const [];
 
   Map<String, String?> _errors = const {};
   bool _saving = false;
@@ -240,7 +240,7 @@ class _CreateProductPageState extends State<CreateProductPage> {
     _subCategoryId = product?.subCategoryId;
     _brandId = product?.brandId;
     _unitId = product?.unitId;
-    _taxTypeId = product?.taxTypeId;
+    _taxCategoryId = product?.taxCategoryId;
     _expiryDate = product?.expiryDate;
 
     // Initialize variant rows from existing product variants.
@@ -311,8 +311,9 @@ class _CreateProductPageState extends State<CreateProductPage> {
             ..where((t) => t.isActive.equals(true))
             ..orderBy([(t) => OrderingTerm.asc(t.unitName.lower())]))
           .get();
-      final taxTypes = await (database.select(database.taxTypes)
-            ..orderBy([(t) => OrderingTerm.asc(t.taxTypeName.lower())]))
+      final taxCategories = await (database.select(database.taxCategories)
+            ..where((t) => t.isActive.equals(true))
+            ..orderBy([(t) => OrderingTerm.asc(t.taxCategoryName.lower())]))
           .get();
 
       List<db.SubCategory> subCategories = const [];
@@ -336,7 +337,7 @@ class _CreateProductPageState extends State<CreateProductPage> {
         _categories = categories;
         _brands = brands;
         _units = units;
-        _taxTypes = taxTypes;
+        _taxCategories = taxCategories;
         _subCategories = subCategories;
       });
     } catch (_) {
@@ -595,7 +596,7 @@ class _CreateProductPageState extends State<CreateProductPage> {
           wholesalePrice: wholesalePrice,
           barcode: barcode.isNotEmpty ? barcode : null,
           hsnCode: hsnCode.isNotEmpty ? hsnCode : null,
-          taxTypeId: _taxTypeId,
+          taxCategoryId: _taxCategoryId,
           expiryDate: _expiryDate,
           notes: notes,
         );
@@ -616,7 +617,7 @@ class _CreateProductPageState extends State<CreateProductPage> {
           wholesalePrice: wholesalePrice,
           barcode: barcode.isNotEmpty ? barcode : null,
           hsnCode: hsnCode.isNotEmpty ? hsnCode : null,
-          taxTypeId: _taxTypeId,
+          taxCategoryId: _taxCategoryId,
           expiryDate: _expiryDate,
           notes: notes,
           variants: variantInputs,
@@ -1003,19 +1004,19 @@ class _CreateProductPageState extends State<CreateProductPage> {
                         LabelledDropdown<int>(
                           label: 'Tax',
                           keyValue: 'product-tax',
-                          value: _taxTypeId,
+                          value: _taxCategoryId,
                           hintText: 'Select tax',
                           focusNode: _focusController.node('tax'),
                           containerKey: _focusController.key('tax'),
                           items: [
-                            for (final t in _taxTypes)
+                            for (final c in _taxCategories)
                               DropdownMenuItem(
-                                value: t.id,
-                                child: Text(t.taxTypeName),
+                                value: c.id,
+                                child: Text(c.taxCategoryName),
                               ),
                           ],
                           onChanged: (value) =>
-                              setState(() => _taxTypeId = value),
+                              setState(() => _taxCategoryId = value),
                         ),
                         const SizedBox(height: 28),
 

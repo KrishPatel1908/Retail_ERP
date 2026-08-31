@@ -966,7 +966,7 @@ class _ProductListPageState extends State<ProductListPage> {
                 width: 80,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: Text(product.taxTypeName ?? '—'),
+                  child: Text(product.taxCategoryName ?? '—'),
                 ),
               ),
               // Created Date

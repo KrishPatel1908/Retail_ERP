@@ -138,6 +138,8 @@ class ProductRepository {
       leftOuterJoin(brandT, brandT.id.equalsExp(t.brandId)),
       innerJoin(unitT, unitT.id.equalsExp(t.unitId)),
       leftOuterJoin(taxT, taxT.id.equalsExp(t.taxTypeId)),
+      leftOuterJoin(_database.taxCategories,
+          _database.taxCategories.id.equalsExp(t.taxCategoryId)),
     ]);
 
     if (predicate != null) rowsQuery.where(predicate);
@@ -177,6 +179,8 @@ class ProductRepository {
           hsnCode: p.hsnCode,
           taxTypeId: p.taxTypeId,
           taxTypeName: p.taxTypeName,
+          taxCategoryId: p.taxCategoryId,
+          taxCategoryName: p.taxCategoryName,
           expiryDate: p.expiryDate,
           notes: p.notes,
           isActive: p.isActive,
@@ -209,6 +213,8 @@ class ProductRepository {
       leftOuterJoin(brandT, brandT.id.equalsExp(t.brandId)),
       innerJoin(unitT, unitT.id.equalsExp(t.unitId)),
       leftOuterJoin(taxT, taxT.id.equalsExp(t.taxTypeId)),
+      leftOuterJoin(_database.taxCategories,
+          _database.taxCategories.id.equalsExp(t.taxCategoryId)),
     ])..where(t.id.equals(id));
 
     final row = await query.getSingleOrNull();
@@ -237,6 +243,8 @@ class ProductRepository {
       hsnCode: product.hsnCode,
       taxTypeId: product.taxTypeId,
       taxTypeName: product.taxTypeName,
+      taxCategoryId: product.taxCategoryId,
+      taxCategoryName: product.taxCategoryName,
       expiryDate: product.expiryDate,
       notes: product.notes,
       isActive: product.isActive,
@@ -261,6 +269,7 @@ class ProductRepository {
     String? barcode,
     String? hsnCode,
     int? taxTypeId,
+    int? taxCategoryId,
     DateTime? expiryDate,
     String? notes,
     List<VariantInput> variants = const [],
@@ -291,6 +300,7 @@ class ProductRepository {
             barcode: Value(trimmedBarcode),
             hsnCode: Value(trimmedHsnCode),
             taxTypeId: Value(taxTypeId),
+            taxCategoryId: Value(taxCategoryId),
             expiryDate: Value(expiryDate),
             notes: Value(trimmedNotes),
           ),
@@ -362,6 +372,7 @@ class ProductRepository {
     String? barcode,
     String? hsnCode,
     int? taxTypeId,
+    int? taxCategoryId,
     DateTime? expiryDate,
     String? notes,
     bool? isActive,
@@ -388,6 +399,7 @@ class ProductRepository {
           barcode: Value(trimmedBarcode),
           hsnCode: Value(trimmedHsnCode),
           taxTypeId: Value(taxTypeId),
+          taxCategoryId: Value(taxCategoryId),
           expiryDate: Value(expiryDate),
           notes: Value(trimmedNotes),
           isActive: isActive == null ? const Value.absent() : Value(isActive),
@@ -593,11 +605,15 @@ class ProductRepository {
     final brands = await _database.select(_database.brands).get();
     final units = await _database.select(_database.units).get();
     final taxTypes = await _database.select(_database.taxTypes).get();
+    final taxCategories = await _database.select(_database.taxCategories).get();
 
     final catMap = {for (final c in categories) c.id: c.categoryName};
     final brandMap = {for (final b in brands) b.id: b.brandName};
     final unitMap = {for (final u in units) u.id: u.unitName};
     final taxMap = {for (final t in taxTypes) t.id: t.taxTypeName};
+    final taxCategoryMap = {
+      for (final c in taxCategories) c.id: c.taxCategoryName,
+    };
 
     return allProducts.map((p) {
       final variants = allVariants.where((v) => v.productId == p.id).toList();
@@ -620,6 +636,8 @@ class ProductRepository {
         hsnCode: p.hsnCode,
         taxTypeId: p.taxTypeId,
         taxTypeName: taxMap[p.taxTypeId],
+        taxCategoryId: p.taxCategoryId,
+        taxCategoryName: taxCategoryMap[p.taxCategoryId],
         expiryDate: p.expiryDate,
         notes: p.notes,
         isActive: p.isActive,
@@ -784,6 +802,7 @@ class ProductRepository {
     final brand = row.readTableOrNull(_database.brands);
     final unit = row.readTable(_database.units);
     final tax = row.readTableOrNull(_database.taxTypes);
+    final taxCategory = row.readTableOrNull(_database.taxCategories);
 
     return ProductEntity(
       id: t.id,
@@ -805,6 +824,8 @@ class ProductRepository {
       hsnCode: t.hsnCode,
       taxTypeId: t.taxTypeId,
       taxTypeName: tax?.taxTypeName,
+      taxCategoryId: t.taxCategoryId,
+      taxCategoryName: taxCategory?.taxCategoryName,
       expiryDate: t.expiryDate,
       notes: t.notes,
       isActive: t.isActive,

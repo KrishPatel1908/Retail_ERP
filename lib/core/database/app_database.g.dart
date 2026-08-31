@@ -9731,6 +9731,20 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
       'REFERENCES tax_type (id)',
     ),
   );
+  static const VerificationMeta _taxCategoryIdMeta = const VerificationMeta(
+    'taxCategoryId',
+  );
+  @override
+  late final GeneratedColumn<int> taxCategoryId = GeneratedColumn<int>(
+    'tax_category_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES tax_category (id)',
+    ),
+  );
   static const VerificationMeta _expiryDateMeta = const VerificationMeta(
     'expiryDate',
   );
@@ -9806,6 +9820,7 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
     barcode,
     hsnCode,
     taxTypeId,
+    taxCategoryId,
     expiryDate,
     notes,
     isActive,
@@ -9929,6 +9944,15 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
         taxTypeId.isAcceptableOrUnknown(data['tax_type_id']!, _taxTypeIdMeta),
       );
     }
+    if (data.containsKey('tax_category_id')) {
+      context.handle(
+        _taxCategoryIdMeta,
+        taxCategoryId.isAcceptableOrUnknown(
+          data['tax_category_id']!,
+          _taxCategoryIdMeta,
+        ),
+      );
+    }
     if (data.containsKey('expiry_date')) {
       context.handle(
         _expiryDateMeta,
@@ -10024,6 +10048,10 @@ class $ProductsTable extends Products with TableInfo<$ProductsTable, Product> {
         DriftSqlType.int,
         data['${effectivePrefix}tax_type_id'],
       ),
+      taxCategoryId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}tax_category_id'],
+      ),
       expiryDate: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
         data['${effectivePrefix}expiry_date'],
@@ -10068,6 +10096,7 @@ class Product extends DataClass implements Insertable<Product> {
   final String? barcode;
   final String? hsnCode;
   final int? taxTypeId;
+  final int? taxCategoryId;
 
   /// Optional expiry date for the parent product (e.g. food, medicine).
   final DateTime? expiryDate;
@@ -10090,6 +10119,7 @@ class Product extends DataClass implements Insertable<Product> {
     this.barcode,
     this.hsnCode,
     this.taxTypeId,
+    this.taxCategoryId,
     this.expiryDate,
     this.notes,
     required this.isActive,
@@ -10130,6 +10160,9 @@ class Product extends DataClass implements Insertable<Product> {
     }
     if (!nullToAbsent || taxTypeId != null) {
       map['tax_type_id'] = Variable<int>(taxTypeId);
+    }
+    if (!nullToAbsent || taxCategoryId != null) {
+      map['tax_category_id'] = Variable<int>(taxCategoryId);
     }
     if (!nullToAbsent || expiryDate != null) {
       map['expiry_date'] = Variable<DateTime>(expiryDate);
@@ -10175,6 +10208,9 @@ class Product extends DataClass implements Insertable<Product> {
       taxTypeId: taxTypeId == null && nullToAbsent
           ? const Value.absent()
           : Value(taxTypeId),
+      taxCategoryId: taxCategoryId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(taxCategoryId),
       expiryDate: expiryDate == null && nullToAbsent
           ? const Value.absent()
           : Value(expiryDate),
@@ -10207,6 +10243,7 @@ class Product extends DataClass implements Insertable<Product> {
       barcode: serializer.fromJson<String?>(json['barcode']),
       hsnCode: serializer.fromJson<String?>(json['hsnCode']),
       taxTypeId: serializer.fromJson<int?>(json['taxTypeId']),
+      taxCategoryId: serializer.fromJson<int?>(json['taxCategoryId']),
       expiryDate: serializer.fromJson<DateTime?>(json['expiryDate']),
       notes: serializer.fromJson<String?>(json['notes']),
       isActive: serializer.fromJson<bool>(json['isActive']),
@@ -10232,6 +10269,7 @@ class Product extends DataClass implements Insertable<Product> {
       'barcode': serializer.toJson<String?>(barcode),
       'hsnCode': serializer.toJson<String?>(hsnCode),
       'taxTypeId': serializer.toJson<int?>(taxTypeId),
+      'taxCategoryId': serializer.toJson<int?>(taxCategoryId),
       'expiryDate': serializer.toJson<DateTime?>(expiryDate),
       'notes': serializer.toJson<String?>(notes),
       'isActive': serializer.toJson<bool>(isActive),
@@ -10255,6 +10293,7 @@ class Product extends DataClass implements Insertable<Product> {
     Value<String?> barcode = const Value.absent(),
     Value<String?> hsnCode = const Value.absent(),
     Value<int?> taxTypeId = const Value.absent(),
+    Value<int?> taxCategoryId = const Value.absent(),
     Value<DateTime?> expiryDate = const Value.absent(),
     Value<String?> notes = const Value.absent(),
     bool? isActive,
@@ -10281,6 +10320,9 @@ class Product extends DataClass implements Insertable<Product> {
     barcode: barcode.present ? barcode.value : this.barcode,
     hsnCode: hsnCode.present ? hsnCode.value : this.hsnCode,
     taxTypeId: taxTypeId.present ? taxTypeId.value : this.taxTypeId,
+    taxCategoryId: taxCategoryId.present
+        ? taxCategoryId.value
+        : this.taxCategoryId,
     expiryDate: expiryDate.present ? expiryDate.value : this.expiryDate,
     notes: notes.present ? notes.value : this.notes,
     isActive: isActive ?? this.isActive,
@@ -10317,6 +10359,9 @@ class Product extends DataClass implements Insertable<Product> {
       barcode: data.barcode.present ? data.barcode.value : this.barcode,
       hsnCode: data.hsnCode.present ? data.hsnCode.value : this.hsnCode,
       taxTypeId: data.taxTypeId.present ? data.taxTypeId.value : this.taxTypeId,
+      taxCategoryId: data.taxCategoryId.present
+          ? data.taxCategoryId.value
+          : this.taxCategoryId,
       expiryDate: data.expiryDate.present
           ? data.expiryDate.value
           : this.expiryDate,
@@ -10344,6 +10389,7 @@ class Product extends DataClass implements Insertable<Product> {
           ..write('barcode: $barcode, ')
           ..write('hsnCode: $hsnCode, ')
           ..write('taxTypeId: $taxTypeId, ')
+          ..write('taxCategoryId: $taxCategoryId, ')
           ..write('expiryDate: $expiryDate, ')
           ..write('notes: $notes, ')
           ..write('isActive: $isActive, ')
@@ -10369,6 +10415,7 @@ class Product extends DataClass implements Insertable<Product> {
     barcode,
     hsnCode,
     taxTypeId,
+    taxCategoryId,
     expiryDate,
     notes,
     isActive,
@@ -10393,6 +10440,7 @@ class Product extends DataClass implements Insertable<Product> {
           other.barcode == this.barcode &&
           other.hsnCode == this.hsnCode &&
           other.taxTypeId == this.taxTypeId &&
+          other.taxCategoryId == this.taxCategoryId &&
           other.expiryDate == this.expiryDate &&
           other.notes == this.notes &&
           other.isActive == this.isActive &&
@@ -10415,6 +10463,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
   final Value<String?> barcode;
   final Value<String?> hsnCode;
   final Value<int?> taxTypeId;
+  final Value<int?> taxCategoryId;
   final Value<DateTime?> expiryDate;
   final Value<String?> notes;
   final Value<bool> isActive;
@@ -10435,6 +10484,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     this.barcode = const Value.absent(),
     this.hsnCode = const Value.absent(),
     this.taxTypeId = const Value.absent(),
+    this.taxCategoryId = const Value.absent(),
     this.expiryDate = const Value.absent(),
     this.notes = const Value.absent(),
     this.isActive = const Value.absent(),
@@ -10456,6 +10506,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     this.barcode = const Value.absent(),
     this.hsnCode = const Value.absent(),
     this.taxTypeId = const Value.absent(),
+    this.taxCategoryId = const Value.absent(),
     this.expiryDate = const Value.absent(),
     this.notes = const Value.absent(),
     this.isActive = const Value.absent(),
@@ -10479,6 +10530,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     Expression<String>? barcode,
     Expression<String>? hsnCode,
     Expression<int>? taxTypeId,
+    Expression<int>? taxCategoryId,
     Expression<DateTime>? expiryDate,
     Expression<String>? notes,
     Expression<bool>? isActive,
@@ -10500,6 +10552,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
       if (barcode != null) 'barcode': barcode,
       if (hsnCode != null) 'hsn_code': hsnCode,
       if (taxTypeId != null) 'tax_type_id': taxTypeId,
+      if (taxCategoryId != null) 'tax_category_id': taxCategoryId,
       if (expiryDate != null) 'expiry_date': expiryDate,
       if (notes != null) 'notes': notes,
       if (isActive != null) 'is_active': isActive,
@@ -10523,6 +10576,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     Value<String?>? barcode,
     Value<String?>? hsnCode,
     Value<int?>? taxTypeId,
+    Value<int?>? taxCategoryId,
     Value<DateTime?>? expiryDate,
     Value<String?>? notes,
     Value<bool>? isActive,
@@ -10544,6 +10598,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
       barcode: barcode ?? this.barcode,
       hsnCode: hsnCode ?? this.hsnCode,
       taxTypeId: taxTypeId ?? this.taxTypeId,
+      taxCategoryId: taxCategoryId ?? this.taxCategoryId,
       expiryDate: expiryDate ?? this.expiryDate,
       notes: notes ?? this.notes,
       isActive: isActive ?? this.isActive,
@@ -10597,6 +10652,9 @@ class ProductsCompanion extends UpdateCompanion<Product> {
     if (taxTypeId.present) {
       map['tax_type_id'] = Variable<int>(taxTypeId.value);
     }
+    if (taxCategoryId.present) {
+      map['tax_category_id'] = Variable<int>(taxCategoryId.value);
+    }
     if (expiryDate.present) {
       map['expiry_date'] = Variable<DateTime>(expiryDate.value);
     }
@@ -10632,6 +10690,7 @@ class ProductsCompanion extends UpdateCompanion<Product> {
           ..write('barcode: $barcode, ')
           ..write('hsnCode: $hsnCode, ')
           ..write('taxTypeId: $taxTypeId, ')
+          ..write('taxCategoryId: $taxCategoryId, ')
           ..write('expiryDate: $expiryDate, ')
           ..write('notes: $notes, ')
           ..write('isActive: $isActive, ')
@@ -19288,6 +19347,25 @@ final class $$TaxCategoriesTableReferences
       manager.$state.copyWith(prefetchedData: cache),
     );
   }
+
+  static MultiTypedResultKey<$ProductsTable, List<Product>> _productsRefsTable(
+    _$AppDatabase db,
+  ) => MultiTypedResultKey.fromTable(
+    db.products,
+    aliasName: 'tax_category__id__product__tax_category_id',
+  );
+
+  $$ProductsTableProcessedTableManager get productsRefs {
+    final manager = $$ProductsTableTableManager(
+      $_db,
+      $_db.products,
+    ).filter((f) => f.taxCategoryId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_productsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
 }
 
 class $$TaxCategoriesTableFilterComposer
@@ -19350,6 +19428,31 @@ class $$TaxCategoriesTableFilterComposer
           }) => $$TaxCategoryRatesTableFilterComposer(
             $db: $db,
             $table: $db.taxCategoryRates,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+
+  Expression<bool> productsRefs(
+    Expression<bool> Function($$ProductsTableFilterComposer f) f,
+  ) {
+    final $$ProductsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.products,
+      getReferencedColumn: (t) => t.taxCategoryId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProductsTableFilterComposer(
+            $db: $db,
+            $table: $db.products,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -19465,6 +19568,31 @@ class $$TaxCategoriesTableAnnotationComposer
     );
     return f(composer);
   }
+
+  Expression<T> productsRefs<T extends Object>(
+    Expression<T> Function($$ProductsTableAnnotationComposer a) f,
+  ) {
+    final $$ProductsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.products,
+      getReferencedColumn: (t) => t.taxCategoryId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$ProductsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.products,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
 }
 
 class $$TaxCategoriesTableTableManager
@@ -19480,7 +19608,7 @@ class $$TaxCategoriesTableTableManager
           $$TaxCategoriesTableUpdateCompanionBuilder,
           (TaxCategory, $$TaxCategoriesTableReferences),
           TaxCategory,
-          PrefetchHooks Function({bool taxCategoryRatesRefs})
+          PrefetchHooks Function({bool taxCategoryRatesRefs, bool productsRefs})
         > {
   $$TaxCategoriesTableTableManager(_$AppDatabase db, $TaxCategoriesTable table)
     : super(
@@ -19537,40 +19665,63 @@ class $$TaxCategoriesTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({taxCategoryRatesRefs = false}) {
-            return PrefetchHooks(
-              db: db,
-              explicitlyWatchedTables: [
-                if (taxCategoryRatesRefs) db.taxCategoryRates,
-              ],
-              addJoins: null,
-              getPrefetchedDataCallback: (items) async {
-                return [
-                  if (taxCategoryRatesRefs)
-                    await $_getPrefetchedData<
-                      TaxCategory,
-                      $TaxCategoriesTable,
-                      TaxCategoryRate
-                    >(
-                      currentTable: table,
-                      referencedTable: $$TaxCategoriesTableReferences
-                          ._taxCategoryRatesRefsTable(db),
-                      managerFromTypedResult: (p0) =>
-                          $$TaxCategoriesTableReferences(
-                            db,
-                            table,
-                            p0,
-                          ).taxCategoryRatesRefs,
-                      referencedItemsForCurrentItem: (item, referencedItems) =>
-                          referencedItems.where(
-                            (e) => e.taxCategoryId == item.id,
-                          ),
-                      typedResults: items,
-                    ),
-                ];
+          prefetchHooksCallback:
+              ({taxCategoryRatesRefs = false, productsRefs = false}) {
+                return PrefetchHooks(
+                  db: db,
+                  explicitlyWatchedTables: [
+                    if (taxCategoryRatesRefs) db.taxCategoryRates,
+                    if (productsRefs) db.products,
+                  ],
+                  addJoins: null,
+                  getPrefetchedDataCallback: (items) async {
+                    return [
+                      if (taxCategoryRatesRefs)
+                        await $_getPrefetchedData<
+                          TaxCategory,
+                          $TaxCategoriesTable,
+                          TaxCategoryRate
+                        >(
+                          currentTable: table,
+                          referencedTable: $$TaxCategoriesTableReferences
+                              ._taxCategoryRatesRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$TaxCategoriesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).taxCategoryRatesRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.taxCategoryId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                      if (productsRefs)
+                        await $_getPrefetchedData<
+                          TaxCategory,
+                          $TaxCategoriesTable,
+                          Product
+                        >(
+                          currentTable: table,
+                          referencedTable: $$TaxCategoriesTableReferences
+                              ._productsRefsTable(db),
+                          managerFromTypedResult: (p0) =>
+                              $$TaxCategoriesTableReferences(
+                                db,
+                                table,
+                                p0,
+                              ).productsRefs,
+                          referencedItemsForCurrentItem:
+                              (item, referencedItems) => referencedItems.where(
+                                (e) => e.taxCategoryId == item.id,
+                              ),
+                          typedResults: items,
+                        ),
+                    ];
+                  },
+                );
               },
-            );
-          },
         ),
       );
 }
@@ -19587,7 +19738,7 @@ typedef $$TaxCategoriesTableProcessedTableManager =
       $$TaxCategoriesTableUpdateCompanionBuilder,
       (TaxCategory, $$TaxCategoriesTableReferences),
       TaxCategory,
-      PrefetchHooks Function({bool taxCategoryRatesRefs})
+      PrefetchHooks Function({bool taxCategoryRatesRefs, bool productsRefs})
     >;
 typedef $$TaxTypesTableCreateCompanionBuilder =
     TaxTypesCompanion Function({
@@ -21980,6 +22131,7 @@ typedef $$ProductsTableCreateCompanionBuilder =
       Value<String?> barcode,
       Value<String?> hsnCode,
       Value<int?> taxTypeId,
+      Value<int?> taxCategoryId,
       Value<DateTime?> expiryDate,
       Value<String?> notes,
       Value<bool> isActive,
@@ -22002,6 +22154,7 @@ typedef $$ProductsTableUpdateCompanionBuilder =
       Value<String?> barcode,
       Value<String?> hsnCode,
       Value<int?> taxTypeId,
+      Value<int?> taxCategoryId,
       Value<DateTime?> expiryDate,
       Value<String?> notes,
       Value<bool> isActive,
@@ -22093,6 +22246,24 @@ final class $$ProductsTableReferences
       $_db.taxTypes,
     ).filter((f) => f.id.sqlEquals($_column));
     final item = $_typedResult.readTableOrNull(_taxTypeIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+
+  static $TaxCategoriesTable _taxCategoryIdTable(_$AppDatabase db) => db
+      .taxCategories
+      .createAlias('product__tax_category_id__tax_category__id');
+
+  $$TaxCategoriesTableProcessedTableManager? get taxCategoryId {
+    final $_column = $_itemColumn<int>('tax_category_id');
+    if ($_column == null) return null;
+    final manager = $$TaxCategoriesTableTableManager(
+      $_db,
+      $_db.taxCategories,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_taxCategoryIdTable($_db));
     if (item == null) return manager;
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: [item]),
@@ -22384,6 +22555,29 @@ class $$ProductsTableFilterComposer
           }) => $$TaxTypesTableFilterComposer(
             $db: $db,
             $table: $db.taxTypes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
+  $$TaxCategoriesTableFilterComposer get taxCategoryId {
+    final $$TaxCategoriesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.taxCategoryId,
+      referencedTable: $db.taxCategories,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TaxCategoriesTableFilterComposer(
+            $db: $db,
+            $table: $db.taxCategories,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -22713,6 +22907,29 @@ class $$ProductsTableOrderingComposer
     );
     return composer;
   }
+
+  $$TaxCategoriesTableOrderingComposer get taxCategoryId {
+    final $$TaxCategoriesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.taxCategoryId,
+      referencedTable: $db.taxCategories,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TaxCategoriesTableOrderingComposer(
+            $db: $db,
+            $table: $db.taxCategories,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
 }
 
 class $$ProductsTableAnnotationComposer
@@ -22893,6 +23110,29 @@ class $$ProductsTableAnnotationComposer
     return composer;
   }
 
+  $$TaxCategoriesTableAnnotationComposer get taxCategoryId {
+    final $$TaxCategoriesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.taxCategoryId,
+      referencedTable: $db.taxCategories,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$TaxCategoriesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.taxCategories,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+
   Expression<T> productVariantsRefs<T extends Object>(
     Expression<T> Function($$ProductVariantsTableAnnotationComposer a) f,
   ) {
@@ -23039,6 +23279,7 @@ class $$ProductsTableTableManager
             bool brandId,
             bool unitId,
             bool taxTypeId,
+            bool taxCategoryId,
             bool productVariantsRefs,
             bool productUomsRefs,
             bool purchaseItemsRefs,
@@ -23073,6 +23314,7 @@ class $$ProductsTableTableManager
                 Value<String?> barcode = const Value.absent(),
                 Value<String?> hsnCode = const Value.absent(),
                 Value<int?> taxTypeId = const Value.absent(),
+                Value<int?> taxCategoryId = const Value.absent(),
                 Value<DateTime?> expiryDate = const Value.absent(),
                 Value<String?> notes = const Value.absent(),
                 Value<bool> isActive = const Value.absent(),
@@ -23093,6 +23335,7 @@ class $$ProductsTableTableManager
                 barcode: barcode,
                 hsnCode: hsnCode,
                 taxTypeId: taxTypeId,
+                taxCategoryId: taxCategoryId,
                 expiryDate: expiryDate,
                 notes: notes,
                 isActive: isActive,
@@ -23115,6 +23358,7 @@ class $$ProductsTableTableManager
                 Value<String?> barcode = const Value.absent(),
                 Value<String?> hsnCode = const Value.absent(),
                 Value<int?> taxTypeId = const Value.absent(),
+                Value<int?> taxCategoryId = const Value.absent(),
                 Value<DateTime?> expiryDate = const Value.absent(),
                 Value<String?> notes = const Value.absent(),
                 Value<bool> isActive = const Value.absent(),
@@ -23135,6 +23379,7 @@ class $$ProductsTableTableManager
                 barcode: barcode,
                 hsnCode: hsnCode,
                 taxTypeId: taxTypeId,
+                taxCategoryId: taxCategoryId,
                 expiryDate: expiryDate,
                 notes: notes,
                 isActive: isActive,
@@ -23156,6 +23401,7 @@ class $$ProductsTableTableManager
                 brandId = false,
                 unitId = false,
                 taxTypeId = false,
+                taxCategoryId = false,
                 productVariantsRefs = false,
                 productUomsRefs = false,
                 purchaseItemsRefs = false,
@@ -23248,6 +23494,19 @@ class $$ProductsTableTableManager
                                         ._taxTypeIdTable(db),
                                     referencedColumn: $$ProductsTableReferences
                                         ._taxTypeIdTable(db)
+                                        .id,
+                                  )
+                                  as T;
+                        }
+                        if (taxCategoryId) {
+                          state =
+                              state.withJoin(
+                                    currentTable: table,
+                                    currentColumn: table.taxCategoryId,
+                                    referencedTable: $$ProductsTableReferences
+                                        ._taxCategoryIdTable(db),
+                                    referencedColumn: $$ProductsTableReferences
+                                        ._taxCategoryIdTable(db)
                                         .id,
                                   )
                                   as T;
@@ -23388,6 +23647,7 @@ typedef $$ProductsTableProcessedTableManager =
         bool brandId,
         bool unitId,
         bool taxTypeId,
+        bool taxCategoryId,
         bool productVariantsRefs,
         bool productUomsRefs,
         bool purchaseItemsRefs,

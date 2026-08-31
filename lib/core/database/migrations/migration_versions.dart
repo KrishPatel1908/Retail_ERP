@@ -56,6 +56,12 @@ abstract final class DatabaseSchemaVersion {
   /// `warehouse_id` column (existing rows preserved).
   static const int v11 = 11;
 
+  /// Schema version 12 — products reference Tax Categories via a new
+  /// `tax_category_id` column (instead of an atomic Tax Type), and the seeded
+  /// `tax_category_rate` data is repaired so each seeded category's CGST+SGST
+  /// components sum to its intended total.
+  static const int v12 = 12;
+
   /// The current schema version of the application.
-  static const int latest = v11;
+  static const int latest = v12;
 }
