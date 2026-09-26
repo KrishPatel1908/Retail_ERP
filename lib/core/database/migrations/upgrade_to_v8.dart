@@ -82,7 +82,9 @@ Future<void> _rebuildProductTable(AppDatabase database) async {
   final hasProductUom = await _tableExists(database, 'product_uom');
 
   if (hasProductUom) {
-    await database.customStatement('DROP INDEX IF EXISTS idx_product_uom_product');
+    await database.customStatement(
+      'DROP INDEX IF EXISTS idx_product_uom_product',
+    );
     await database.customStatement(
       'CREATE TABLE product_uom_new AS SELECT * FROM product_uom',
     );

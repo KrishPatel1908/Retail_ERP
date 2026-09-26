@@ -16,7 +16,7 @@ final _throwsDatabaseError = throwsA(
   anyOf(isA<SqliteException>(), isA<DriftWrappedException>()),
 );
 
-/// The 19 tables of the approved blueprint.
+/// The tables of the approved blueprint.
 const _expectedTables = {
   'company_settings',
   'category',
@@ -37,6 +37,9 @@ const _expectedTables = {
   'purchase_item',
   'inventory_transaction',
   'current_stock',
+  'purchase_transaction',
+  'purchase_return',
+  'purchase_return_item',
 };
 
 /// The 10 case-insensitive unique indexes of the approved blueprint. Units
@@ -82,7 +85,7 @@ void main() {
       expect(result.single.data.values.single, 1);
     });
 
-    test('registers all 19 blueprint tables', () async {
+    test('registers all 22 blueprint tables', () async {
       final db = AppDatabase(NativeDatabase.memory());
       addTearDown(db.close);
       await db.customSelect('SELECT 1').get();
@@ -101,11 +104,11 @@ void main() {
       final db = AppDatabase(NativeDatabase.memory());
       addTearDown(db.close);
 
-      expect(db.schemaVersion, 12);
+      expect(db.schemaVersion, 15);
       await db.customSelect('SELECT 1').get();
 
       final row = (await db.customSelect('PRAGMA user_version').get()).single;
-      expect(row.read<int>('user_version'), 12);
+      expect(row.read<int>('user_version'), 15);
     });
 
     test('creates the case-insensitive unique indexes', () async {
@@ -516,10 +519,10 @@ void main() {
         addTearDown(db.close);
         await db.customSelect('SELECT 1').get();
 
-        expect(db.schemaVersion, 12);
+        expect(db.schemaVersion, 15);
         final versionRow =
             (await db.customSelect('PRAGMA user_version').get()).single;
-        expect(versionRow.read<int>('user_version'), 12);
+        expect(versionRow.read<int>("user_version"), 15);
 
         // The old columns are gone and the new ones are present.
         final unitColumns = await db
@@ -654,7 +657,8 @@ void main() {
       final v3 = sq.sqlite3.open(file.path);
       v3.execute('PRAGMA user_version = 3');
       // The v3 customer shape had `credit_limit`; the supplier did not.
-      const sharedColumns = ', gst_number TEXT, mobile TEXT, '
+      const sharedColumns =
+          ', gst_number TEXT, mobile TEXT, '
           'alternate_mobile TEXT, email TEXT, address TEXT, city TEXT, '
           'state TEXT, state_code TEXT, country TEXT, pincode TEXT, '
           'opening_balance INTEGER NOT NULL DEFAULT 0, '
@@ -691,17 +695,18 @@ void main() {
       final db = AppDatabase(NativeDatabase(file));
       addTearDown(db.close);
       await db.customSelect('SELECT 1').get();
-      expect(db.schemaVersion, 12);
+      expect(db.schemaVersion, 15);
       final versionRow =
           (await db.customSelect('PRAGMA user_version').get()).single;
-      expect(versionRow.read<int>('user_version'), 12);
+      expect(versionRow.read<int>("user_version"), 15);
 
-        // Customer gained the new columns and `address` became line 1.
+      // Customer gained the new columns and `address` became line 1.
       final customerColumns = await db
           .customSelect("SELECT name FROM pragma_table_info('customer')")
           .get();
-      final customerNames =
-          customerColumns.map((row) => row.read<String>('name')).toSet();
+      final customerNames = customerColumns
+          .map((row) => row.read<String>('name'))
+          .toSet();
       expect(
         customerNames,
         containsAll([
@@ -718,8 +723,9 @@ void main() {
       final supplierColumns = await db
           .customSelect("SELECT name FROM pragma_table_info('supplier')")
           .get();
-      final supplierNames =
-          supplierColumns.map((row) => row.read<String>('name')).toSet();
+      final supplierNames = supplierColumns
+          .map((row) => row.read<String>('name'))
+          .toSet();
       expect(
         supplierNames,
         containsAll([
@@ -789,11 +795,16 @@ void main() {
       final db = AppDatabase(NativeDatabase(file));
       addTearDown(db.close);
       await db.customSelect('SELECT 1').get();
-      expect(db.schemaVersion, 12);
+      expect(db.schemaVersion, 15);
 
-        final customerCols = (await db.customSelect("SELECT name FROM pragma_table_info('customer')").get())
-          .map((r) => r.read<String>('name'))
-          .toSet();
+      final customerCols =
+          (await db
+                  .customSelect(
+                    "SELECT name FROM pragma_table_info('customer')",
+                  )
+                  .get())
+              .map((r) => r.read<String>('name'))
+              .toSet();
       expect(
         customerCols,
         containsAll([
@@ -806,9 +817,14 @@ void main() {
         ]),
       );
 
-      final supplierCols = (await db.customSelect("SELECT name FROM pragma_table_info('supplier')").get())
-          .map((r) => r.read<String>('name'))
-          .toSet();
+      final supplierCols =
+          (await db
+                  .customSelect(
+                    "SELECT name FROM pragma_table_info('supplier')",
+                  )
+                  .get())
+              .map((r) => r.read<String>('name'))
+              .toSet();
       expect(
         supplierCols,
         containsAll([
@@ -867,16 +883,19 @@ void main() {
       final db = AppDatabase(NativeDatabase(file));
       addTearDown(db.close);
       await db.customSelect('SELECT 1').get();
-      expect(db.schemaVersion, 12);
+      expect(db.schemaVersion, 15);
       final versionRow =
           (await db.customSelect('PRAGMA user_version').get()).single;
-      expect(versionRow.read<int>('user_version'), 12);
+      expect(versionRow.read<int>("user_version"), 15);
 
-        final columns = (await db
-              .customSelect("SELECT name FROM pragma_table_info('company_settings')")
-              .get())
-          .map((r) => r.read<String>('name'))
-          .toSet();
+      final columns =
+          (await db
+                  .customSelect(
+                    "SELECT name FROM pragma_table_info('company_settings')",
+                  )
+                  .get())
+              .map((r) => r.read<String>('name'))
+              .toSet();
       expect(
         columns,
         containsAll([

@@ -34,8 +34,7 @@ class ProductUomDisplay {
   final DateTime createdAt;
   final DateTime updatedAt;
 
-  String get factorText =>
-      conversionFactor % 1 == 0
-          ? conversionFactor.toInt().toString()
-          : conversionFactor.toString();
+  String get factorText => conversionFactor % 1 == 0
+      ? conversionFactor.toInt().toString()
+      : conversionFactor.toString();
 }

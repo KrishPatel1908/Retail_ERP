@@ -35,14 +35,16 @@ class TaxTypeRepository {
       return getAllTaxTypes();
     }
 
-    final rows = await (_database.select(_database.taxTypes)
-      ..where(
-        (t) =>
-            t.taxTypeName.lower().contains(normalized) |
-            (t.description.isNotNull() &
-                t.description.lower().contains(normalized)),
-      )
-      ..orderBy([(t) => OrderingTerm.asc(t.taxTypeName.lower())])).get();
+    final rows =
+        await (_database.select(_database.taxTypes)
+              ..where(
+                (t) =>
+                    t.taxTypeName.lower().contains(normalized) |
+                    (t.description.isNotNull() &
+                        t.description.lower().contains(normalized)),
+              )
+              ..orderBy([(t) => OrderingTerm.asc(t.taxTypeName.lower())]))
+            .get();
 
     return rows.map(_toEntity).toList();
   }
@@ -53,15 +55,16 @@ class TaxTypeRepository {
   /// uniqueness during an edit.
   Future<bool> existsByName(String name, {int? excludeId}) async {
     final normalized = name.trim().toLowerCase();
-    final row =
-        await (_database.select(_database.taxTypes)..where((t) {
-              final matches = t.taxTypeName.lower().equals(normalized);
-              if (excludeId == null) {
-                return matches;
-              }
-              return matches & t.id.isNotValue(excludeId);
-            }))
-            .getSingleOrNull();
+    final t = _database.taxTypes;
+    final condition = excludeId == null
+        ? t.taxTypeName.lower().equals(normalized)
+        : t.taxTypeName.lower().equals(normalized) &
+            t.id.isNotValue(excludeId);
+    final row = await (_database.selectOnly(t)
+          ..addColumns([t.id])
+          ..where(condition)
+          ..limit(1))
+        .getSingleOrNull();
     return row != null;
   }
 
@@ -80,13 +83,15 @@ class TaxTypeRepository {
     }
 
     try {
-      final id = await _database.into(_database.taxTypes).insert(
-        db.TaxTypesCompanion.insert(
-          taxTypeCode: 'TT_${DateTime.now().microsecondsSinceEpoch}',
-          taxTypeName: trimmedName,
-          description: Value(trimmedDescription),
-        ),
-      );
+      final id = await _database
+          .into(_database.taxTypes)
+          .insert(
+            db.TaxTypesCompanion.insert(
+              taxTypeCode: 'TT_${DateTime.now().microsecondsSinceEpoch}',
+              taxTypeName: trimmedName,
+              description: Value(trimmedDescription),
+            ),
+          );
       return _toEntity(await _getById(id));
     } on Exception catch (error, stackTrace) {
       if (_isUniqueViolation(error) && await existsByName(trimmedName)) {
@@ -150,10 +155,12 @@ class TaxTypeRepository {
   ///
   /// Throws [TaxTypeInUseException] when referenced by tax category rates or products.
   Future<void> deleteTaxType(int id) async {
-    final productCount = await (_database.select(_database.products)
-      ..where((t) => t.taxTypeId.equals(id))).get().then((l) => l.length);
-    final rateCount = await (_database.select(_database.taxCategoryRates)
-      ..where((t) => t.taxTypeId.equals(id))).get().then((l) => l.length);
+    final productCount = await (_database.select(
+      _database.products,
+    )..where((t) => t.taxTypeId.equals(id))).get().then((l) => l.length);
+    final rateCount = await (_database.select(
+      _database.taxCategoryRates,
+    )..where((t) => t.taxTypeId.equals(id))).get().then((l) => l.length);
 
     if (productCount > 0 || rateCount > 0) {
       throw const TaxTypeInUseException();

@@ -4,8 +4,7 @@
 class UomConversionAlreadyExistsException implements Exception {
   const UomConversionAlreadyExistsException();
 
-  String get message =>
-      'A conversion between these units already exists.';
+  String get message => 'A conversion between these units already exists.';
 
   @override
   String toString() => 'UomConversionAlreadyExistsException: $message';

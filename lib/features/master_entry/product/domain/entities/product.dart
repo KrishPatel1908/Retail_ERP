@@ -26,6 +26,7 @@ class ProductEntity {
     this.taxTypeName,
     this.taxCategoryId,
     this.taxCategoryName,
+    this.minimumStock = 0,
     this.expiryDate,
     this.notes,
     required this.isActive,
@@ -77,6 +78,10 @@ class ProductEntity {
   /// auto-fill the tax rate from the category's configured total).
   final int? taxCategoryId;
   final String? taxCategoryName;
+
+  /// Minimum stock threshold used by the Inventory module's Low Stock status.
+  /// Zero disables the low-stock warning. Variants inherit this threshold.
+  final int minimumStock;
 
   /// Optional expiry date for the parent product.
   final DateTime? expiryDate;

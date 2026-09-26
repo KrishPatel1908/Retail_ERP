@@ -54,12 +54,11 @@ class ProductUomRepository {
             toUnits,
             toUnits.id.equalsExp(_database.productUoms.toUnitId),
           ),
-        ])
-          ..orderBy([
-            OrderingTerm.asc(_database.products.productName),
-            OrderingTerm.desc(_database.productUoms.isDefault),
-            OrderingTerm.asc(_database.productUoms.id),
-          ]);
+        ])..orderBy([
+          OrderingTerm.asc(_database.products.productName),
+          OrderingTerm.desc(_database.productUoms.isDefault),
+          OrderingTerm.asc(_database.productUoms.id),
+        ]);
 
     final rows = await query.get();
     return rows.map((row) {
@@ -97,19 +96,19 @@ class ProductUomRepository {
 
     final query =
         _database.select(_database.productUoms).join([
-          innerJoin(
-            _database.products,
-            _database.products.id.equalsExp(_database.productUoms.productId),
-          ),
-          innerJoin(
-            fromUnits,
-            fromUnits.id.equalsExp(_database.productUoms.fromUnitId),
-          ),
-          innerJoin(
-            toUnits,
-            toUnits.id.equalsExp(_database.productUoms.toUnitId),
-          ),
-        ])
+            innerJoin(
+              _database.products,
+              _database.products.id.equalsExp(_database.productUoms.productId),
+            ),
+            innerJoin(
+              fromUnits,
+              fromUnits.id.equalsExp(_database.productUoms.fromUnitId),
+            ),
+            innerJoin(
+              toUnits,
+              toUnits.id.equalsExp(_database.productUoms.toUnitId),
+            ),
+          ])
           ..where(
             _database.products.productName.lower().like(term) |
                 fromUnits.unitName.lower().like(term) |
@@ -154,11 +153,12 @@ class ProductUomRepository {
   Future<List<ProductUom>> getForProduct(int productId) async {
     final rows =
         await (_database.select(_database.productUoms)
-          ..where((t) => t.productId.equals(productId))
-          ..orderBy([
-            (t) => OrderingTerm.desc(t.isDefault),
-            (t) => OrderingTerm.asc(t.id),
-          ])).get();
+              ..where((t) => t.productId.equals(productId))
+              ..orderBy([
+                (t) => OrderingTerm.desc(t.isDefault),
+                (t) => OrderingTerm.asc(t.id),
+              ]))
+            .get();
     return rows.map(_toEntity).toList();
   }
 
@@ -170,18 +170,20 @@ class ProductUomRepository {
     double conversionFactor, {
     int? excludeId,
   }) async {
-    final row =
-        await (_database.select(_database.productUoms)..where((t) {
-          var matches =
-              t.productId.equals(productId) &
-              t.fromUnitId.equals(fromUnitId) &
-              t.toUnitId.equals(toUnitId) &
-              t.conversionFactor.equals(conversionFactor);
-          if (excludeId != null) {
-            matches = matches & t.id.isNotValue(excludeId);
-          }
-          return matches;
-        })).getSingleOrNull();
+    final t = _database.productUoms;
+    var matches =
+        t.productId.equals(productId) &
+        t.fromUnitId.equals(fromUnitId) &
+        t.toUnitId.equals(toUnitId) &
+        t.conversionFactor.equals(conversionFactor);
+    if (excludeId != null) {
+      matches = matches & t.id.isNotValue(excludeId);
+    }
+    final row = await (_database.selectOnly(t)
+          ..addColumns([t.id])
+          ..where(matches)
+          ..limit(1))
+        .getSingleOrNull();
     return row != null;
   }
 
@@ -208,29 +210,30 @@ class ProductUomRepository {
 
     try {
       final id = await _database.transaction(() async {
-        final existing =
-            await (_database.select(_database.productUoms)
-              ..where((t) => t.productId.equals(productId))).get();
+        final existing = await (_database.select(
+          _database.productUoms,
+        )..where((t) => t.productId.equals(productId))).get();
         final isFirst = existing.isEmpty;
         final shouldBeDefault = isDefault || isFirst;
 
         if (shouldBeDefault && existing.isNotEmpty) {
           await (_database.update(_database.productUoms)
-            ..where((t) => t.productId.equals(productId))).write(
-            const db.ProductUomsCompanion(isDefault: Value(false)),
-          );
+                ..where((t) => t.productId.equals(productId)))
+              .write(const db.ProductUomsCompanion(isDefault: Value(false)));
         }
 
-        return _database.into(_database.productUoms).insert(
-          db.ProductUomsCompanion.insert(
-            productId: productId,
-            fromUnitId: fromUnitId,
-            toUnitId: toUnitId,
-            conversionFactor: conversionFactor,
-            isDefault: Value(shouldBeDefault),
-            description: Value(_normalizeDescription(description)),
-          ),
-        );
+        return _database
+            .into(_database.productUoms)
+            .insert(
+              db.ProductUomsCompanion.insert(
+                productId: productId,
+                fromUnitId: fromUnitId,
+                toUnitId: toUnitId,
+                conversionFactor: conversionFactor,
+                isDefault: Value(shouldBeDefault),
+                description: Value(_normalizeDescription(description)),
+              ),
+            );
       });
       return _toEntity(await _getById(id));
     } on Exception catch (error, stackTrace) {
@@ -279,13 +282,13 @@ class ProductUomRepository {
       await _database.transaction(() async {
         if (resolvedIsDefault && !row.isDefault) {
           await (_database.update(_database.productUoms)
-            ..where((t) => t.productId.equals(resolvedProduct))).write(
-            const db.ProductUomsCompanion(isDefault: Value(false)),
-          );
+                ..where((t) => t.productId.equals(resolvedProduct)))
+              .write(const db.ProductUomsCompanion(isDefault: Value(false)));
         }
 
-        await (_database.update(_database.productUoms)
-          ..where((t) => t.id.equals(id))).write(
+        await (_database.update(
+          _database.productUoms,
+        )..where((t) => t.id.equals(id))).write(
           db.ProductUomsCompanion(
             productId: Value(resolvedProduct),
             fromUnitId: Value(resolvedFrom),
@@ -320,21 +323,22 @@ class ProductUomRepository {
 
     try {
       await _database.transaction(() async {
-        await (_database.delete(_database.productUoms)
-          ..where((t) => t.id.equals(id))).go();
+        await (_database.delete(
+          _database.productUoms,
+        )..where((t) => t.id.equals(id))).go();
 
         if (row.isDefault) {
           final remaining =
               await (_database.select(_database.productUoms)
-                ..where((t) => t.productId.equals(row.productId))
-                ..orderBy([(t) => OrderingTerm.asc(t.id)])).get();
+                    ..where((t) => t.productId.equals(row.productId))
+                    ..orderBy([(t) => OrderingTerm.asc(t.id)]))
+                  .get();
 
           if (remaining.isNotEmpty) {
             final oldest = remaining.first;
             await (_database.update(_database.productUoms)
-              ..where((t) => t.id.equals(oldest.id))).write(
-              const db.ProductUomsCompanion(isDefault: Value(true)),
-            );
+                  ..where((t) => t.id.equals(oldest.id)))
+                .write(const db.ProductUomsCompanion(isDefault: Value(true)));
           }
         }
       });
@@ -354,11 +358,11 @@ class ProductUomRepository {
 
     await _database.transaction(() async {
       await (_database.update(_database.productUoms)
-        ..where((t) => t.productId.equals(row.productId))).write(
-        const db.ProductUomsCompanion(isDefault: Value(false)),
-      );
-      await (_database.update(_database.productUoms)
-        ..where((t) => t.id.equals(id))).write(
+            ..where((t) => t.productId.equals(row.productId)))
+          .write(const db.ProductUomsCompanion(isDefault: Value(false)));
+      await (_database.update(
+        _database.productUoms,
+      )..where((t) => t.id.equals(id))).write(
         db.ProductUomsCompanion(
           isDefault: const Value(true),
           updatedAt: Value(DateTime.now()),
@@ -377,20 +381,22 @@ class ProductUomRepository {
 
     final forward =
         await (_database.select(_database.productUoms)..where(
-          (t) =>
-              t.productId.equals(productId) &
-              t.fromUnitId.equals(fromUnitId) &
-              t.toUnitId.equals(toUnitId),
-        )).getSingleOrNull();
+              (t) =>
+                  t.productId.equals(productId) &
+                  t.fromUnitId.equals(fromUnitId) &
+                  t.toUnitId.equals(toUnitId),
+            ))
+            .getSingleOrNull();
     if (forward != null) return forward.conversionFactor;
 
     final reverse =
         await (_database.select(_database.productUoms)..where(
-          (t) =>
-              t.productId.equals(productId) &
-              t.fromUnitId.equals(toUnitId) &
-              t.toUnitId.equals(fromUnitId),
-        )).getSingleOrNull();
+              (t) =>
+                  t.productId.equals(productId) &
+                  t.fromUnitId.equals(toUnitId) &
+                  t.toUnitId.equals(fromUnitId),
+            ))
+            .getSingleOrNull();
     if (reverse != null) return 1 / reverse.conversionFactor;
 
     return null;
@@ -411,8 +417,9 @@ class ProductUomRepository {
   }
 
   Future<db.ProductUom?> _getByIdOrNull(int id) async {
-    return (_database.select(_database.productUoms)
-      ..where((t) => t.id.equals(id))).getSingleOrNull();
+    return (_database.select(
+      _database.productUoms,
+    )..where((t) => t.id.equals(id))).getSingleOrNull();
   }
 
   Future<db.ProductUom> _getById(int id) async {

@@ -63,7 +63,9 @@ class SidebarItem extends StatelessWidget {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: textTheme.bodyMedium?.copyWith(
-                          fontWeight: selected ? FontWeight.w600 : FontWeight.w500,
+                          fontWeight: selected
+                              ? FontWeight.w600
+                              : FontWeight.w500,
                           color: selected
                               ? colorScheme.primary
                               : colorScheme.onSurfaceVariant,
@@ -76,9 +78,7 @@ class SidebarItem extends StatelessWidget {
             )
           : SizedBox(
               height: 44,
-              child: Center(
-                child: Icon(iconData, size: 20, color: iconColor),
-              ),
+              child: Center(child: Icon(iconData, size: 20, color: iconColor)),
             ),
     );
 

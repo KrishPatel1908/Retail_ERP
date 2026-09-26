@@ -66,10 +66,12 @@ class _VariantEditDialogState extends State<VariantEditDialog> {
           ? ''
           : ProductValidator.formatPaise(widget.variant.wholesalePrice!),
     );
-    _barcodeController =
-        TextEditingController(text: widget.variant.barcode ?? '');
-    _hsnCodeController =
-        TextEditingController(text: widget.variant.hsnCode ?? '');
+    _barcodeController = TextEditingController(
+      text: widget.variant.barcode ?? '',
+    );
+    _hsnCodeController = TextEditingController(
+      text: widget.variant.hsnCode ?? '',
+    );
     _notesController = TextEditingController(text: widget.variant.notes ?? '');
     _selectedExpiryDate = widget.variant.expiryDate;
   }
@@ -99,11 +101,11 @@ class _VariantEditDialogState extends State<VariantEditDialog> {
 
     final vNameErr = ProductValidator.validateVariantName(name);
     final vPriceErr = ProductValidator.validateVariantSellingPrice(price);
-    final vPurchaseErr =
-        ProductValidator.validatePurchasePrice(purchasePrice);
+    final vPurchaseErr = ProductValidator.validatePurchasePrice(purchasePrice);
     final vMrpErr = ProductValidator.validateMrp(mrp);
-    final vWholesaleErr =
-        ProductValidator.validateWholesalePrice(wholesalePrice);
+    final vWholesaleErr = ProductValidator.validateWholesalePrice(
+      wholesalePrice,
+    );
     final vBarcodeErr = ProductValidator.validateBarcode(barcode);
     final vHsnErr = ProductValidator.validateHsnCode(hsnCode);
 
@@ -139,11 +141,13 @@ class _VariantEditDialogState extends State<VariantEditDialog> {
 
     try {
       final parsedPrice = ProductValidator.parseRupeesToPaise(price) ?? 0;
-      final parsedPurchasePrice =
-          ProductValidator.parseRupeesToPaise(purchasePrice);
+      final parsedPurchasePrice = ProductValidator.parseRupeesToPaise(
+        purchasePrice,
+      );
       final parsedMrp = ProductValidator.parseRupeesToPaise(mrp);
-      final parsedWholesalePrice =
-          ProductValidator.parseRupeesToPaise(wholesalePrice);
+      final parsedWholesalePrice = ProductValidator.parseRupeesToPaise(
+        wholesalePrice,
+      );
 
       await widget.repository.updateVariant(
         widget.variant.id,
@@ -190,11 +194,7 @@ class _VariantEditDialogState extends State<VariantEditDialog> {
     return AlertDialog(
       title: const Row(
         children: [
-          Icon(
-            Icons.edit_note_rounded,
-            size: 24,
-            color: AppTheme.primary,
-          ),
+          Icon(Icons.edit_note_rounded, size: 24, color: AppTheme.primary),
           SizedBox(width: 8),
           Text('Edit Variant'),
         ],
@@ -372,10 +372,8 @@ class _VariantEditDialogState extends State<VariantEditDialog> {
                     style: TextStyle(
                       fontSize: 14,
                       color: formattedExpiry.isEmpty
-                          ? Theme.of(context)
-                              .colorScheme
-                              .onSurfaceVariant
-                              .withValues(alpha: 0.6)
+                          ? Theme.of(context).colorScheme.onSurfaceVariant
+                                .withValues(alpha: 0.6)
                           : null,
                     ),
                   ),

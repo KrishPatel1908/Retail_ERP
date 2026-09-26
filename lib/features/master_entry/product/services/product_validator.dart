@@ -54,6 +54,15 @@ abstract final class ProductValidator {
     return null;
   }
 
+  /// Validates the optional minimum stock threshold.
+  static String? validateMinimumStock(String value) {
+    if (value.trim().isEmpty) return null; // Optional field, defaults to 0.
+    final parsed = int.tryParse(value.trim().replaceAll(',', ''));
+    if (parsed == null) return 'Please enter a valid whole number.';
+    if (parsed < 0) return 'Minimum stock cannot be negative.';
+    return null;
+  }
+
   /// Validates optional HSN/SAC code.
   static String? validateHsnCode(String value) {
     if (value.trim().isEmpty) return null;

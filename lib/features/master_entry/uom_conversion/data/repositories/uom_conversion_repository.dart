@@ -51,19 +51,20 @@ class UomConversionRepository {
     int toUnitId, {
     int? excludeId,
   }) async {
-    final row = await (_database.select(_database.uomConversions)..where((
-      t,
-    ) {
-      final sameDirection =
-          t.fromUnitId.equals(fromUnitId) & t.toUnitId.equals(toUnitId);
-      final reverse =
-          t.fromUnitId.equals(toUnitId) & t.toUnitId.equals(fromUnitId);
-      var matches = sameDirection | reverse;
-      if (excludeId != null) {
-        matches = matches & t.id.isNotValue(excludeId);
-      }
-      return matches;
-    })).getSingleOrNull();
+    final t = _database.uomConversions;
+    final sameDirection =
+        t.fromUnitId.equals(fromUnitId) & t.toUnitId.equals(toUnitId);
+    final reverse =
+        t.fromUnitId.equals(toUnitId) & t.toUnitId.equals(fromUnitId);
+    var matches = sameDirection | reverse;
+    if (excludeId != null) {
+      matches = matches & t.id.isNotValue(excludeId);
+    }
+    final row = await (_database.selectOnly(t)
+          ..addColumns([t.id])
+          ..where(matches)
+          ..limit(1))
+        .getSingleOrNull();
     return row != null;
   }
 
@@ -85,14 +86,16 @@ class UomConversionRepository {
     }
 
     try {
-      final id = await _database.into(_database.uomConversions).insert(
-        db.UomConversionsCompanion.insert(
-          fromUnitId: fromUnitId,
-          toUnitId: toUnitId,
-          conversionFactor: conversionFactor,
-          description: Value(_normalizeDescription(description)),
-        ),
-      );
+      final id = await _database
+          .into(_database.uomConversions)
+          .insert(
+            db.UomConversionsCompanion.insert(
+              fromUnitId: fromUnitId,
+              toUnitId: toUnitId,
+              conversionFactor: conversionFactor,
+              description: Value(_normalizeDescription(description)),
+            ),
+          );
       final rows = await (_database.select(
         _database.uomConversions,
       )..where((t) => t.id.equals(id))).get();
@@ -184,19 +187,20 @@ class UomConversionRepository {
   Future<double?> resolveFactor(int fromUnitId, int toUnitId) async {
     if (fromUnitId == toUnitId) return 1.0;
 
-    final forward = await (_database.select(
-      _database.uomConversions,
-    )..where(
-        (t) =>
-            t.fromUnitId.equals(fromUnitId) & t.toUnitId.equals(toUnitId),
-      )).getSingleOrNull();
+    final forward =
+        await (_database.select(_database.uomConversions)..where(
+              (t) =>
+                  t.fromUnitId.equals(fromUnitId) & t.toUnitId.equals(toUnitId),
+            ))
+            .getSingleOrNull();
     if (forward != null) return forward.conversionFactor;
 
-    final reverse = await (_database.select(
-      _database.uomConversions,
-    )..where(
-        (t) => t.fromUnitId.equals(toUnitId) & t.toUnitId.equals(fromUnitId),
-      )).getSingleOrNull();
+    final reverse =
+        await (_database.select(_database.uomConversions)..where(
+              (t) =>
+                  t.fromUnitId.equals(toUnitId) & t.toUnitId.equals(fromUnitId),
+            ))
+            .getSingleOrNull();
     if (reverse != null) return 1 / reverse.conversionFactor;
 
     return null;
@@ -220,9 +224,7 @@ class UomConversionRepository {
 
   /// Resolves display names for the given conversion rows and sorts them by
   /// from-unit name then to-unit name (case-insensitive).
-  Future<List<UomConversion>> _mapWithUnits(
-    List<db.UomConversion> rows,
-  ) async {
+  Future<List<UomConversion>> _mapWithUnits(List<db.UomConversion> rows) async {
     if (rows.isEmpty) return const [];
     final units = await (_database.select(_database.units)).get();
     final byId = {for (final unit in units) unit.id: unit};
@@ -250,9 +252,7 @@ class UomConversionRepository {
         b.fromUnitName.toLowerCase(),
       );
       if (byFrom != 0) return byFrom;
-      return a.toUnitName.toLowerCase().compareTo(
-        b.toUnitName.toLowerCase(),
-      );
+      return a.toUnitName.toLowerCase().compareTo(b.toUnitName.toLowerCase());
     });
     return result;
   }

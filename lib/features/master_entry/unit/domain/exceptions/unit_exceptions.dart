@@ -29,7 +29,8 @@ class UnitNotFoundException implements Exception {
 class UnitInUseException implements Exception {
   const UnitInUseException();
 
-  String get message => 'This unit is in use by conversions or products and cannot be deleted.';
+  String get message =>
+      'This unit is in use by conversions or products and cannot be deleted.';
 
   @override
   String toString() => 'UnitInUseException: $message';

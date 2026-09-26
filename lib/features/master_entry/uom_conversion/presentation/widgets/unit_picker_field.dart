@@ -114,10 +114,7 @@ class UnitPickerField extends StatelessWidget {
           onTap: () => _openPicker(context),
           borderRadius: BorderRadius.circular(10),
           child: InputDecorator(
-            decoration: InputDecoration(
-              errorText: errorText,
-              errorMaxLines: 2,
-            ),
+            decoration: InputDecoration(errorText: errorText, errorMaxLines: 2),
             child: Row(
               children: [
                 Expanded(
@@ -141,10 +138,7 @@ class UnitPickerField extends StatelessWidget {
                         ),
                 ),
                 const SizedBox(width: 8),
-                Icon(
-                  Icons.arrow_drop_down_rounded,
-                  color: AppTheme.textMuted,
-                ),
+                Icon(Icons.arrow_drop_down_rounded, color: AppTheme.textMuted),
               ],
             ),
           ),

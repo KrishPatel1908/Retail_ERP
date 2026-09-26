@@ -34,15 +34,9 @@ const List<({String name, String definition})> _v6NullableTextColumns = [
 /// New columns with a default; existing rows automatically receive the
 /// default value.
 const List<({String name, String definition})> _v6DefaultedColumns = [
-  (
-    name: 'business_type',
-    definition: "TEXT NOT NULL DEFAULT 'PROPRIETORSHIP'",
-  ),
+  (name: 'business_type', definition: "TEXT NOT NULL DEFAULT 'PROPRIETORSHIP'"),
   (name: 'gst_registered', definition: 'INTEGER NOT NULL DEFAULT 0'),
-  (
-    name: 'invoice_start_number',
-    definition: 'INTEGER NOT NULL DEFAULT 1',
-  ),
+  (name: 'invoice_start_number', definition: 'INTEGER NOT NULL DEFAULT 1'),
   (name: 'currency_symbol', definition: "TEXT NOT NULL DEFAULT '\u20B9'"),
   (name: 'decimal_places', definition: 'INTEGER NOT NULL DEFAULT 2'),
   (name: 'show_logo_on_invoice', definition: 'INTEGER NOT NULL DEFAULT 1'),

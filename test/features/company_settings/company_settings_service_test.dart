@@ -1,7 +1,8 @@
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:retail_erp/core/database/app_database.dart' hide CompanySettings;
+import 'package:retail_erp/core/database/app_database.dart'
+    hide CompanySettings;
 import 'package:retail_erp/features/company_settings/data/repositories/company_settings_repository.dart';
 import 'package:retail_erp/features/company_settings/domain/company_settings_enums.dart';
 import 'package:retail_erp/features/company_settings/domain/company_settings_exceptions.dart';
@@ -71,43 +72,46 @@ void main() {
     expect(CompanySettingsService.cached, isNotNull);
   });
 
-  test('save persists, refreshes the cache and rejects invalid drafts', () async {
-    final repository = _CountingRepository(database);
-    final service = CompanySettingsService(repository: repository);
+  test(
+    'save persists, refreshes the cache and rejects invalid drafts',
+    () async {
+      final repository = _CountingRepository(database);
+      final service = CompanySettingsService(repository: repository);
 
-    final saved = await service.save(_validDraft());
-    expect(saved.companyName, 'Acme Retailers');
+      final saved = await service.save(_validDraft());
+      expect(saved.companyName, 'Acme Retailers');
 
-    // The cache now holds the saved configuration — no reload required.
-    final cached = await service.getSettings();
-    expect(cached.companyName, 'Acme Retailers');
-    expect(repository.getOrCreateCalls, 0);
+      // The cache now holds the saved configuration — no reload required.
+      final cached = await service.getSettings();
+      expect(cached.companyName, 'Acme Retailers');
+      expect(repository.getOrCreateCalls, 0);
 
-    // Invalid drafts are rejected at the application layer.
-    final invalid = _validDraft().withLogoPath(null);
-    final badDraft = CompanySettingsDraft(
-      businessName: '',
-      businessType: invalid.businessType,
-      gstRegistered: false,
-      phone: invalid.phone,
-      addressLine1: invalid.addressLine1,
-      city: invalid.city,
-      state: invalid.state,
-      pincode: invalid.pincode,
-      defaultTaxType: invalid.defaultTaxType,
-      invoicePrefix: invalid.invoicePrefix,
-      invoiceStartNumber: invalid.invoiceStartNumber,
-      financialYearStartMonth: 4,
-      decimalPlaces: 2,
-      showLogoOnInvoice: true,
-      showBankDetailsOnInvoice: true,
-      showGstDetailsOnInvoice: true,
-    );
-    await expectLater(
-      service.save(badDraft),
-      throwsA(isA<CompanySettingsValidationException>()),
-    );
-  });
+      // Invalid drafts are rejected at the application layer.
+      final invalid = _validDraft().withLogoPath(null);
+      final badDraft = CompanySettingsDraft(
+        businessName: '',
+        businessType: invalid.businessType,
+        gstRegistered: false,
+        phone: invalid.phone,
+        addressLine1: invalid.addressLine1,
+        city: invalid.city,
+        state: invalid.state,
+        pincode: invalid.pincode,
+        defaultTaxType: invalid.defaultTaxType,
+        invoicePrefix: invalid.invoicePrefix,
+        invoiceStartNumber: invalid.invoiceStartNumber,
+        financialYearStartMonth: 4,
+        decimalPlaces: 2,
+        showLogoOnInvoice: true,
+        showBankDetailsOnInvoice: true,
+        showGstDetailsOnInvoice: true,
+      );
+      await expectLater(
+        service.save(badDraft),
+        throwsA(isA<CompanySettingsValidationException>()),
+      );
+    },
+  );
 
   test('invalidateCache forces a fresh load', () async {
     final repository = _CountingRepository(database);

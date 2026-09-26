@@ -151,8 +151,9 @@ class _SubCategoryListPageState extends State<SubCategoryListPage> {
     if (_subCategories.isEmpty) {
       return EmptyState(
         icon: Icons.account_tree_outlined,
-        title:
-            _query.isEmpty ? 'No sub-categories yet' : 'No sub-categories found',
+        title: _query.isEmpty
+            ? 'No sub-categories yet'
+            : 'No sub-categories found',
         message: _query.isEmpty
             ? 'Click "Add Sub Category" to create your first sub-category.'
             : 'Try a different search term.',

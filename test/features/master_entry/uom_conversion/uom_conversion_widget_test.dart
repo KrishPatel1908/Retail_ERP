@@ -135,9 +135,7 @@ void main() {
     expect(find.text('Create Conversion'), findsWidgets);
   });
 
-  testWidgets('edit pre-fills the form and updates the factor', (
-    tester,
-  ) async {
+  testWidgets('edit pre-fills the form and updates the factor', (tester) async {
     await openUomConversionPage(tester);
 
     // Seeded conversion id 1 is Dozen -> Piece.
@@ -177,9 +175,7 @@ void main() {
     expect(find.text('Conversion deleted successfully.'), findsOneWidget);
   });
 
-  testWidgets('adds a new unit from the picker and selects it', (
-    tester,
-  ) async {
+  testWidgets('adds a new unit from the picker and selects it', (tester) async {
     // Tall viewport so the create-unit dialog and its dropdown menu fit.
     useTallViewport(tester);
 
@@ -208,7 +204,9 @@ void main() {
     await tester.tap(find.text('Other').last);
     await tester.pumpAndSettle();
 
-    await tester.tap(find.descendant(of: createDialog, matching: find.text('Save')));
+    await tester.tap(
+      find.descendant(of: createDialog, matching: find.text('Save')),
+    );
     await tester.pumpAndSettle();
 
     // Back on the conversion form: the new unit is auto-selected.

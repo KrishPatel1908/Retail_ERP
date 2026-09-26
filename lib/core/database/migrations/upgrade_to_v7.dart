@@ -29,10 +29,18 @@ Future<void> _upgradeToV7(Migrator migrator, AppDatabase database) async {
 
   // Step 2: If product_uom exists, save it and drop it (it references product).
   if (hasProductUom) {
-    await database.customStatement('DROP INDEX IF EXISTS idx_product_uom_product');
-    await database.customStatement('DROP INDEX IF EXISTS idx_product_uom_from_unit');
-    await database.customStatement('DROP INDEX IF EXISTS idx_product_uom_to_unit');
-    await database.customStatement('DROP INDEX IF EXISTS idx_product_uom_one_default');
+    await database.customStatement(
+      'DROP INDEX IF EXISTS idx_product_uom_product',
+    );
+    await database.customStatement(
+      'DROP INDEX IF EXISTS idx_product_uom_from_unit',
+    );
+    await database.customStatement(
+      'DROP INDEX IF EXISTS idx_product_uom_to_unit',
+    );
+    await database.customStatement(
+      'DROP INDEX IF EXISTS idx_product_uom_one_default',
+    );
 
     await database.customStatement('DROP TABLE IF EXISTS product_uom_new');
     await database.customStatement(
@@ -140,5 +148,3 @@ Future<bool> _tableExists(AppDatabase database, String tableName) async {
       .get();
   return rows.isNotEmpty;
 }
-
-

@@ -90,10 +90,7 @@ class SupplierRepository extends PartyRepositoryBase {
       ..limit(pageSize, offset: (effectivePage - 1) * pageSize);
 
     final rows = await rowsQuery.get();
-    return PartyPage(
-      items: rows.map(_toEntity).toList(),
-      totalCount: total,
-    );
+    return PartyPage(items: rows.map(_toEntity).toList(), totalCount: total);
   }
 
   /// Distinct, non-empty cities, case-insensitively sorted — for the city
@@ -136,12 +133,16 @@ class SupplierRepository extends PartyRepositoryBase {
     Expression<bool> Function(db.$SuppliersTable t) matches, {
     int? excludeId,
   }) async {
-    final query = database.select(database.suppliers)..where((t) {
-      final condition = matches(t);
-      if (excludeId == null) return condition;
-      return condition & t.id.isNotValue(excludeId);
-    });
-    return (await query.getSingleOrNull()) != null;
+    final t = database.suppliers;
+    final condition = excludeId == null
+        ? matches(t)
+        : matches(t) & t.id.isNotValue(excludeId);
+    final row = await (database.selectOnly(t)
+          ..addColumns([t.id])
+          ..where(condition)
+          ..limit(1))
+        .getSingleOrNull();
+    return row != null;
   }
 
   // --- Mutations -----------------------------------------------------------
@@ -196,38 +197,40 @@ class SupplierRepository extends PartyRepositoryBase {
           column: 'supplier_code',
           prefix: _codePrefix,
         );
-        return database.into(database.suppliers).insert(
-          db.SuppliersCompanion.insert(
-            supplierCode: code,
-            supplierName: trimmedName,
-            contactPerson: Value(normalizeOptional(contactPerson)),
-            gstNumber: Value(normalizedGst),
-            panNumber: Value(normalizedPan),
-            mobile: Value(normalizeOptional(mobile)),
-            alternateMobile: Value(normalizeOptional(alternateMobile)),
-            email: Value(normalizedEmail),
-            addressLine1: Value(normalizeOptional(addressLine1)),
-            addressLine2: Value(normalizeOptional(addressLine2)),
-            city: Value(normalizeOptional(city)),
-            state: Value(normalizeOptional(state)),
-            stateCode: Value(normalizeOptional(stateCode)),
-            country: Value(normalizeOptional(country)),
-            pincode: Value(normalizeOptional(pincode)),
-            creditLimit: Value(creditLimit),
-            openingBalance: Value(openingBalance),
-            outstandingBalance: Value(openingBalance),
-            balanceType: Value(balanceType.dbValue),
-            paymentDueDate: Value(paymentDueDate),
-            paymentTerms: Value(normalizeOptional(paymentTerms)),
-            accountName: Value(normalizeOptional(accountName)),
-            accountNumber: Value(normalizeOptional(accountNumber)),
-            bankName: Value(normalizeOptional(bankName)),
-            branchName: Value(normalizeOptional(branchName)),
-            ifscCode: Value(normalizedIfsc),
-            notes: Value(normalizeOptional(notes)),
-            isActive: Value(isActive),
-          ),
-        );
+        return database
+            .into(database.suppliers)
+            .insert(
+              db.SuppliersCompanion.insert(
+                supplierCode: code,
+                supplierName: trimmedName,
+                contactPerson: Value(normalizeOptional(contactPerson)),
+                gstNumber: Value(normalizedGst),
+                panNumber: Value(normalizedPan),
+                mobile: Value(normalizeOptional(mobile)),
+                alternateMobile: Value(normalizeOptional(alternateMobile)),
+                email: Value(normalizedEmail),
+                addressLine1: Value(normalizeOptional(addressLine1)),
+                addressLine2: Value(normalizeOptional(addressLine2)),
+                city: Value(normalizeOptional(city)),
+                state: Value(normalizeOptional(state)),
+                stateCode: Value(normalizeOptional(stateCode)),
+                country: Value(normalizeOptional(country)),
+                pincode: Value(normalizeOptional(pincode)),
+                creditLimit: Value(creditLimit),
+                openingBalance: Value(openingBalance),
+                outstandingBalance: Value(openingBalance),
+                balanceType: Value(balanceType.dbValue),
+                paymentDueDate: Value(paymentDueDate),
+                paymentTerms: Value(normalizeOptional(paymentTerms)),
+                accountName: Value(normalizeOptional(accountName)),
+                accountNumber: Value(normalizeOptional(accountNumber)),
+                bankName: Value(normalizeOptional(bankName)),
+                branchName: Value(normalizeOptional(branchName)),
+                ifscCode: Value(normalizedIfsc),
+                notes: Value(normalizeOptional(notes)),
+                isActive: Value(isActive),
+              ),
+            );
       });
       return _toEntity(await _getById(id));
     } on Exception catch (error, stackTrace) {
@@ -286,41 +289,42 @@ class SupplierRepository extends PartyRepositoryBase {
     await _rejectDuplicates(normalizedGst, normalizedEmail, excludeId: id);
 
     try {
-      final updatedRows = await (database.update(
-        database.suppliers,
-      )..where((t) => t.id.equals(id))).write(
-        db.SuppliersCompanion(
-          supplierName: Value(trimmedName),
-          contactPerson: Value(normalizeOptional(contactPerson)),
-          gstNumber: Value(normalizedGst),
-          panNumber: Value(normalizedPan),
-          mobile: Value(normalizeOptional(mobile)),
-          alternateMobile: Value(normalizeOptional(alternateMobile)),
-          email: Value(normalizedEmail),
-          addressLine1: Value(normalizeOptional(addressLine1)),
-          addressLine2: Value(normalizeOptional(addressLine2)),
-          city: Value(normalizeOptional(city)),
-          state: Value(normalizeOptional(state)),
-          stateCode: Value(normalizeOptional(stateCode)),
-          country: Value(normalizeOptional(country)),
-          pincode: Value(normalizeOptional(pincode)),
-          creditLimit: Value(creditLimit),
-          openingBalance: Value(openingBalance),
-          balanceType: Value(balanceType.dbValue),
-          paymentDueDate: Value(paymentDueDate),
-          paymentTerms: Value(normalizeOptional(paymentTerms)),
-          accountName: Value(normalizeOptional(accountName)),
-          accountNumber: Value(normalizeOptional(accountNumber)),
-          bankName: Value(normalizeOptional(bankName)),
-          branchName: Value(normalizeOptional(branchName)),
-          ifscCode: Value(normalizedIfsc),
-          notes: Value(normalizeOptional(notes)),
-          isActive: isActive == null
-              ? const Value.absent()
-              : Value(isActive),
-          updatedAt: Value(DateTime.now()),
-        ),
-      );
+      final updatedRows =
+          await (database.update(
+            database.suppliers,
+          )..where((t) => t.id.equals(id))).write(
+            db.SuppliersCompanion(
+              supplierName: Value(trimmedName),
+              contactPerson: Value(normalizeOptional(contactPerson)),
+              gstNumber: Value(normalizedGst),
+              panNumber: Value(normalizedPan),
+              mobile: Value(normalizeOptional(mobile)),
+              alternateMobile: Value(normalizeOptional(alternateMobile)),
+              email: Value(normalizedEmail),
+              addressLine1: Value(normalizeOptional(addressLine1)),
+              addressLine2: Value(normalizeOptional(addressLine2)),
+              city: Value(normalizeOptional(city)),
+              state: Value(normalizeOptional(state)),
+              stateCode: Value(normalizeOptional(stateCode)),
+              country: Value(normalizeOptional(country)),
+              pincode: Value(normalizeOptional(pincode)),
+              creditLimit: Value(creditLimit),
+              openingBalance: Value(openingBalance),
+              balanceType: Value(balanceType.dbValue),
+              paymentDueDate: Value(paymentDueDate),
+              paymentTerms: Value(normalizeOptional(paymentTerms)),
+              accountName: Value(normalizeOptional(accountName)),
+              accountNumber: Value(normalizeOptional(accountNumber)),
+              bankName: Value(normalizeOptional(bankName)),
+              branchName: Value(normalizeOptional(branchName)),
+              ifscCode: Value(normalizedIfsc),
+              notes: Value(normalizeOptional(notes)),
+              isActive: isActive == null
+                  ? const Value.absent()
+                  : Value(isActive),
+              updatedAt: Value(DateTime.now()),
+            ),
+          );
       if (updatedRows == 0) {
         throw SupplierNotFoundException(id);
       }
@@ -329,11 +333,7 @@ class SupplierRepository extends PartyRepositoryBase {
       rethrow;
     } on Exception catch (error, stackTrace) {
       if (isUniqueViolation(error)) {
-        await _rejectDuplicates(
-          normalizedGst,
-          normalizedEmail,
-          excludeId: id,
-        );
+        await _rejectDuplicates(normalizedGst, normalizedEmail, excludeId: id);
       }
       throw DatabaseOperationException(
         'Failed to update supplier.',
@@ -386,10 +386,38 @@ class SupplierRepository extends PartyRepositoryBase {
     }
   }
 
-  /// Number of transactions referencing this supplier. Always zero until the
-  /// purchase / payment / ledger tables exist; extend this method when they
-  /// are added so delete stays protected.
-  Future<int> _countTransactionReferences(int id) async => 0;
+  /// All active suppliers sorted alphabetically by name.
+  Future<List<Supplier>> fetchAllActive() async {
+    final rows = await (database.select(database.suppliers)
+          ..where((t) => t.isActive.equals(true))
+          ..orderBy([(t) => OrderingTerm.asc(t.supplierName.lower())]))
+        .get();
+    return rows.map((r) => _toEntity(r)).toList();
+  }
+
+  /// Number of transactions referencing this supplier across purchases,
+  /// purchase returns, and purchase financial transactions.
+  Future<int> _countTransactionReferences(int id) async {
+    final purchaseCount = await (database.selectOnly(database.purchases)
+          ..addColumns([database.purchases.id.count()])
+          ..where(database.purchases.supplierId.equals(id)))
+        .map((row) => row.read(database.purchases.id.count()) ?? 0)
+        .getSingle();
+
+    final returnCount = await (database.selectOnly(database.purchaseReturns)
+          ..addColumns([database.purchaseReturns.id.count()])
+          ..where(database.purchaseReturns.supplierId.equals(id)))
+        .map((row) => row.read(database.purchaseReturns.id.count()) ?? 0)
+        .getSingle();
+
+    final txnCount = await (database.selectOnly(database.purchaseTransactions)
+          ..addColumns([database.purchaseTransactions.id.count()])
+          ..where(database.purchaseTransactions.supplierId.equals(id)))
+        .map((row) => row.read(database.purchaseTransactions.id.count()) ?? 0)
+        .getSingle();
+
+    return purchaseCount + returnCount + txnCount;
+  }
 
   Future<db.Supplier> _getById(int id) async {
     final row = await (database.select(

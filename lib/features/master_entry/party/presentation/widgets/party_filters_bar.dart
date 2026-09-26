@@ -239,10 +239,7 @@ class PartyFiltersBar extends StatelessWidget {
                     const SizedBox(width: 12),
                     TextButton.icon(
                       onPressed: onClear,
-                      icon: const Icon(
-                        Icons.filter_alt_off_rounded,
-                        size: 16,
-                      ),
+                      icon: const Icon(Icons.filter_alt_off_rounded, size: 16),
                       label: const Text('Clear'),
                     ),
                   ],
@@ -318,10 +315,7 @@ class _PartyFilterDropdown<T> extends StatelessWidget {
           fontWeight: FontWeight.w600,
           color: colorScheme.onSurface,
         ),
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 10,
-          vertical: 6,
-        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       ),
       selectedItemBuilder: (context) {
         return effectiveItems.map((item) {

@@ -33,20 +33,22 @@ void main() {
       bool isActive = true,
       int openingBalance = 0,
     }) {
-      return database.into(database.customers).insertReturning(
-        db.CustomersCompanion.insert(
-          customerCode: code,
-          customerName: name,
-          gstNumber: Value(gst),
-          email: Value(email),
-          city: Value(city),
-          state: Value(state),
-          openingBalance: Value(openingBalance),
-          isActive: Value(isActive),
-          createdAt: Value(createdAt ?? DateTime(2026, 1, 1, 12)),
-          updatedAt: Value(createdAt ?? DateTime(2026, 1, 1, 12)),
-        ),
-      );
+      return database
+          .into(database.customers)
+          .insertReturning(
+            db.CustomersCompanion.insert(
+              customerCode: code,
+              customerName: name,
+              gstNumber: Value(gst),
+              email: Value(email),
+              city: Value(city),
+              state: Value(state),
+              openingBalance: Value(openingBalance),
+              isActive: Value(isActive),
+              createdAt: Value(createdAt ?? DateTime(2026, 1, 1, 12)),
+              updatedAt: Value(createdAt ?? DateTime(2026, 1, 1, 12)),
+            ),
+          );
     }
 
     test('creates a customer with a sequential auto-generated code', () async {
@@ -76,19 +78,22 @@ void main() {
       expect(created.notes, isNull);
     });
 
-    test('stores balances in paise and initialises outstanding balance', () async {
-      final created = await repository.createCustomer(
-        customerName: 'Balance Co',
-        openingBalance: 500000, // ₹5,000
-        creditLimit: 1000000, // ₹10,000
-        balanceType: BalanceType.credit,
-      );
+    test(
+      'stores balances in paise and initialises outstanding balance',
+      () async {
+        final created = await repository.createCustomer(
+          customerName: 'Balance Co',
+          openingBalance: 500000, // ₹5,000
+          creditLimit: 1000000, // ₹10,000
+          balanceType: BalanceType.credit,
+        );
 
-      expect(created.openingBalance, 500000);
-      expect(created.creditLimit, 1000000);
-      expect(created.outstandingBalance, 500000);
-      expect(created.balanceType, BalanceType.credit);
-    });
+        expect(created.openingBalance, 500000);
+        expect(created.creditLimit, 1000000);
+        expect(created.outstandingBalance, 500000);
+        expect(created.balanceType, BalanceType.credit);
+      },
+    );
 
     test('fetchPage returns every row with the total count', () async {
       await insertCustomerRaw('CUS-X1', 'Alpha', city: 'Mumbai');
@@ -204,10 +209,13 @@ void main() {
         sortAscending: true,
         pageSize: 50,
       );
-      expect(
-        sorted.items.map((c) => c.customerName),
-        ['apple', 'banana', 'kiwi', 'Mango', 'Zebra'],
-      );
+      expect(sorted.items.map((c) => c.customerName), [
+        'apple',
+        'banana',
+        'kiwi',
+        'Mango',
+        'Zebra',
+      ]);
 
       final firstPage = await repository.fetchPage(page: 1, pageSize: 2);
       expect(firstPage.items, hasLength(2));
@@ -283,22 +291,25 @@ void main() {
       expect(reloaded.customerName, 'New Name');
     });
 
-    test('updateCustomer rejects a GST collision with another customer', () async {
-      await repository.createCustomer(
-        customerName: 'First',
-        gstNumber: '27ABCDE1234F1Z5',
-      );
-      final second = await repository.createCustomer(customerName: 'Second');
-
-      await expectLater(
-        repository.updateCustomer(
-          second.id,
-          customerName: 'Second',
+    test(
+      'updateCustomer rejects a GST collision with another customer',
+      () async {
+        await repository.createCustomer(
+          customerName: 'First',
           gstNumber: '27ABCDE1234F1Z5',
-        ),
-        throwsA(isA<CustomerDuplicateException>()),
-      );
-    });
+        );
+        final second = await repository.createCustomer(customerName: 'Second');
+
+        await expectLater(
+          repository.updateCustomer(
+            second.id,
+            customerName: 'Second',
+            gstNumber: '27ABCDE1234F1Z5',
+          ),
+          throwsA(isA<CustomerDuplicateException>()),
+        );
+      },
+    );
 
     test('updateCustomer keeps its own GST number when unchanged', () async {
       final first = await repository.createCustomer(
@@ -315,12 +326,15 @@ void main() {
       expect(updated.customerName, 'First Updated');
     });
 
-    test('updateCustomer throws CustomerNotFoundException for unknown ids', () async {
-      await expectLater(
-        repository.updateCustomer(9999, customerName: 'Missing'),
-        throwsA(isA<CustomerNotFoundException>()),
-      );
-    });
+    test(
+      'updateCustomer throws CustomerNotFoundException for unknown ids',
+      () async {
+        await expectLater(
+          repository.updateCustomer(9999, customerName: 'Missing'),
+          throwsA(isA<CustomerNotFoundException>()),
+        );
+      },
+    );
 
     test('deleteCustomer removes the customer', () async {
       final created = await repository.createCustomer(customerName: 'Gone');
@@ -367,13 +381,16 @@ void main() {
       expect(updated.updatedAt.isAfter(initialCreated), isTrue);
     });
 
-    test('distinctCities and distinctStates return sorted unique values', () async {
-      await insertCustomerRaw('CUS-C1', 'One', city: 'Mumbai', state: 'MH');
-      await insertCustomerRaw('CUS-C2', 'Two', city: 'Pune', state: 'MH');
-      await insertCustomerRaw('CUS-C3', 'Three', city: 'mumbai', state: 'KA');
+    test(
+      'distinctCities and distinctStates return sorted unique values',
+      () async {
+        await insertCustomerRaw('CUS-C1', 'One', city: 'Mumbai', state: 'MH');
+        await insertCustomerRaw('CUS-C2', 'Two', city: 'Pune', state: 'MH');
+        await insertCustomerRaw('CUS-C3', 'Three', city: 'mumbai', state: 'KA');
 
-      expect(await repository.distinctCities(), ['Mumbai', 'Pune']);
-      expect(await repository.distinctStates(), ['KA', 'MH']);
-    });
+        expect(await repository.distinctCities(), ['Mumbai', 'Pune']);
+        expect(await repository.distinctStates(), ['KA', 'MH']);
+      },
+    );
   });
 }

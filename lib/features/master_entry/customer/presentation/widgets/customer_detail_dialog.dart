@@ -13,20 +13,14 @@ Future<void> showCustomerDetailDialog(
 }) {
   return showDialog<void>(
     context: context,
-    builder: (context) => CustomerDetailDialog(
-      customer: customer,
-      onEdit: onEdit,
-    ),
+    builder: (context) =>
+        CustomerDetailDialog(customer: customer, onEdit: onEdit),
   );
 }
 
 /// Dedicated read-only customer detail dialog widget.
 class CustomerDetailDialog extends StatelessWidget {
-  const CustomerDetailDialog({
-    super.key,
-    required this.customer,
-    this.onEdit,
-  });
+  const CustomerDetailDialog({super.key, required this.customer, this.onEdit});
 
   final Customer customer;
   final VoidCallback? onEdit;

@@ -29,7 +29,8 @@ Future<void> _extendPartyTableV5(
   if (!await _tableExists(database, table)) return;
 
   final columns = [
-    if (isSupplier) (name: 'credit_limit', definition: 'INTEGER NOT NULL DEFAULT 0'),
+    if (isSupplier)
+      (name: 'credit_limit', definition: 'INTEGER NOT NULL DEFAULT 0'),
     ..._sharedV5Columns,
   ];
 

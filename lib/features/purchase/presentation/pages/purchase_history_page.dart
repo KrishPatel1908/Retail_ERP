@@ -31,7 +31,7 @@ class PurchaseHistoryPage extends StatefulWidget {
 class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
   late final PurchaseRepository _repository;
 
-  List<PurchaseEntity> _purchases = const [];
+  List<PurchaseTransactionHistoryEntry> _purchases = const [];
   int _totalCount = 0;
   bool _loading = true;
   Object? _error;
@@ -82,7 +82,7 @@ class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
       _error = null;
     });
     try {
-      final result = await _repository.fetchPage(
+      final result = await _repository.fetchTransactionHistoryPage(
         query: _query,
         filters: PurchaseFilters(
           supplierId: _supplierId,
@@ -99,7 +99,6 @@ class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
               : null,
           isReturn: false,
         ),
-        sort: _sortColumn,
         sortAscending: _sortAscending,
         page: _page,
         pageSize: _pageSize,
@@ -189,25 +188,25 @@ class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
       _createdTo != null;
 
   int get _sortColumnIndex => switch (_sortColumn) {
-        PurchaseSortColumn.purchaseNumber => 1,
-        PurchaseSortColumn.supplierName => 3,
-        PurchaseSortColumn.purchaseDate => 7,
-        PurchaseSortColumn.totalAmount => 6,
-        PurchaseSortColumn.dueAmount => 4,
-        PurchaseSortColumn.paymentStatus => 8,
-        PurchaseSortColumn.createdAt => 9,
-      };
+    PurchaseSortColumn.purchaseNumber => 1,
+    PurchaseSortColumn.supplierName => 3,
+    PurchaseSortColumn.purchaseDate => 7,
+    PurchaseSortColumn.totalAmount => 6,
+    PurchaseSortColumn.dueAmount => 4,
+    PurchaseSortColumn.paymentStatus => 8,
+    PurchaseSortColumn.createdAt => 9,
+  };
 
   static PurchaseSortColumn _sortForIndex(int index) => switch (index) {
-        1 => PurchaseSortColumn.purchaseNumber,
-        3 => PurchaseSortColumn.supplierName,
-        6 => PurchaseSortColumn.totalAmount,
-        4 => PurchaseSortColumn.dueAmount,
-        7 => PurchaseSortColumn.purchaseDate,
-        8 => PurchaseSortColumn.paymentStatus,
-        9 => PurchaseSortColumn.createdAt,
-        _ => PurchaseSortColumn.purchaseDate,
-      };
+    1 => PurchaseSortColumn.purchaseNumber,
+    3 => PurchaseSortColumn.supplierName,
+    6 => PurchaseSortColumn.totalAmount,
+    4 => PurchaseSortColumn.dueAmount,
+    7 => PurchaseSortColumn.purchaseDate,
+    8 => PurchaseSortColumn.paymentStatus,
+    9 => PurchaseSortColumn.createdAt,
+    _ => PurchaseSortColumn.purchaseDate,
+  };
 
   void _showPurchaseDetails(PurchaseEntity purchase) async {
     final full = await _repository.getById(purchase.id);
@@ -270,9 +269,11 @@ class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
       if (!mounted) return;
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
-        ..showSnackBar(SnackBar(
-          content: Text('Purchase ${purchase.purchaseNumber} deleted.'),
-        ));
+        ..showSnackBar(
+          SnackBar(
+            content: Text('Purchase ${purchase.purchaseNumber} deleted.'),
+          ),
+        );
       _load();
     } on PurchaseDeletionException catch (e) {
       _showFailure(e.message);
@@ -302,7 +303,8 @@ class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
           children: [
             PageHeader(
               title: 'Purchase',
-              description: 'Record and manage products purchased from suppliers.',
+              description:
+                  'Record and manage products purchased from suppliers.',
               breadcrumbs: const ['Purchase', 'Purchase History'],
               actions: [
                 FilledButton.icon(
@@ -331,7 +333,8 @@ class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
                       const SizedBox(width: 12),
                       OutlinedButton.icon(
                         onPressed: () => setState(
-                            () => _filtersExpanded = !_filtersExpanded),
+                          () => _filtersExpanded = !_filtersExpanded,
+                        ),
                         icon: Icon(
                           _filtersExpanded
                               ? Icons.filter_list_off_rounded
@@ -339,7 +342,8 @@ class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
                           size: 18,
                         ),
                         label: Text(
-                            _hasActiveFilters ? 'Filters ●' : 'Filters'),
+                          _hasActiveFilters ? 'Filters ●' : 'Filters',
+                        ),
                       ),
                       if (_hasActiveFilters) ...[
                         const SizedBox(width: 8),
@@ -404,8 +408,7 @@ class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
                           SizedBox(
                             width: 24,
                             height: 24,
-                            child:
-                                CircularProgressIndicator(strokeWidth: 2.5),
+                            child: CircularProgressIndicator(strokeWidth: 2.5),
                           ),
                           SizedBox(height: 12),
                           Text(
@@ -420,36 +423,37 @@ class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
                     ),
                   )
                 : _purchases.isEmpty
-                    ? EmptyState(
-                        icon: Icons.shopping_cart_outlined,
-                        title: _query.isEmpty && !_hasActiveFilters
-                            ? 'No purchases yet'
-                            : 'No purchases found',
-                        message: _query.isEmpty && !_hasActiveFilters
-                            ? 'Click "New Purchase" to record your first purchase.'
-                            : 'Try a different search term or clear the filters.',
-                      )
-                    : SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: SizedBox(
-                          width: 1300,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              _buildHeaderRow(colorScheme, textTheme),
-                              ListView.builder(
-                                physics:
-                                    const NeverScrollableScrollPhysics(),
-                                shrinkWrap: true,
-                                itemCount: _purchases.length,
-                                itemBuilder: (context, index) =>
-                                    _buildDataRow(
-                                        _purchases[index], colorScheme, textTheme),
-                              ),
-                            ],
+                ? EmptyState(
+                    icon: Icons.shopping_cart_outlined,
+                    title: _query.isEmpty && !_hasActiveFilters
+                        ? 'No purchases yet'
+                        : 'No purchases found',
+                    message: _query.isEmpty && !_hasActiveFilters
+                        ? 'Click "New Purchase" to record your first purchase.'
+                        : 'Try a different search term or clear the filters.',
+                  )
+                : SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: SizedBox(
+                      width: 1300,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          _buildHeaderRow(colorScheme, textTheme),
+                          ListView.builder(
+                            physics: const NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            itemCount: _purchases.length,
+                            itemBuilder: (context, index) => _buildDataRow(
+                              _purchases[index],
+                              colorScheme,
+                              textTheme,
+                            ),
                           ),
-                        ),
+                        ],
                       ),
+                    ),
+                  ),
           ),
           if (!_loading) _buildPaginationFooter(textTheme, colorScheme),
         ],
@@ -593,9 +597,7 @@ class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
                   fontSize: 12,
                   fontWeight: FontWeight.w600,
                   letterSpacing: 0.3,
-                  color: isSorted
-                      ? AppTheme.primary
-                      : AppTheme.textSecondary,
+                  color: isSorted ? AppTheme.primary : AppTheme.textSecondary,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -605,8 +607,8 @@ class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
             Icon(
               isSorted
                   ? (_sortAscending
-                      ? Icons.arrow_downward_rounded
-                      : Icons.arrow_upward_rounded)
+                        ? Icons.arrow_downward_rounded
+                        : Icons.arrow_upward_rounded)
                   : Icons.unfold_more_rounded,
               size: 14,
               color: isSorted ? AppTheme.primary : AppTheme.textMuted,
@@ -618,19 +620,21 @@ class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
   }
 
   Widget _buildDataRow(
-    PurchaseEntity purchase,
+    PurchaseTransactionHistoryEntry entry,
     ColorScheme colorScheme,
     TextTheme textTheme,
   ) {
+    final purchase = entry.purchase;
+    final transaction = entry.transaction;
     final statusColor = switch (purchase.paymentStatus) {
       PurchasePaymentStatus.paid => AppTheme.success,
       PurchasePaymentStatus.partial => AppTheme.warning,
       PurchasePaymentStatus.unpaid => AppTheme.danger,
     };
 
-    final credit = purchase.dueAmount;
-    final debit = purchase.paidAmount;
-    final balance = purchase.runningBalance ?? credit - debit;
+    final credit = transaction.credit;
+    final debit = transaction.debit;
+    final balance = transaction.runningTotal;
 
     String formatDate(DateTime date) {
       final local = date.toLocal();
@@ -640,9 +644,7 @@ class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
     return Container(
       height: 52,
       decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(color: colorScheme.outlineVariant),
-        ),
+        border: Border(bottom: BorderSide(color: colorScheme.outlineVariant)),
       ),
       child: Row(
         children: [
@@ -753,7 +755,7 @@ class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
                 style: TextStyle(
                   fontWeight: FontWeight.w700,
                   color: balance > 0
-                      ? AppTheme.primary
+                      ? AppTheme.success
                       : (balance < 0 ? AppTheme.danger : AppTheme.textPrimary),
                 ),
                 textAlign: TextAlign.right,
@@ -766,7 +768,7 @@ class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               child: Text(
-                formatDate(purchase.purchaseDate),
+                formatDate(transaction.transactionDate),
                 style: textTheme.bodySmall,
               ),
             ),
@@ -777,8 +779,7 @@ class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                 decoration: BoxDecoration(
                   color: statusColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(6),
@@ -800,7 +801,7 @@ class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               child: DescriptionPreview(
-                description: purchase.notes,
+                description: transaction.note,
                 maxLines: 1,
                 style: textTheme.bodySmall,
               ),
@@ -821,25 +822,27 @@ class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Supplier',
-                  style: textTheme.bodySmall
-                      ?.copyWith(fontWeight: FontWeight.w600)),
+              Text(
+                'Supplier',
+                style: textTheme.bodySmall?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
               const SizedBox(height: 6),
               DropdownButtonFormField<int>(
                 initialValue: _supplierId,
                 isDense: true,
                 isExpanded: true,
                 items: [
-                  const DropdownMenuItem<int>(
-                    child: Text('All Suppliers'),
-                  ),
+                  const DropdownMenuItem<int>(child: Text('All Suppliers')),
                   for (final s in _suppliers)
                     DropdownMenuItem(value: s.id, child: Text(s.name)),
                 ],
                 onChanged: (value) {
                   setState(() {
-                    _supplierId =
-                        value == _suppliers.firstOrNull?.id ? null : value;
+                    _supplierId = value == _suppliers.firstOrNull?.id
+                        ? null
+                        : value;
                   });
                   _applyFilters();
                 },
@@ -852,9 +855,12 @@ class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Payment Status',
-                  style: textTheme.bodySmall
-                      ?.copyWith(fontWeight: FontWeight.w600)),
+              Text(
+                'Payment Status',
+                style: textTheme.bodySmall?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
               const SizedBox(height: 6),
               DropdownButtonFormField<PurchasePaymentStatus?>(
                 initialValue: _paymentStatus,
@@ -865,8 +871,7 @@ class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
                     child: Text('All Statuses'),
                   ),
                   for (final s in PurchasePaymentStatus.values)
-                    DropdownMenuItem(
-                        value: s, child: Text(s.label)),
+                    DropdownMenuItem(value: s, child: Text(s.label)),
                 ],
                 onChanged: (value) {
                   setState(() => _paymentStatus = value);
@@ -978,8 +983,7 @@ class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
                 items: [10, 25, 50, 100].map((sz) {
                   return DropdownMenuItem<int>(
                     value: sz,
-                    child: Text('$sz',
-                        style: const TextStyle(fontSize: 13)),
+                    child: Text('$sz', style: const TextStyle(fontSize: 13)),
                   );
                 }).toList(),
                 onChanged: (val) {
@@ -991,11 +995,8 @@ class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
           Row(
             children: [
               IconButton(
-                icon:
-                    const Icon(Icons.chevron_left_rounded, size: 20),
-                onPressed: (_page > 1)
-                    ? () => _onPageChanged(_page - 1)
-                    : null,
+                icon: const Icon(Icons.chevron_left_rounded, size: 20),
+                onPressed: (_page > 1) ? () => _onPageChanged(_page - 1) : null,
                 tooltip: 'Previous page',
               ),
               Padding(
@@ -1008,8 +1009,7 @@ class _PurchaseHistoryPageState extends State<PurchaseHistoryPage> {
                 ),
               ),
               IconButton(
-                icon: const Icon(Icons.chevron_right_rounded,
-                    size: 20),
+                icon: const Icon(Icons.chevron_right_rounded, size: 20),
                 onPressed: (_page < maxPage)
                     ? () => _onPageChanged(_page + 1)
                     : null,

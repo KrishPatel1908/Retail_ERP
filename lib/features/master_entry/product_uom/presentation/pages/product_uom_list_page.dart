@@ -132,7 +132,8 @@ class _ProductUomListPageState extends State<ProductUomListPage> {
       return EmptyState(
         icon: Icons.error_outline_rounded,
         title: 'Could not load product conversions',
-        message: 'Something went wrong while reading the database. Please try again.',
+        message:
+            'Something went wrong while reading the database. Please try again.',
         action: OutlinedButton.icon(
           onPressed: _load,
           icon: const Icon(Icons.refresh_rounded, size: 18),

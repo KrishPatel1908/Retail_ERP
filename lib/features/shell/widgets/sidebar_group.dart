@@ -98,8 +98,9 @@ class _SidebarGroupState extends State<SidebarGroup> {
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: textTheme.bodyMedium?.copyWith(
-                          fontWeight:
-                              _hasSelection ? FontWeight.w600 : FontWeight.w500,
+                          fontWeight: _hasSelection
+                              ? FontWeight.w600
+                              : FontWeight.w500,
                           color: _hasSelection
                               ? colorScheme.primary
                               : colorScheme.onSurfaceVariant,
@@ -122,9 +123,7 @@ class _SidebarGroupState extends State<SidebarGroup> {
             )
           : SizedBox(
               height: 44,
-              child: Center(
-                child: Icon(groupIcon, size: 20, color: iconColor),
-              ),
+              child: Center(child: Icon(groupIcon, size: 20, color: iconColor)),
             ),
     );
 
@@ -150,8 +149,9 @@ class _SidebarGroupState extends State<SidebarGroup> {
         AnimatedCrossFade(
           duration: const Duration(milliseconds: 220),
           sizeCurve: Curves.easeOut,
-          crossFadeState:
-              _open ? CrossFadeState.showSecond : CrossFadeState.showFirst,
+          crossFadeState: _open
+              ? CrossFadeState.showSecond
+              : CrossFadeState.showFirst,
           firstChild: const SizedBox(width: double.infinity),
           secondChild: Container(
             margin: widget.expanded

@@ -11,19 +11,13 @@ void showPurchaseDetailDialog(
 }) {
   showDialog(
     context: context,
-    builder: (context) => PurchaseDetailDialog(
-      purchase: purchase,
-      onEdit: onEdit,
-    ),
+    builder: (context) =>
+        PurchaseDetailDialog(purchase: purchase, onEdit: onEdit),
   );
 }
 
 class PurchaseDetailDialog extends StatelessWidget {
-  const PurchaseDetailDialog({
-    super.key,
-    required this.purchase,
-    this.onEdit,
-  });
+  const PurchaseDetailDialog({super.key, required this.purchase, this.onEdit});
 
   final PurchaseEntity purchase;
   final VoidCallback? onEdit;
@@ -65,14 +59,14 @@ class PurchaseDetailDialog extends StatelessWidget {
                         const SizedBox(height: 4),
                         Row(
                           children: [
-                            _StatusBadge(
-                              status: purchase.paymentStatus,
-                            ),
+                            _StatusBadge(status: purchase.paymentStatus),
                             if (purchase.isReturn) ...[
                               const SizedBox(width: 8),
                               Container(
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 8, vertical: 2),
+                                  horizontal: 8,
+                                  vertical: 2,
+                                ),
                                 decoration: BoxDecoration(
                                   color: AppTheme.danger.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(6),
@@ -128,6 +122,9 @@ class PurchaseDetailDialog extends StatelessWidget {
 
                     // Summary.
                     _buildSummary(textTheme, colorScheme),
+
+                    const SizedBox(height: 24),
+                    _buildTransactionHistory(textTheme, colorScheme),
 
                     if (purchase.notes != null &&
                         purchase.notes!.isNotEmpty) ...[
@@ -212,9 +209,7 @@ class PurchaseDetailDialog extends StatelessWidget {
               padding: const EdgeInsets.all(16),
               child: Text(
                 'No items',
-                style: textTheme.bodySmall?.copyWith(
-                  color: AppTheme.textMuted,
-                ),
+                style: textTheme.bodySmall?.copyWith(color: AppTheme.textMuted),
               ),
             )
           else
@@ -239,62 +234,76 @@ class PurchaseDetailDialog extends StatelessWidget {
                       children: [
                         Expanded(
                           flex: 3,
-                          child: Text('Product',
-                              style: textTheme.labelSmall?.copyWith(
-                                fontWeight: FontWeight.w600,
-                                color: AppTheme.textSecondary,
-                              )),
+                          child: Text(
+                            'Product',
+                            style: textTheme.labelSmall?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: AppTheme.textSecondary,
+                            ),
+                          ),
                         ),
                         Expanded(
                           flex: 2,
-                          child: Text('Variant',
-                              style: textTheme.labelSmall?.copyWith(
-                                fontWeight: FontWeight.w600,
-                                color: AppTheme.textSecondary,
-                              )),
+                          child: Text(
+                            'Variant',
+                            style: textTheme.labelSmall?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: AppTheme.textSecondary,
+                            ),
+                          ),
                         ),
                         SizedBox(
                           width: 60,
-                          child: Text('Qty',
-                              style: textTheme.labelSmall?.copyWith(
-                                fontWeight: FontWeight.w600,
-                                color: AppTheme.textSecondary,
-                              )),
+                          child: Text(
+                            'Qty',
+                            style: textTheme.labelSmall?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: AppTheme.textSecondary,
+                            ),
+                          ),
                         ),
                         SizedBox(
                           width: 80,
-                          child: Text('Unit',
-                              style: textTheme.labelSmall?.copyWith(
-                                fontWeight: FontWeight.w600,
-                                color: AppTheme.textSecondary,
-                              )),
+                          child: Text(
+                            'Unit',
+                            style: textTheme.labelSmall?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: AppTheme.textSecondary,
+                            ),
+                          ),
                         ),
                         SizedBox(
                           width: 100,
-                          child: Text('Price',
-                              style: textTheme.labelSmall?.copyWith(
-                                fontWeight: FontWeight.w600,
-                                color: AppTheme.textSecondary,
-                              ),
-                              textAlign: TextAlign.right),
+                          child: Text(
+                            'Price',
+                            style: textTheme.labelSmall?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: AppTheme.textSecondary,
+                            ),
+                            textAlign: TextAlign.right,
+                          ),
                         ),
                         SizedBox(
                           width: 80,
-                          child: Text('Tax',
-                              style: textTheme.labelSmall?.copyWith(
-                                fontWeight: FontWeight.w600,
-                                color: AppTheme.textSecondary,
-                              ),
-                              textAlign: TextAlign.right),
+                          child: Text(
+                            'Tax',
+                            style: textTheme.labelSmall?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: AppTheme.textSecondary,
+                            ),
+                            textAlign: TextAlign.right,
+                          ),
                         ),
                         SizedBox(
                           width: 100,
-                          child: Text('Total',
-                              style: textTheme.labelSmall?.copyWith(
-                                fontWeight: FontWeight.w600,
-                                color: AppTheme.textSecondary,
-                              ),
-                              textAlign: TextAlign.right),
+                          child: Text(
+                            'Total',
+                            style: textTheme.labelSmall?.copyWith(
+                              fontWeight: FontWeight.w600,
+                              color: AppTheme.textSecondary,
+                            ),
+                            textAlign: TextAlign.right,
+                          ),
                         ),
                       ],
                     ),
@@ -403,12 +412,93 @@ class PurchaseDetailDialog extends StatelessWidget {
     );
   }
 
+  Widget _buildTransactionHistory(
+    TextTheme textTheme,
+    ColorScheme colorScheme,
+  ) {
+    return _SectionCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _SectionTitle(textTheme: textTheme, title: 'Transaction History'),
+          const SizedBox(height: 12),
+          if (purchase.transactions.isEmpty)
+            Text(
+              'No financial transactions recorded.',
+              style: textTheme.bodySmall,
+            )
+          else
+            for (final transaction in purchase.transactions)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: Row(
+                  children: [
+                    SizedBox(
+                      width: 100,
+                      child: Text(
+                        _formatDate(transaction.transactionDate),
+                        style: textTheme.bodySmall,
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        transaction.credit == 0
+                            ? 'Credit —'
+                            : 'Credit ${_formatCurrency(transaction.credit)}',
+                        style: textTheme.bodySmall?.copyWith(
+                          color: transaction.credit == 0
+                              ? AppTheme.textPrimary
+                              : AppTheme.danger,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        transaction.debit == 0
+                            ? 'Debit —'
+                            : 'Debit ${_formatCurrency(transaction.debit)}',
+                        style: textTheme.bodySmall?.copyWith(
+                          color: transaction.debit == 0
+                              ? AppTheme.textPrimary
+                              : AppTheme.success,
+                        ),
+                      ),
+                    ),
+                    Text(
+                      _formatSignedCurrency(transaction.runningTotal),
+                      style: textTheme.bodySmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: transaction.runningTotal > 0
+                            ? AppTheme.success
+                            : transaction.runningTotal < 0
+                            ? AppTheme.danger
+                            : AppTheme.textPrimary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+        ],
+      ),
+    );
+  }
+
   static String _formatCurrency(int paise) {
     final rupees = paise / 100;
     final text = rupees == rupees.roundToDouble()
         ? rupees.round().toString()
         : rupees.toStringAsFixed(2);
     return '₹$text';
+  }
+
+  static String _formatSignedCurrency(int paise) {
+    if (paise == 0) return _formatCurrency(0);
+    return '${paise > 0 ? '+' : '-'}${_formatCurrency(paise.abs())}';
+  }
+
+  static String _formatDate(DateTime date) {
+    final local = date.toLocal();
+    return '${local.day.toString().padLeft(2, '0')}/${local.month.toString().padLeft(2, '0')}/${local.year}';
   }
 }
 
@@ -445,9 +535,11 @@ class _SectionTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(Icons.circle,
-            size: 6,
-            color: Theme.of(context).colorScheme.primary),
+        Icon(
+          Icons.circle,
+          size: 6,
+          color: Theme.of(context).colorScheme.primary,
+        ),
         const SizedBox(width: 8),
         Text(
           title,
@@ -479,16 +571,12 @@ class _InfoField extends StatelessWidget {
       children: [
         Text(
           label,
-          style: textTheme.bodySmall?.copyWith(
-            color: AppTheme.textSecondary,
-          ),
+          style: textTheme.bodySmall?.copyWith(color: AppTheme.textSecondary),
         ),
         const SizedBox(height: 2),
         Text(
           value,
-          style: textTheme.bodyMedium?.copyWith(
-            fontWeight: FontWeight.w500,
-          ),
+          style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w500),
         ),
       ],
     );
@@ -538,10 +626,7 @@ class _ProductRow extends StatelessWidget {
           ),
           SizedBox(
             width: 80,
-            child: Text(
-              item.unitName ?? '—',
-              style: textTheme.bodySmall,
-            ),
+            child: Text(item.unitName ?? '—', style: textTheme.bodySmall),
           ),
           SizedBox(
             width: 100,

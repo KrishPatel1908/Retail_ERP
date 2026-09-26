@@ -77,9 +77,7 @@ class _UnitFormState extends State<UnitForm> {
     final nameError = UnitValidator.validateName(name);
     final symbolError = UnitValidator.validateSymbol(symbol);
     final descriptionError = UnitValidator.validateDescription(description);
-    if (nameError != null ||
-        symbolError != null ||
-        descriptionError != null) {
+    if (nameError != null || symbolError != null || descriptionError != null) {
       setState(() {
         _nameError = nameError;
         _symbolError = symbolError;

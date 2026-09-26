@@ -16,21 +16,24 @@ import '../sub_category_code_generator.dart';
 /// return [SubCategory] domain entities only.
 class SubCategoryRepository {
   SubCategoryRepository({db.AppDatabase? database})
-      : _database = database ?? DatabaseProvider.instance.database;
+    : _database = database ?? DatabaseProvider.instance.database;
 
   final db.AppDatabase _database;
 
   /// All sub-categories joined with their parent category name, ordered
   /// case-insensitively by sub-category name.
   Future<List<SubCategory>> getAllSubCategories() async {
-    final query = _database.select(_database.subCategories).join([
-      innerJoin(
-        _database.categories,
-        _database.categories.id.equalsExp(_database.subCategories.categoryId),
-      ),
-    ])..orderBy([
-        OrderingTerm.asc(_database.subCategories.subCategoryName.lower()),
-      ]);
+    final query =
+        _database.select(_database.subCategories).join([
+          innerJoin(
+            _database.categories,
+            _database.categories.id.equalsExp(
+              _database.subCategories.categoryId,
+            ),
+          ),
+        ])..orderBy([
+          OrderingTerm.asc(_database.subCategories.subCategoryName.lower()),
+        ]);
 
     final rows = await query.get();
     return rows.map(_fromTypedResult).toList();
@@ -44,25 +47,30 @@ class SubCategoryRepository {
       return getAllSubCategories();
     }
 
-    final query = _database.select(_database.subCategories).join([
-      innerJoin(
-        _database.categories,
-        _database.categories.id.equalsExp(_database.subCategories.categoryId),
-      ),
-    ])
-      ..where(
-        _database.categories.categoryName.lower().contains(normalized) |
-            _database.subCategories.subCategoryName
-                .lower()
-                .contains(normalized) |
-            _database.subCategories.subCategoryCode
-                .lower()
-                .contains(normalized) |
-            _database.subCategories.description.lower().contains(normalized),
-      )
-      ..orderBy([
-        OrderingTerm.asc(_database.subCategories.subCategoryName.lower()),
-      ]);
+    final query =
+        _database.select(_database.subCategories).join([
+            innerJoin(
+              _database.categories,
+              _database.categories.id.equalsExp(
+                _database.subCategories.categoryId,
+              ),
+            ),
+          ])
+          ..where(
+            _database.categories.categoryName.lower().contains(normalized) |
+                _database.subCategories.subCategoryName.lower().contains(
+                  normalized,
+                ) |
+                _database.subCategories.subCategoryCode.lower().contains(
+                  normalized,
+                ) |
+                _database.subCategories.description.lower().contains(
+                  normalized,
+                ),
+          )
+          ..orderBy([
+            OrderingTerm.asc(_database.subCategories.subCategoryName.lower()),
+          ]);
 
     final rows = await query.get();
     return rows.map(_fromTypedResult).toList();
@@ -79,16 +87,17 @@ class SubCategoryRepository {
     int? excludeId,
   }) async {
     final normalized = name.trim().toLowerCase();
-    final query = _database.select(_database.subCategories)
-      ..where((t) {
-        final matches = t.categoryId.equals(categoryId) &
-            t.subCategoryName.lower().equals(normalized);
-        if (excludeId == null) {
-          return matches;
-        }
-        return matches & t.id.isNotValue(excludeId);
-      });
-    final row = await query.getSingleOrNull();
+    final t = _database.subCategories;
+    final matches =
+        t.categoryId.equals(categoryId) &
+        t.subCategoryName.lower().equals(normalized);
+    final condition =
+        excludeId == null ? matches : matches & t.id.isNotValue(excludeId);
+    final row = await (_database.selectOnly(t)
+          ..addColumns([t.id])
+          ..where(condition)
+          ..limit(1))
+        .getSingleOrNull();
     return row != null;
   }
 
@@ -110,7 +119,10 @@ class SubCategoryRepository {
 
     if (await existsByName(trimmedName, categoryId)) {
       final category = await _getCategoryById(categoryId);
-      throw SubCategoryAlreadyExistsException(trimmedName, category?.categoryName);
+      throw SubCategoryAlreadyExistsException(
+        trimmedName,
+        category?.categoryName,
+      );
     }
 
     try {
@@ -119,7 +131,9 @@ class SubCategoryRepository {
             ? trimmedCode
             : await SubCategoryCodeGenerator.nextCode(_database);
 
-        return _database.into(_database.subCategories).insert(
+        return _database
+            .into(_database.subCategories)
+            .insert(
               db.SubCategoriesCompanion.insert(
                 categoryId: categoryId,
                 subCategoryCode: finalCode,
@@ -132,9 +146,13 @@ class SubCategoryRepository {
 
       return await getById(id);
     } on Exception catch (error, stackTrace) {
-      if (_isUniqueViolation(error) && await existsByName(trimmedName, categoryId)) {
+      if (_isUniqueViolation(error) &&
+          await existsByName(trimmedName, categoryId)) {
         final category = await _getCategoryById(categoryId);
-        throw SubCategoryAlreadyExistsException(trimmedName, category?.categoryName);
+        throw SubCategoryAlreadyExistsException(
+          trimmedName,
+          category?.categoryName,
+        );
       }
       throw DatabaseOperationException(
         'Failed to create sub-category.',
@@ -163,26 +181,30 @@ class SubCategoryRepository {
 
     if (await existsByName(trimmedName, categoryId, excludeId: id)) {
       final category = await _getCategoryById(categoryId);
-      throw SubCategoryAlreadyExistsException(trimmedName, category?.categoryName);
+      throw SubCategoryAlreadyExistsException(
+        trimmedName,
+        category?.categoryName,
+      );
     }
 
     try {
-      final updatedRows = await (_database.update(_database.subCategories)
-            ..where((t) => t.id.equals(id)))
-          .write(
-        db.SubCategoriesCompanion(
-          categoryId: Value(categoryId),
-          subCategoryName: Value(trimmedName),
-          subCategoryCode: (trimmedCode != null && trimmedCode.isNotEmpty)
-              ? Value(trimmedCode)
-              : const Value.absent(),
-          description: Value(trimmedDescription),
-          isActive: isActive == null
-              ? const Value.absent()
-              : Value(isActive),
-          updatedAt: Value(DateTime.now()),
-        ),
-      );
+      final updatedRows =
+          await (_database.update(
+            _database.subCategories,
+          )..where((t) => t.id.equals(id))).write(
+            db.SubCategoriesCompanion(
+              categoryId: Value(categoryId),
+              subCategoryName: Value(trimmedName),
+              subCategoryCode: (trimmedCode != null && trimmedCode.isNotEmpty)
+                  ? Value(trimmedCode)
+                  : const Value.absent(),
+              description: Value(trimmedDescription),
+              isActive: isActive == null
+                  ? const Value.absent()
+                  : Value(isActive),
+              updatedAt: Value(DateTime.now()),
+            ),
+          );
 
       if (updatedRows == 0) {
         throw SubCategoryNotFoundException(id);
@@ -194,7 +216,10 @@ class SubCategoryRepository {
     } on Exception catch (error, stackTrace) {
       if (_isUniqueViolation(error)) {
         final category = await _getCategoryById(categoryId);
-        throw SubCategoryAlreadyExistsException(trimmedName, category?.categoryName);
+        throw SubCategoryAlreadyExistsException(
+          trimmedName,
+          category?.categoryName,
+        );
       }
       throw DatabaseOperationException(
         'Failed to update sub-category.',
@@ -210,9 +235,9 @@ class SubCategoryRepository {
   /// reference the sub-category.
   Future<void> deleteSubCategory(int id) async {
     try {
-      await (_database.delete(_database.subCategories)
-            ..where((t) => t.id.equals(id)))
-          .go();
+      await (_database.delete(
+        _database.subCategories,
+      )..where((t) => t.id.equals(id))).go();
     } on Exception catch (error, stackTrace) {
       if (_isForeignKeyViolation(error)) {
         throw const SubCategoryInUseException();
@@ -249,9 +274,9 @@ class SubCategoryRepository {
   }
 
   Future<db.Category?> _getCategoryById(int categoryId) async {
-    return (_database.select(_database.categories)
-          ..where((t) => t.id.equals(categoryId)))
-        .getSingleOrNull();
+    return (_database.select(
+      _database.categories,
+    )..where((t) => t.id.equals(categoryId))).getSingleOrNull();
   }
 
   SubCategory _fromTypedResult(TypedResult row) {

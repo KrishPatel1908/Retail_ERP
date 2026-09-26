@@ -28,19 +28,21 @@ void main() {
       return query.getSingle();
     }
 
-    test('getAllConversions returns seeded conversions sorted by from unit',
-        () async {
-      final rows = await repository.getAllConversions();
-      expect(rows, hasLength(seededConversionCount));
+    test(
+      'getAllConversions returns seeded conversions sorted by from unit',
+      () async {
+        final rows = await repository.getAllConversions();
+        expect(rows, hasLength(seededConversionCount));
 
-      // Sorted by from-unit name: Bundle, Dozen, Foot, Kilogram, ...
-      expect(rows.first.fromUnitName, 'Bundle');
-      expect(rows.first.toUnitName, 'Piece');
-      expect(rows.first.conversionFactor, 12.0);
-      expect(rows.last.fromUnitName, 'Pair');
-      // Denormalised symbols are resolved.
-      expect(rows.first.fromUnitSymbol, 'bdl');
-    });
+        // Sorted by from-unit name: Bundle, Dozen, Foot, Kilogram, ...
+        expect(rows.first.fromUnitName, 'Bundle');
+        expect(rows.first.toUnitName, 'Piece');
+        expect(rows.first.conversionFactor, 12.0);
+        expect(rows.last.fromUnitName, 'Pair');
+        // Denormalised symbols are resolved.
+        expect(rows.first.fromUnitSymbol, 'bdl');
+      },
+    );
 
     test('creates a conversion with a trimmed description', () async {
       final box = await unitByName('Box');
@@ -60,8 +62,7 @@ void main() {
       expect(created.description, '1 Box = 10 Packets');
     });
 
-    test('rejects identical from/to units and non-positive factors',
-        () async {
+    test('rejects identical from/to units and non-positive factors', () async {
       final box = await unitByName('Box');
       final packet = await unitByName('Packet');
 
@@ -151,22 +152,24 @@ void main() {
       );
     });
 
-    test('updateConversion rejects a pair already used by another row',
-        () async {
-      final rows = await repository.getAllConversions();
-      final dozen = rows.firstWhere((c) => c.fromUnitName == 'Dozen');
-      final bundle = rows.firstWhere((c) => c.fromUnitName == 'Bundle');
+    test(
+      'updateConversion rejects a pair already used by another row',
+      () async {
+        final rows = await repository.getAllConversions();
+        final dozen = rows.firstWhere((c) => c.fromUnitName == 'Dozen');
+        final bundle = rows.firstWhere((c) => c.fromUnitName == 'Bundle');
 
-      await expectLater(
-        repository.updateConversion(
-          dozen.id,
-          fromUnitId: bundle.fromUnitId,
-          toUnitId: bundle.toUnitId,
-          conversionFactor: 12,
-        ),
-        throwsA(isA<UomConversionAlreadyExistsException>()),
-      );
-    });
+        await expectLater(
+          repository.updateConversion(
+            dozen.id,
+            fromUnitId: bundle.fromUnitId,
+            toUnitId: bundle.toUnitId,
+            conversionFactor: 12,
+          ),
+          throwsA(isA<UomConversionAlreadyExistsException>()),
+        );
+      },
+    );
 
     test('update throws for unknown ids', () async {
       final box = await unitByName('Box');
@@ -208,8 +211,7 @@ void main() {
       );
     });
 
-    test('resolveFactor uses the stored row and derives the reverse',
-        () async {
+    test('resolveFactor uses the stored row and derives the reverse', () async {
       final kilogram = await unitByName('Kilogram');
       final gram = await unitByName('Gram');
 

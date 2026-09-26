@@ -43,9 +43,9 @@ class _UnitTableState extends State<UnitTable> {
           );
           break;
         case 2:
-          comparison = _typeLabel(a.unitFamily).compareTo(
-            _typeLabel(b.unitFamily),
-          );
+          comparison = _typeLabel(
+            a.unitFamily,
+          ).compareTo(_typeLabel(b.unitFamily));
           break;
         default:
           comparison = 0;

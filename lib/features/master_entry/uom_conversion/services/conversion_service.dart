@@ -26,11 +26,8 @@ class ConversionService {
 
   /// Prepared seam for Product UOM. Returns the product conversion factor
   /// (both directions), or `null` when the product has no such conversion.
-  final Future<double?> Function(
-    int productId,
-    int fromUnitId,
-    int toUnitId,
-  )? productLookup;
+  final Future<double?> Function(int productId, int fromUnitId, int toUnitId)?
+  productLookup;
 
   /// Converts [quantity] from [fromUnitId] to [toUnitId].
   ///

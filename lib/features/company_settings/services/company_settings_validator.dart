@@ -35,7 +35,9 @@ abstract final class CompanySettingsValidator {
   );
   static final RegExp _ifscPattern = RegExp(r'^[A-Z]{4}0[A-Z0-9]{6}$');
   static final RegExp _accountNumberPattern = RegExp(r'^[a-zA-Z0-9]{9,30}$');
-  static final RegExp _upiPattern = RegExp(r'^[a-zA-Z0-9.\-_]{2,}@[a-zA-Z]{2,}$');
+  static final RegExp _upiPattern = RegExp(
+    r'^[a-zA-Z0-9.\-_]{2,}@[a-zA-Z]{2,}$',
+  );
   static final RegExp _invoicePrefixPattern = RegExp(r'^[A-Za-z0-9_-]+$');
 
   /// Validates the whole draft. Returns a map of field key → error message;
@@ -44,23 +46,14 @@ abstract final class CompanySettingsValidator {
     final requiresCin = draft.businessType.requiresCin;
     return {
       'businessName': validateBusinessName(draft.businessName),
-      'gstin': validateGstin(
-        draft.gstin,
-        required: draft.gstRegistered,
-      ),
+      'gstin': validateGstin(draft.gstin, required: draft.gstRegistered),
       'pan': validatePan(draft.pan),
       'cin': validateCin(draft.cin, required: requiresCin),
       'phone': validatePhone(draft.phone),
       'email': validateEmail(draft.email),
       'website': validateWebsite(draft.website),
-      'addressLine1': validateRequired(
-        draft.addressLine1,
-        label: 'Address 1',
-      ),
-      'addressLine2': validateOptional(
-        draft.addressLine2,
-        label: 'Address 2',
-      ),
+      'addressLine1': validateRequired(draft.addressLine1, label: 'Address 1'),
+      'addressLine2': validateOptional(draft.addressLine2, label: 'Address 2'),
       'city': validateRequired(draft.city, label: 'City'),
       'state': validateRequired(draft.state, label: 'State'),
       'pincode': validatePincode(draft.pincode, required: true),
@@ -137,7 +130,9 @@ abstract final class CompanySettingsValidator {
   static String? validateGstin(String value, {bool required = false}) {
     final normalized = value.trim().toUpperCase();
     if (normalized.isEmpty) {
-      return required ? 'GSTIN is required when GST registration is enabled.' : null;
+      return required
+          ? 'GSTIN is required when GST registration is enabled.'
+          : null;
     }
     if (!_gstPattern.hasMatch(normalized)) {
       return 'Enter a valid 15-character GST number.';
@@ -159,9 +154,7 @@ abstract final class CompanySettingsValidator {
   static String? validateCin(String value, {bool required = false}) {
     final normalized = value.trim().toUpperCase();
     if (normalized.isEmpty) {
-      return required
-          ? 'CIN is required for this business type.'
-          : null;
+      return required ? 'CIN is required for this business type.' : null;
     }
     if (!_cinPattern.hasMatch(normalized)) {
       return 'Enter a valid 21-character CIN (e.g. U12345MH2024PTC123456).';

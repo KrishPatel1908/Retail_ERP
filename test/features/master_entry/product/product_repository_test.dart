@@ -35,66 +35,69 @@ void main() {
   });
 
   group('ProductRepository with new fields', () {
-    test('creates product with purchasePrice, mrp, wholesalePrice, barcode, hsnCode and variants', () async {
-      final product = await repository.createProduct(
-        productName: 'Maggi Noodles',
-        productCode: 'MAGGI01',
-        categoryId: categoryId,
-        brandId: brandId,
-        unitId: unitId,
-        sellingPrice: 1400,
-        purchasePrice: 1000,
-        mrp: 1500,
-        wholesalePrice: 1200,
-        barcode: '8901058852341',
-        hsnCode: '19023010',
-        variants: [
-          const VariantInput(
-            variantName: 'Single Pack 70g',
-            sellingPrice: 1400,
-            purchasePrice: 1000,
-            mrp: 1500,
-            wholesalePrice: 1200,
-            barcode: '8901058852342',
-            hsnCode: '19023010',
-          ),
-          const VariantInput(
-            variantName: 'Special 4-Pack 280g',
-            sellingPrice: 5200,
-            purchasePrice: 4000,
-            mrp: 5600,
-            wholesalePrice: 4600,
-            barcode: '8901058852343',
-            hsnCode: '19023010',
-          ),
-        ],
-      );
+    test(
+      'creates product with purchasePrice, mrp, wholesalePrice, barcode, hsnCode and variants',
+      () async {
+        final product = await repository.createProduct(
+          productName: 'Maggi Noodles',
+          productCode: 'MAGGI01',
+          categoryId: categoryId,
+          brandId: brandId,
+          unitId: unitId,
+          sellingPrice: 1400,
+          purchasePrice: 1000,
+          mrp: 1500,
+          wholesalePrice: 1200,
+          barcode: '8901058852341',
+          hsnCode: '19023010',
+          variants: [
+            const VariantInput(
+              variantName: 'Single Pack 70g',
+              sellingPrice: 1400,
+              purchasePrice: 1000,
+              mrp: 1500,
+              wholesalePrice: 1200,
+              barcode: '8901058852342',
+              hsnCode: '19023010',
+            ),
+            const VariantInput(
+              variantName: 'Special 4-Pack 280g',
+              sellingPrice: 5200,
+              purchasePrice: 4000,
+              mrp: 5600,
+              wholesalePrice: 4600,
+              barcode: '8901058852343',
+              hsnCode: '19023010',
+            ),
+          ],
+        );
 
-      expect(product.productName, 'Maggi Noodles');
-      expect(product.sellingPrice, 1400);
-      expect(product.purchasePrice, 1000);
-      expect(product.mrp, 1500);
-      expect(product.wholesalePrice, 1200);
-      expect(product.barcode, '8901058852341');
-      expect(product.hsnCode, '19023010');
-      expect(product.variants.length, 2);
+        expect(product.productName, 'Maggi Noodles');
+        expect(product.sellingPrice, 1400);
+        expect(product.purchasePrice, 1000);
+        expect(product.mrp, 1500);
+        expect(product.wholesalePrice, 1200);
+        expect(product.barcode, '8901058852341');
+        expect(product.hsnCode, '19023010');
+        expect(product.variants.length, 2);
 
-      final v1 = product.variants[0];
-      expect(v1.variantName, 'Single Pack 70g');
-      expect(v1.purchasePrice, 1000);
-      expect(v1.mrp, 1500);
-      expect(v1.wholesalePrice, 1200);
-      expect(v1.barcode, '8901058852342');
-      expect(v1.hsnCode, '19023010');
+        final v1 = product.variants[0];
+        expect(v1.variantName, 'Single Pack 70g');
+        expect(v1.purchasePrice, 1000);
+        expect(v1.mrp, 1500);
+        expect(v1.wholesalePrice, 1200);
+        expect(v1.barcode, '8901058852342');
+        expect(v1.hsnCode, '19023010');
 
-      final v2 = product.variants[1];
-      expect(v2.variantName, 'Special 4-Pack 280g');
-      expect(v2.sellingPrice, 5200);
-      expect(v2.purchasePrice, 4000);
-      expect(v2.mrp, 5600);
-      expect(v2.wholesalePrice, 4600);
-      expect(v2.barcode, '8901058852343');
-    });
+        final v2 = product.variants[1];
+        expect(v2.variantName, 'Special 4-Pack 280g');
+        expect(v2.sellingPrice, 5200);
+        expect(v2.purchasePrice, 4000);
+        expect(v2.mrp, 5600);
+        expect(v2.wholesalePrice, 4600);
+        expect(v2.barcode, '8901058852343');
+      },
+    );
 
     test('updates product with new fields and updates variants', () async {
       final created = await repository.createProduct(
@@ -133,7 +136,9 @@ void main() {
         hsnCode: '18069010',
       );
 
-      final resultByBarcode = await repository.fetchPage(query: '8901233445566');
+      final resultByBarcode = await repository.fetchPage(
+        query: '8901233445566',
+      );
       expect(resultByBarcode.items.length, 1);
       expect(resultByBarcode.items.first.productName, 'Dairy Milk Silk');
 

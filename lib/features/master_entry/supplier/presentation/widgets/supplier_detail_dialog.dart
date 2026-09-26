@@ -13,20 +13,14 @@ Future<void> showSupplierDetailDialog(
 }) {
   return showDialog<void>(
     context: context,
-    builder: (context) => SupplierDetailDialog(
-      supplier: supplier,
-      onEdit: onEdit,
-    ),
+    builder: (context) =>
+        SupplierDetailDialog(supplier: supplier, onEdit: onEdit),
   );
 }
 
 /// Dedicated read-only supplier detail dialog widget.
 class SupplierDetailDialog extends StatelessWidget {
-  const SupplierDetailDialog({
-    super.key,
-    required this.supplier,
-    this.onEdit,
-  });
+  const SupplierDetailDialog({super.key, required this.supplier, this.onEdit});
 
   final Supplier supplier;
   final VoidCallback? onEdit;

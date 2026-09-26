@@ -138,14 +138,22 @@ class ProductRepository {
       leftOuterJoin(brandT, brandT.id.equalsExp(t.brandId)),
       innerJoin(unitT, unitT.id.equalsExp(t.unitId)),
       leftOuterJoin(taxT, taxT.id.equalsExp(t.taxTypeId)),
-      leftOuterJoin(_database.taxCategories,
-          _database.taxCategories.id.equalsExp(t.taxCategoryId)),
+      leftOuterJoin(
+        _database.taxCategories,
+        _database.taxCategories.id.equalsExp(t.taxCategoryId),
+      ),
     ]);
 
     if (predicate != null) rowsQuery.where(predicate);
 
     rowsQuery.orderBy([
-      _buildOrderBy(t: t, catT: catT, brandT: brandT, sort: sort, ascending: sortAscending),
+      _buildOrderBy(
+        t: t,
+        catT: catT,
+        brandT: brandT,
+        sort: sort,
+        ascending: sortAscending,
+      ),
     ]);
 
     rowsQuery.limit(pageSize, offset: (effectivePage - 1) * pageSize);
@@ -181,6 +189,7 @@ class ProductRepository {
           taxTypeName: p.taxTypeName,
           taxCategoryId: p.taxCategoryId,
           taxCategoryName: p.taxCategoryName,
+          minimumStock: p.minimumStock,
           expiryDate: p.expiryDate,
           notes: p.notes,
           isActive: p.isActive,
@@ -189,10 +198,7 @@ class ProductRepository {
           variants: pVariants,
         );
       }).toList();
-      return ProductPage(
-        items: productsWithVariants,
-        totalCount: total,
-      );
+      return ProductPage(items: productsWithVariants, totalCount: total);
     }
 
     return ProductPage(items: products, totalCount: total);
@@ -213,8 +219,10 @@ class ProductRepository {
       leftOuterJoin(brandT, brandT.id.equalsExp(t.brandId)),
       innerJoin(unitT, unitT.id.equalsExp(t.unitId)),
       leftOuterJoin(taxT, taxT.id.equalsExp(t.taxTypeId)),
-      leftOuterJoin(_database.taxCategories,
-          _database.taxCategories.id.equalsExp(t.taxCategoryId)),
+      leftOuterJoin(
+        _database.taxCategories,
+        _database.taxCategories.id.equalsExp(t.taxCategoryId),
+      ),
     ])..where(t.id.equals(id));
 
     final row = await query.getSingleOrNull();
@@ -270,6 +278,7 @@ class ProductRepository {
     String? hsnCode,
     int? taxTypeId,
     int? taxCategoryId,
+    int minimumStock = 0,
     DateTime? expiryDate,
     String? notes,
     List<VariantInput> variants = const [],
@@ -285,43 +294,48 @@ class ProductRepository {
             ? productCode.trim()
             : await _nextProductCode();
 
-        final productId = await _database.into(_database.products).insert(
-          db.ProductsCompanion.insert(
-            productCode: code,
-            productName: trimmedName,
-            categoryId: Value(categoryId),
-            subCategoryId: Value(subCategoryId),
-            brandId: Value(brandId),
-            unitId: unitId,
-            sellingPrice: Value(sellingPrice),
-            purchasePrice: Value(purchasePrice),
-            mrp: Value(mrp),
-            wholesalePrice: Value(wholesalePrice),
-            barcode: Value(trimmedBarcode),
-            hsnCode: Value(trimmedHsnCode),
-            taxTypeId: Value(taxTypeId),
-            taxCategoryId: Value(taxCategoryId),
-            expiryDate: Value(expiryDate),
-            notes: Value(trimmedNotes),
-          ),
-        );
+        final productId = await _database
+            .into(_database.products)
+            .insert(
+              db.ProductsCompanion.insert(
+                productCode: code,
+                productName: trimmedName,
+                categoryId: Value(categoryId),
+                subCategoryId: Value(subCategoryId),
+                brandId: Value(brandId),
+                unitId: unitId,
+                sellingPrice: Value(sellingPrice),
+                purchasePrice: Value(purchasePrice),
+                mrp: Value(mrp),
+                wholesalePrice: Value(wholesalePrice),
+                barcode: Value(trimmedBarcode),
+                hsnCode: Value(trimmedHsnCode),
+                taxTypeId: Value(taxTypeId),
+                taxCategoryId: Value(taxCategoryId),
+                minimumStock: Value(minimumStock),
+                expiryDate: Value(expiryDate),
+                notes: Value(trimmedNotes),
+              ),
+            );
 
         // Insert variants within the same transaction.
         for (final variant in variants) {
-          await _database.into(_database.productVariants).insert(
-            db.ProductVariantsCompanion.insert(
-              productId: productId,
-              variantName: variant.variantName.trim(),
-              sellingPrice: Value(variant.sellingPrice),
-              purchasePrice: Value(variant.purchasePrice),
-              mrp: Value(variant.mrp),
-              wholesalePrice: Value(variant.wholesalePrice),
-              barcode: Value(_normalizeText(variant.barcode)),
-              hsnCode: Value(_normalizeText(variant.hsnCode)),
-              expiryDate: Value(variant.expiryDate),
-              notes: Value(_normalizeText(variant.notes)),
-            ),
-          );
+          await _database
+              .into(_database.productVariants)
+              .insert(
+                db.ProductVariantsCompanion.insert(
+                  productId: productId,
+                  variantName: variant.variantName.trim(),
+                  sellingPrice: Value(variant.sellingPrice),
+                  purchasePrice: Value(variant.purchasePrice),
+                  mrp: Value(variant.mrp),
+                  wholesalePrice: Value(variant.wholesalePrice),
+                  barcode: Value(_normalizeText(variant.barcode)),
+                  hsnCode: Value(_normalizeText(variant.hsnCode)),
+                  expiryDate: Value(variant.expiryDate),
+                  notes: Value(_normalizeText(variant.notes)),
+                ),
+              );
         }
 
         return productId;
@@ -331,9 +345,7 @@ class ProductRepository {
       if (_isUniqueViolation(error)) {
         final errorStr = error.toString().toLowerCase();
         if (errorStr.contains('barcode')) {
-          throw const ProductDuplicateException(
-            ProductDuplicateField.barcode,
-          );
+          throw const ProductDuplicateException(ProductDuplicateField.barcode);
         }
         if (errorStr.contains('product_variant')) {
           throw const ProductDuplicateException(
@@ -373,6 +385,7 @@ class ProductRepository {
     String? hsnCode,
     int? taxTypeId,
     int? taxCategoryId,
+    int? minimumStock,
     DateTime? expiryDate,
     String? notes,
     bool? isActive,
@@ -383,29 +396,35 @@ class ProductRepository {
     final trimmedNotes = _normalizeText(notes);
 
     try {
-      final updatedRows = await (_database.update(
-        _database.products,
-      )..where((t) => t.id.equals(id))).write(
-        db.ProductsCompanion(
-          productName: Value(trimmedName),
-          categoryId: Value(categoryId),
-          subCategoryId: Value(subCategoryId),
-          brandId: Value(brandId),
-          unitId: Value(unitId),
-          sellingPrice: Value(sellingPrice),
-          purchasePrice: Value(purchasePrice),
-          mrp: Value(mrp),
-          wholesalePrice: Value(wholesalePrice),
-          barcode: Value(trimmedBarcode),
-          hsnCode: Value(trimmedHsnCode),
-          taxTypeId: Value(taxTypeId),
-          taxCategoryId: Value(taxCategoryId),
-          expiryDate: Value(expiryDate),
-          notes: Value(trimmedNotes),
-          isActive: isActive == null ? const Value.absent() : Value(isActive),
-          updatedAt: Value(DateTime.now()),
-        ),
-      );
+      final updatedRows =
+          await (_database.update(
+            _database.products,
+          )..where((t) => t.id.equals(id))).write(
+            db.ProductsCompanion(
+              productName: Value(trimmedName),
+              categoryId: Value(categoryId),
+              subCategoryId: Value(subCategoryId),
+              brandId: Value(brandId),
+              unitId: Value(unitId),
+              sellingPrice: Value(sellingPrice),
+              purchasePrice: Value(purchasePrice),
+              mrp: Value(mrp),
+              wholesalePrice: Value(wholesalePrice),
+              barcode: Value(trimmedBarcode),
+              hsnCode: Value(trimmedHsnCode),
+              taxTypeId: Value(taxTypeId),
+              taxCategoryId: Value(taxCategoryId),
+              minimumStock: minimumStock == null
+                  ? const Value.absent()
+                  : Value(minimumStock),
+              expiryDate: Value(expiryDate),
+              notes: Value(trimmedNotes),
+              isActive: isActive == null
+                  ? const Value.absent()
+                  : Value(isActive),
+              updatedAt: Value(DateTime.now()),
+            ),
+          );
       if (updatedRows == 0) throw ProductNotFoundException(id);
       return getById(id);
     } on ProductNotFoundException {
@@ -414,11 +433,11 @@ class ProductRepository {
       if (_isUniqueViolation(error)) {
         final errorStr = error.toString().toLowerCase();
         if (errorStr.contains('barcode')) {
-          throw const ProductDuplicateException(
-            ProductDuplicateField.barcode,
-          );
+          throw const ProductDuplicateException(ProductDuplicateField.barcode);
         }
-        throw const ProductDuplicateException(ProductDuplicateField.productCode);
+        throw const ProductDuplicateException(
+          ProductDuplicateField.productCode,
+        );
       }
       throw DatabaseOperationException(
         'Failed to update product.',
@@ -472,28 +491,28 @@ class ProductRepository {
     String? notes,
   }) async {
     try {
-      final id = await _database.into(_database.productVariants).insert(
-        db.ProductVariantsCompanion.insert(
-          productId: productId,
-          variantName: variantName.trim(),
-          sellingPrice: Value(sellingPrice),
-          purchasePrice: Value(purchasePrice),
-          mrp: Value(mrp),
-          wholesalePrice: Value(wholesalePrice),
-          barcode: Value(_normalizeText(barcode)),
-          hsnCode: Value(_normalizeText(hsnCode)),
-          expiryDate: Value(expiryDate),
-          notes: Value(_normalizeText(notes)),
-        ),
-      );
+      final id = await _database
+          .into(_database.productVariants)
+          .insert(
+            db.ProductVariantsCompanion.insert(
+              productId: productId,
+              variantName: variantName.trim(),
+              sellingPrice: Value(sellingPrice),
+              purchasePrice: Value(purchasePrice),
+              mrp: Value(mrp),
+              wholesalePrice: Value(wholesalePrice),
+              barcode: Value(_normalizeText(barcode)),
+              hsnCode: Value(_normalizeText(hsnCode)),
+              expiryDate: Value(expiryDate),
+              notes: Value(_normalizeText(notes)),
+            ),
+          );
       return _getVariantById(id);
     } on Exception catch (error, stackTrace) {
       if (_isUniqueViolation(error)) {
         final errorStr = error.toString().toLowerCase();
         if (errorStr.contains('barcode')) {
-          throw const ProductDuplicateException(
-            ProductDuplicateField.barcode,
-          );
+          throw const ProductDuplicateException(ProductDuplicateField.barcode);
         }
         throw const ProductDuplicateException(
           ProductDuplicateField.variantName,
@@ -521,22 +540,23 @@ class ProductRepository {
     String? notes,
   }) async {
     try {
-      final updatedRows = await (_database.update(
-        _database.productVariants,
-      )..where((t) => t.id.equals(variantId))).write(
-        db.ProductVariantsCompanion(
-          variantName: Value(variantName.trim()),
-          sellingPrice: Value(sellingPrice),
-          purchasePrice: Value(purchasePrice),
-          mrp: Value(mrp),
-          wholesalePrice: Value(wholesalePrice),
-          barcode: Value(_normalizeText(barcode)),
-          hsnCode: Value(_normalizeText(hsnCode)),
-          expiryDate: Value(expiryDate),
-          notes: Value(_normalizeText(notes)),
-          updatedAt: Value(DateTime.now()),
-        ),
-      );
+      final updatedRows =
+          await (_database.update(
+            _database.productVariants,
+          )..where((t) => t.id.equals(variantId))).write(
+            db.ProductVariantsCompanion(
+              variantName: Value(variantName.trim()),
+              sellingPrice: Value(sellingPrice),
+              purchasePrice: Value(purchasePrice),
+              mrp: Value(mrp),
+              wholesalePrice: Value(wholesalePrice),
+              barcode: Value(_normalizeText(barcode)),
+              hsnCode: Value(_normalizeText(hsnCode)),
+              expiryDate: Value(expiryDate),
+              notes: Value(_normalizeText(notes)),
+              updatedAt: Value(DateTime.now()),
+            ),
+          );
       if (updatedRows == 0) throw ProductVariantNotFoundException(variantId);
       return _getVariantById(variantId);
     } on ProductVariantNotFoundException {
@@ -545,9 +565,7 @@ class ProductRepository {
       if (_isUniqueViolation(error)) {
         final errorStr = error.toString().toLowerCase();
         if (errorStr.contains('barcode')) {
-          throw const ProductDuplicateException(
-            ProductDuplicateField.barcode,
-          );
+          throw const ProductDuplicateException(ProductDuplicateField.barcode);
         }
         throw const ProductDuplicateException(
           ProductDuplicateField.variantName,
@@ -590,10 +608,11 @@ class ProductRepository {
 
   /// Fetches products with their variants, used by the tracking module.
   Future<List<ProductEntity>> fetchAllWithVariants() async {
-    final allProducts = await (_database.select(_database.products)
-          ..where((t) => t.isActive.equals(true))
-          ..orderBy([(t) => OrderingTerm.asc(t.productName.lower())]))
-        .get();
+    final allProducts =
+        await (_database.select(_database.products)
+              ..where((t) => t.isActive.equals(true))
+              ..orderBy([(t) => OrderingTerm.asc(t.productName.lower())]))
+            .get();
 
     if (allProducts.isEmpty) return const [];
 
@@ -638,6 +657,7 @@ class ProductRepository {
         taxTypeName: taxMap[p.taxTypeId],
         taxCategoryId: p.taxCategoryId,
         taxCategoryName: taxCategoryMap[p.taxCategoryId],
+        minimumStock: p.minimumStock,
         expiryDate: p.expiryDate,
         notes: p.notes,
         isActive: p.isActive,
@@ -683,11 +703,13 @@ class ProductRepository {
   // --- Internals -----------------------------------------------------------
 
   Future<String> _nextProductCode() async {
-    final row = await _database.customSelect(
-      "SELECT COALESCE(MAX(CAST(SUBSTR(product_code, ${_codePrefix.length + 1}) "
-      "AS INTEGER)), 0) + 1 AS next "
-      "FROM product WHERE product_code LIKE '$_codePrefix%'",
-    ).getSingle();
+    final row = await _database
+        .customSelect(
+          "SELECT COALESCE(MAX(CAST(SUBSTR(product_code, ${_codePrefix.length + 1}) "
+          "AS INTEGER)), 0) + 1 AS next "
+          "FROM product WHERE product_code LIKE '$_codePrefix%'",
+        )
+        .getSingle();
     final next = row.read<int>('next');
     return '$_codePrefix${next.toString().padLeft(_suffixLength, '0')}';
   }
@@ -713,18 +735,19 @@ class ProductRepository {
       final variantSubQuery = _database.selectOnly(_database.productVariants)
         ..addColumns([_database.productVariants.productId])
         ..where(
-          _database.productVariants.variantName
-              .lower()
-              .contains(normalizedQuery) |
-          _database.productVariants.barcode
-              .lower()
-              .contains(normalizedQuery) |
-          _database.productVariants.hsnCode
-              .lower()
-              .contains(normalizedQuery),
+          _database.productVariants.variantName.lower().contains(
+                normalizedQuery,
+              ) |
+              _database.productVariants.barcode.lower().contains(
+                normalizedQuery,
+              ) |
+              _database.productVariants.hsnCode.lower().contains(
+                normalizedQuery,
+              ),
         );
 
-      predicate = predicate &
+      predicate =
+          predicate &
           (t.productName.lower().contains(normalizedQuery) |
               t.productCode.lower().contains(normalizedQuery) |
               t.barcode.lower().contains(normalizedQuery) |
@@ -746,28 +769,35 @@ class ProductRepository {
       predicate = predicate & t.brandId.equals(filters.brandId!);
     }
     if (filters.minPrice != null) {
-      predicate = predicate & t.sellingPrice.isBiggerOrEqualValue(filters.minPrice!);
+      predicate =
+          predicate & t.sellingPrice.isBiggerOrEqualValue(filters.minPrice!);
     }
     if (filters.maxPrice != null) {
-      predicate = predicate & t.sellingPrice.isSmallerOrEqualValue(filters.maxPrice!);
+      predicate =
+          predicate & t.sellingPrice.isSmallerOrEqualValue(filters.maxPrice!);
     }
     if (filters.createdFrom != null) {
-      predicate = predicate & t.createdAt.isBiggerOrEqualValue(filters.createdFrom!);
+      predicate =
+          predicate & t.createdAt.isBiggerOrEqualValue(filters.createdFrom!);
     }
     if (filters.createdTo != null) {
       final endOfDay = DateTime(
         filters.createdTo!.year,
         filters.createdTo!.month,
         filters.createdTo!.day,
-        23, 59, 59,
+        23,
+        59,
+        59,
       );
       predicate = predicate & t.createdAt.isSmallerOrEqualValue(endOfDay);
     }
     if (filters.expiryFrom != null) {
-      predicate = predicate & t.expiryDate.isBiggerOrEqualValue(filters.expiryFrom!);
+      predicate =
+          predicate & t.expiryDate.isBiggerOrEqualValue(filters.expiryFrom!);
     }
     if (filters.expiryTo != null) {
-      predicate = predicate & t.expiryDate.isSmallerOrEqualValue(filters.expiryTo!);
+      predicate =
+          predicate & t.expiryDate.isSmallerOrEqualValue(filters.expiryTo!);
     }
     if (filters.isActive != null) {
       predicate = predicate & t.isActive.equals(filters.isActive!);
@@ -826,6 +856,7 @@ class ProductRepository {
       taxTypeName: tax?.taxTypeName,
       taxCategoryId: t.taxCategoryId,
       taxCategoryName: taxCategory?.taxCategoryName,
+      minimumStock: t.minimumStock,
       expiryDate: t.expiryDate,
       notes: t.notes,
       isActive: t.isActive,
@@ -840,34 +871,39 @@ class ProductRepository {
   ) async {
     if (productIds.isEmpty) return const [];
 
-    final rows = await (_database.select(_database.productVariants)
-          ..where((t) => t.productId.isIn(productIds))
-          ..orderBy([(t) => OrderingTerm.asc(t.variantName.lower())]))
-        .get();
+    final rows =
+        await (_database.select(_database.productVariants)
+              ..where((t) => t.productId.isIn(productIds))
+              ..orderBy([(t) => OrderingTerm.asc(t.variantName.lower())]))
+            .get();
 
-    return rows.map((row) => ProductVariantEntity(
-      id: row.id,
-      productId: row.productId,
-      variantName: row.variantName,
-      sellingPrice: row.sellingPrice,
-      purchasePrice: row.purchasePrice,
-      mrp: row.mrp,
-      wholesalePrice: row.wholesalePrice,
-      barcode: row.barcode,
-      hsnCode: row.hsnCode,
-      expiryDate: row.expiryDate,
-      notes: row.notes,
-      isActive: row.isActive,
-      createdAt: row.createdAt,
-      updatedAt: row.updatedAt,
-    )).toList();
+    return rows
+        .map(
+          (row) => ProductVariantEntity(
+            id: row.id,
+            productId: row.productId,
+            variantName: row.variantName,
+            sellingPrice: row.sellingPrice,
+            purchasePrice: row.purchasePrice,
+            mrp: row.mrp,
+            wholesalePrice: row.wholesalePrice,
+            barcode: row.barcode,
+            hsnCode: row.hsnCode,
+            expiryDate: row.expiryDate,
+            notes: row.notes,
+            isActive: row.isActive,
+            createdAt: row.createdAt,
+            updatedAt: row.updatedAt,
+          ),
+        )
+        .toList();
   }
 
   /// Gets a single variant by ID.
   Future<ProductVariantEntity> _getVariantById(int id) async {
-    final row = await (_database.select(_database.productVariants)
-          ..where((t) => t.id.equals(id)))
-        .getSingleOrNull();
+    final row = await (_database.select(
+      _database.productVariants,
+    )..where((t) => t.id.equals(id))).getSingleOrNull();
     if (row == null) throw ProductVariantNotFoundException(id);
     return ProductVariantEntity(
       id: row.id,
@@ -896,7 +932,8 @@ class ProductRepository {
   SqliteException? _asSqliteException(Object error) {
     return switch (error) {
       SqliteException exception => exception,
-      DriftWrappedException(:final cause) when cause is SqliteException => cause,
+      DriftWrappedException(:final cause) when cause is SqliteException =>
+        cause,
       _ => null,
     };
   }

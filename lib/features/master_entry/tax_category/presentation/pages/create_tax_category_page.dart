@@ -17,10 +17,8 @@ import '../../services/tax_category_validator.dart';
 
 /// Row helper for managing component form state.
 class _ComponentRowState {
-  _ComponentRowState({
-    this.taxTypeId,
-    required String percentageText,
-  }) : percentageController = TextEditingController(text: percentageText);
+  _ComponentRowState({this.taxTypeId, required String percentageText})
+    : percentageController = TextEditingController(text: percentageText);
 
   int? taxTypeId;
   final TextEditingController percentageController;
@@ -76,7 +74,8 @@ class _CreateTaxCategoryPageState extends State<CreateTaxCategoryPage> {
   double get _calculatedTotalTax {
     double total = 0.0;
     for (final row in _componentRows) {
-      final parsed = double.tryParse(row.percentageController.text.trim()) ?? 0.0;
+      final parsed =
+          double.tryParse(row.percentageController.text.trim()) ?? 0.0;
       total += parsed;
     }
     return total;
@@ -104,7 +103,9 @@ class _CreateTaxCategoryPageState extends State<CreateTaxCategoryPage> {
         );
       }
     } else {
-      _componentRows.add(_ComponentRowState(taxTypeId: null, percentageText: ''));
+      _componentRows.add(
+        _ComponentRowState(taxTypeId: null, percentageText: ''),
+      );
     }
 
     _loadTaxTypes();
@@ -136,7 +137,9 @@ class _CreateTaxCategoryPageState extends State<CreateTaxCategoryPage> {
 
   void _addComponentRow() {
     setState(() {
-      _componentRows.add(_ComponentRowState(taxTypeId: null, percentageText: ''));
+      _componentRows.add(
+        _ComponentRowState(taxTypeId: null, percentageText: ''),
+      );
       _componentsError = null;
     });
   }
@@ -160,7 +163,9 @@ class _CreateTaxCategoryPageState extends State<CreateTaxCategoryPage> {
     final description = _descriptionController.text.trim();
 
     final nameError = TaxCategoryValidator.validateName(name);
-    final descriptionError = TaxCategoryValidator.validateDescription(description);
+    final descriptionError = TaxCategoryValidator.validateDescription(
+      description,
+    );
 
     // Build components from row states
     final componentsList = <TaxCategoryComponent>[];
@@ -186,9 +191,13 @@ class _CreateTaxCategoryPageState extends State<CreateTaxCategoryPage> {
       );
     }
 
-    final componentsError = TaxCategoryValidator.validateComponents(componentsList);
+    final componentsError = TaxCategoryValidator.validateComponents(
+      componentsList,
+    );
 
-    if (nameError != null || descriptionError != null || componentsError != null) {
+    if (nameError != null ||
+        descriptionError != null ||
+        componentsError != null) {
       setState(() {
         _nameError = nameError;
         _descriptionError = descriptionError;
@@ -296,8 +305,13 @@ class _CreateTaxCategoryPageState extends State<CreateTaxCategoryPage> {
                 labelText: 'Tax Type',
                 hintText: 'Select Tax Type',
                 isDense: true,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 12,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
               items: _availableTaxTypes.map((taxType) {
                 final isSelectedElsewhere = excludedIds.contains(taxType.id);
@@ -328,7 +342,9 @@ class _CreateTaxCategoryPageState extends State<CreateTaxCategoryPage> {
             flex: 2,
             child: TextFormField(
               controller: row.percentageController,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
+              keyboardType: const TextInputType.numberWithOptions(
+                decimal: true,
+              ),
               inputFormatters: [
                 FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
               ],
@@ -337,8 +353,13 @@ class _CreateTaxCategoryPageState extends State<CreateTaxCategoryPage> {
                 hintText: 'e.g. 9',
                 suffixText: '%',
                 isDense: true,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 12,
+                ),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                ),
               ),
               onChanged: (_) => setState(() => _componentsError = null),
             ),

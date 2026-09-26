@@ -119,82 +119,90 @@ void main() {
     expect(find.text('Mobile number is required.'), findsOneWidget);
   });
 
-  testWidgets('validates the mobile number format and enforces 10-digit limit', (
-    tester,
-  ) async {
-    useTallViewport(tester);
-    await openCreateCustomerForm(tester);
+  testWidgets(
+    'validates the mobile number format and enforces 10-digit limit',
+    (tester) async {
+      useTallViewport(tester);
+      await openCreateCustomerForm(tester);
 
-    await tester.enterText(
-      find.byKey(const ValueKey('customer-name')),
-      'Acme',
-    );
-    await tester.enterText(
-      find.byKey(const ValueKey('customer-mobile')),
-      '1234567890123', // Trying 13 digits
-    );
+      await tester.enterText(
+        find.byKey(const ValueKey('customer-name')),
+        'Acme',
+      );
+      await tester.enterText(
+        find.byKey(const ValueKey('customer-mobile')),
+        '1234567890123', // Trying 13 digits
+      );
 
-    // Form should cap input to 10 digits
-    final mobileField = tester.widget<TextField>(
-      find.byKey(const ValueKey('customer-mobile')),
-    );
-    expect(mobileField.controller?.text.length, equals(10));
+      // Form should cap input to 10 digits
+      final mobileField = tester.widget<TextField>(
+        find.byKey(const ValueKey('customer-mobile')),
+      );
+      expect(mobileField.controller?.text.length, equals(10));
 
-    await tester.ensureVisible(find.text('Save'));
-    await tester.tap(find.text('Save'));
-    await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('Save'));
+      await tester.tap(find.text('Save'));
+      await tester.pumpAndSettle();
 
-    expect(
-      find.text('Enter a valid 10-digit mobile number.'),
-      findsOneWidget,
-    );
-  });
+      expect(
+        find.text('Enter a valid 10-digit mobile number.'),
+        findsOneWidget,
+      );
+    },
+  );
 
-  testWidgets('validates invalid email, GST, PAN, pincode and alternate mobile', (
-    tester,
-  ) async {
-    useTallViewport(tester);
-    await openCreateCustomerForm(tester);
+  testWidgets(
+    'validates invalid email, GST, PAN, pincode and alternate mobile',
+    (tester) async {
+      useTallViewport(tester);
+      await openCreateCustomerForm(tester);
 
-    await tester.enterText(
-      find.byKey(const ValueKey('customer-name')),
-      'Valid Name',
-    );
-    await tester.enterText(
-      find.byKey(const ValueKey('customer-mobile')),
-      '9876543210',
-    );
-    await tester.enterText(
-      find.byKey(const ValueKey('customer-alternate-mobile')),
-      '123',
-    );
-    await tester.enterText(
-      find.byKey(const ValueKey('customer-email')),
-      'invalid-email',
-    );
-    await tester.enterText(
-      find.byKey(const ValueKey('customer-gst')),
-      'INVALIDGST',
-    );
-    await tester.enterText(
-      find.byKey(const ValueKey('customer-pan')),
-      'INVALIDPAN',
-    );
-    await tester.enterText(
-      find.byKey(const ValueKey('customer-pincode')),
-      '123',
-    );
+      await tester.enterText(
+        find.byKey(const ValueKey('customer-name')),
+        'Valid Name',
+      );
+      await tester.enterText(
+        find.byKey(const ValueKey('customer-mobile')),
+        '9876543210',
+      );
+      await tester.enterText(
+        find.byKey(const ValueKey('customer-alternate-mobile')),
+        '123',
+      );
+      await tester.enterText(
+        find.byKey(const ValueKey('customer-email')),
+        'invalid-email',
+      );
+      await tester.enterText(
+        find.byKey(const ValueKey('customer-gst')),
+        'INVALIDGST',
+      );
+      await tester.enterText(
+        find.byKey(const ValueKey('customer-pan')),
+        'INVALIDPAN',
+      );
+      await tester.enterText(
+        find.byKey(const ValueKey('customer-pincode')),
+        '123',
+      );
 
-    await tester.ensureVisible(find.text('Save'));
-    await tester.tap(find.text('Save'));
-    await tester.pumpAndSettle();
+      await tester.ensureVisible(find.text('Save'));
+      await tester.tap(find.text('Save'));
+      await tester.pumpAndSettle();
 
-    expect(find.text('Enter a valid 10-digit mobile number.'), findsOneWidget);
-    expect(find.text('Enter a valid email address.'), findsOneWidget);
-    expect(find.text('Enter a valid 15-character GST number.'), findsOneWidget);
-    expect(find.text('Enter a valid PAN (e.g. ABCDE1234F).'), findsOneWidget);
-    expect(find.text('Enter a valid 6-digit pincode.'), findsOneWidget);
-  });
+      expect(
+        find.text('Enter a valid 10-digit mobile number.'),
+        findsOneWidget,
+      );
+      expect(find.text('Enter a valid email address.'), findsOneWidget);
+      expect(
+        find.text('Enter a valid 15-character GST number.'),
+        findsOneWidget,
+      );
+      expect(find.text('Enter a valid PAN (e.g. ABCDE1234F).'), findsOneWidget);
+      expect(find.text('Enter a valid 6-digit pincode.'), findsOneWidget);
+    },
+  );
 
   testWidgets('focuses the first invalid field when Save validation fails', (
     tester,
@@ -214,36 +222,43 @@ void main() {
     expect(nameField.focusNode?.hasFocus, isTrue);
   });
 
-  testWidgets('opens read-only customer view displaying complete customer details', (
-    tester,
-  ) async {
-    useTallViewport(tester);
-    final customer = await seedCustomer(
-      'Acme View Test',
-      mobile: '9876543210',
-      gst: '27ABCDE1234F1Z5',
-      city: 'Mumbai',
-    );
+  testWidgets(
+    'opens read-only customer view displaying complete customer details',
+    (tester) async {
+      useTallViewport(tester);
+      final customer = await seedCustomer(
+        'Acme View Test',
+        mobile: '9876543210',
+        gst: '27ABCDE1234F1Z5',
+        city: 'Mumbai',
+      );
 
-    await openCustomerPage(tester);
-    await tester.ensureVisible(
-      find.byKey(ValueKey('view-customer-${customer.id}')),
-    );
-    await tester.tap(find.byKey(ValueKey('view-customer-${customer.id}')));
-    await tester.pumpAndSettle();
+      await openCustomerPage(tester);
+      await tester.ensureVisible(
+        find.byKey(ValueKey('view-customer-${customer.id}')),
+      );
+      await tester.tap(find.byKey(ValueKey('view-customer-${customer.id}')));
+      await tester.pumpAndSettle();
 
-    expect(find.text('Acme View Test'), findsWidgets);
-    expect(find.text('Customer Code: ${customer.customerCode}'), findsOneWidget);
-    expect(find.text('Basic Info'), findsOneWidget);
-    expect(find.text('Contact Information'), findsOneWidget);
-    expect(find.text('Financial Details'), findsOneWidget);
-    expect(find.text('Close'), findsOneWidget);
+      expect(find.text('Acme View Test'), findsWidgets);
+      expect(
+        find.text('Customer Code: ${customer.customerCode}'),
+        findsOneWidget,
+      );
+      expect(find.text('Basic Info'), findsOneWidget);
+      expect(find.text('Contact Information'), findsOneWidget);
+      expect(find.text('Financial Details'), findsOneWidget);
+      expect(find.text('Close'), findsOneWidget);
 
-    await tester.tap(find.text('Close'));
-    await tester.pumpAndSettle();
+      await tester.tap(find.text('Close'));
+      await tester.pumpAndSettle();
 
-    expect(find.text('Customer Code: ${customer.customerCode}'), findsNothing);
-  });
+      expect(
+        find.text('Customer Code: ${customer.customerCode}'),
+        findsNothing,
+      );
+    },
+  );
 
   testWidgets('rejects a duplicate GST number inline', (tester) async {
     useTallViewport(tester);

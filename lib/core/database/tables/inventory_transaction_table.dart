@@ -30,9 +30,16 @@ class InventoryTransactions extends Table {
   /// Positive for stock in, negative for stock out.
   IntColumn get quantity => integer()();
 
+  /// Stock level before this movement. Null for rows written before this
+  /// column existed (schema v15); those display only their in/out quantity.
+  IntColumn get previousQuantity => integer().nullable()();
+
+  /// Stock level after this movement. Null for rows written before this
+  /// column existed (schema v15).
+  IntColumn get newQuantity => integer().nullable()();
+
   /// Reference purchase ID for purchase/return transactions.
-  IntColumn get purchaseId =>
-      integer().nullable().references(Purchases, #id)();
+  IntColumn get purchaseId => integer().nullable().references(Purchases, #id)();
 
   DateTimeColumn get transactionDate => dateTime()();
 

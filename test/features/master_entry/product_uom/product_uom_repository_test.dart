@@ -40,12 +40,15 @@ void main() {
 
     tearDown(() => database.close());
 
-    test('getAllProducts fetches products directly from the DB products table', () async {
-      final products = await repository.getAllProducts();
-      expect(products, hasLength(1));
-      expect(products.first.productName, equals('Banana'));
-      expect(products.first.productCode, equals('P-1'));
-    });
+    test(
+      'getAllProducts fetches products directly from the DB products table',
+      () async {
+        final products = await repository.getAllProducts();
+        expect(products, hasLength(1));
+        expect(products.first.productName, equals('Banana'));
+        expect(products.first.productCode, equals('P-1'));
+      },
+    );
 
     test('the first conversion for a product becomes the default', () async {
       final created = await repository.createConversion(
@@ -175,46 +178,52 @@ void main() {
       );
     });
 
-    test('deleting default conversion assigns default to oldest remaining', () async {
-      final first = await repository.createConversion(
-        productId: productId,
-        fromUnitId: 2,
-        toUnitId: 1,
-        conversionFactor: 12,
-      );
-      final second = await repository.createConversion(
-        productId: productId,
-        fromUnitId: 3,
-        toUnitId: 1,
-        conversionFactor: 2,
-      );
+    test(
+      'deleting default conversion assigns default to oldest remaining',
+      () async {
+        final first = await repository.createConversion(
+          productId: productId,
+          fromUnitId: 2,
+          toUnitId: 1,
+          conversionFactor: 12,
+        );
+        final second = await repository.createConversion(
+          productId: productId,
+          fromUnitId: 3,
+          toUnitId: 1,
+          conversionFactor: 2,
+        );
 
-      expect(first.isDefault, isTrue);
-      expect(second.isDefault, isFalse);
+        expect(first.isDefault, isTrue);
+        expect(second.isDefault, isFalse);
 
-      await repository.deleteConversion(first.id);
+        await repository.deleteConversion(first.id);
 
-      final rows = await repository.getForProduct(productId);
-      expect(rows, hasLength(1));
-      expect(rows.single.id, equals(second.id));
-      expect(rows.single.isDefault, isTrue);
-    });
+        final rows = await repository.getForProduct(productId);
+        expect(rows, hasLength(1));
+        expect(rows.single.id, equals(second.id));
+        expect(rows.single.isDefault, isTrue);
+      },
+    );
 
-    test('resolveFactor uses the product row and derives the reverse', () async {
-      await repository.createConversion(
-        productId: productId,
-        fromUnitId: 2,
-        toUnitId: 1,
-        conversionFactor: 12,
-      );
+    test(
+      'resolveFactor uses the product row and derives the reverse',
+      () async {
+        await repository.createConversion(
+          productId: productId,
+          fromUnitId: 2,
+          toUnitId: 1,
+          conversionFactor: 12,
+        );
 
-      expect(await repository.resolveFactor(productId, 2, 1), 12.0);
-      expect(
-        await repository.resolveFactor(productId, 1, 2),
-        closeTo(1 / 12, 1e-9),
-      );
-      expect(await repository.resolveFactor(productId, 1, 1), 1.0);
-      expect(await repository.resolveFactor(productId, 2, 5), isNull);
-    });
+        expect(await repository.resolveFactor(productId, 2, 1), 12.0);
+        expect(
+          await repository.resolveFactor(productId, 1, 2),
+          closeTo(1 / 12, 1e-9),
+        );
+        expect(await repository.resolveFactor(productId, 1, 1), 1.0);
+        expect(await repository.resolveFactor(productId, 2, 5), isNull);
+      },
+    );
   });
 }

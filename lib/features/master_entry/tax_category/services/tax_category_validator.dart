@@ -55,7 +55,10 @@ class TaxCategoryValidator {
       }
     }
 
-    final totalPercentage = components.fold(0.0, (sum, c) => sum + c.percentage);
+    final totalPercentage = components.fold(
+      0.0,
+      (sum, c) => sum + c.percentage,
+    );
     if (totalPercentage < 0 || totalPercentage > 100) {
       return 'Total tax percentage must be between 0% and 100%.';
     }

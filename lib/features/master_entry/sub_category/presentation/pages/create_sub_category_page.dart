@@ -70,8 +70,9 @@ class _CreateSubCategoryPageState extends State<CreateSubCategoryPage> {
     _selectedCategoryId = subCategory?.categoryId;
     _nameController = TextEditingController(text: subCategory?.subCategoryName);
     _codeController = TextEditingController(text: subCategory?.subCategoryCode);
-    _descriptionController =
-        TextEditingController(text: subCategory?.description);
+    _descriptionController = TextEditingController(
+      text: subCategory?.description,
+    );
     _active = subCategory?.isActive ?? true;
 
     _loadCategories();
@@ -113,8 +114,9 @@ class _CreateSubCategoryPageState extends State<CreateSubCategoryPage> {
     final categoryError = SubCategoryValidator.validateCategory(categoryId);
     final nameError = SubCategoryValidator.validateName(name);
     final codeError = SubCategoryValidator.validateCode(code);
-    final descriptionError =
-        SubCategoryValidator.validateDescription(description);
+    final descriptionError = SubCategoryValidator.validateDescription(
+      description,
+    );
 
     if (categoryError != null ||
         nameError != null ||
@@ -193,7 +195,8 @@ class _CreateSubCategoryPageState extends State<CreateSubCategoryPage> {
     if (!mounted) return;
     setState(() {
       _saving = false;
-      _nameError = message ??
+      _nameError =
+          message ??
           'A sub-category with this name already exists under this category.';
     });
   }

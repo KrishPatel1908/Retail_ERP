@@ -3,6 +3,7 @@ import '../master_entry/brand/domain/entities/brand.dart';
 import '../master_entry/category/domain/entities/category.dart';
 import '../master_entry/customer/domain/entities/customer.dart';
 import '../master_entry/product/domain/entities/product.dart';
+import '../master_entry/product_uom/domain/entities/product_uom_display.dart';
 import '../master_entry/sub_category/domain/entities/sub_category.dart';
 import '../master_entry/supplier/domain/entities/supplier.dart';
 import '../master_entry/tax_category/domain/entities/tax_category.dart';
@@ -97,7 +98,7 @@ class UomConversionFormRoute extends ContentRoute {
 class ProductUomFormRoute extends ContentRoute {
   const ProductUomFormRoute({this.productUomDisplay});
 
-  final dynamic productUomDisplay;
+  final ProductUomDisplay? productUomDisplay;
 }
 
 /// The "Create / Edit Customer" form shown above the Customer list.
@@ -138,4 +139,9 @@ class PurchaseFormRoute extends ContentRoute {
   const PurchaseFormRoute({this.purchase});
 
   final PurchaseEntity? purchase;
+}
+
+/// The "Create Purchase Return" form shown above the Purchase Return list.
+class PurchaseReturnFormRoute extends ContentRoute {
+  const PurchaseReturnFormRoute();
 }

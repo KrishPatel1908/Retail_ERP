@@ -253,9 +253,7 @@ class _CreateUomConversionPageState extends State<CreateUomConversionPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Breadcrumbs(
-                  items: ['Master Entry', 'UOM Conversion', title],
-                ),
+                Breadcrumbs(items: ['Master Entry', 'UOM Conversion', title]),
                 const SizedBox(height: 12),
                 Text(
                   title,
@@ -287,8 +285,9 @@ class _CreateUomConversionPageState extends State<CreateUomConversionPage> {
                               isRequired: true,
                               units: _units,
                               selectedId: _fromUnitId,
-                              excludeIds:
-                                  _toUnitId == null ? const {} : {_toUnitId!},
+                              excludeIds: _toUnitId == null
+                                  ? const {}
+                                  : {_toUnitId!},
                               onChanged: _onFromChanged,
                               onAddNewUnit: _addNewUnit,
                               errorText: _fromError,
@@ -330,16 +329,18 @@ class _CreateUomConversionPageState extends State<CreateUomConversionPage> {
                       Align(
                         alignment: Alignment.centerLeft,
                         child: TextButton.icon(
-                          onPressed: _saving ? null : () async {
-                            final newUnitId = await _addNewUnit();
-                            if (newUnitId != null) {
-                              if (_fromUnitId == null) {
-                                _onFromChanged(newUnitId);
-                              } else if (_toUnitId == null) {
-                                _onToChanged(newUnitId);
-                              }
-                            }
-                          },
+                          onPressed: _saving
+                              ? null
+                              : () async {
+                                  final newUnitId = await _addNewUnit();
+                                  if (newUnitId != null) {
+                                    if (_fromUnitId == null) {
+                                      _onFromChanged(newUnitId);
+                                    } else if (_toUnitId == null) {
+                                      _onToChanged(newUnitId);
+                                    }
+                                  }
+                                },
                           icon: const Icon(Icons.add_rounded, size: 16),
                           label: const Text('+ Add New Unit'),
                           style: TextButton.styleFrom(

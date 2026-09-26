@@ -23,15 +23,16 @@ class BrandRepository {
   /// calculated product counts.
   Future<List<Brand>> getAllBrands() async {
     final countExpr = _database.products.id.count();
-    final query = _database.select(_database.brands).join([
-      leftOuterJoin(
-        _database.products,
-        _database.products.brandId.equalsExp(_database.brands.id),
-      ),
-    ])
-      ..addColumns([countExpr])
-      ..groupBy([_database.brands.id])
-      ..orderBy([OrderingTerm.asc(_database.brands.brandName.lower())]);
+    final query =
+        _database.select(_database.brands).join([
+            leftOuterJoin(
+              _database.products,
+              _database.products.brandId.equalsExp(_database.brands.id),
+            ),
+          ])
+          ..addColumns([countExpr])
+          ..groupBy([_database.brands.id])
+          ..orderBy([OrderingTerm.asc(_database.brands.brandName.lower())]);
 
     final rows = await query.get();
     return rows.map((row) {
@@ -50,20 +51,21 @@ class BrandRepository {
     }
 
     final countExpr = _database.products.id.count();
-    final joinedQuery = _database.select(_database.brands).join([
-      leftOuterJoin(
-        _database.products,
-        _database.products.brandId.equalsExp(_database.brands.id),
-      ),
-    ])
-      ..where(
-        _database.brands.brandName.lower().contains(normalized) |
-            (_database.brands.description.isNotNull() &
-                _database.brands.description.lower().contains(normalized)),
-      )
-      ..addColumns([countExpr])
-      ..groupBy([_database.brands.id])
-      ..orderBy([OrderingTerm.asc(_database.brands.brandName.lower())]);
+    final joinedQuery =
+        _database.select(_database.brands).join([
+            leftOuterJoin(
+              _database.products,
+              _database.products.brandId.equalsExp(_database.brands.id),
+            ),
+          ])
+          ..where(
+            _database.brands.brandName.lower().contains(normalized) |
+                (_database.brands.description.isNotNull() &
+                    _database.brands.description.lower().contains(normalized)),
+          )
+          ..addColumns([countExpr])
+          ..groupBy([_database.brands.id])
+          ..orderBy([OrderingTerm.asc(_database.brands.brandName.lower())]);
 
     final rows = await joinedQuery.get();
     return rows.map((row) {
@@ -79,25 +81,22 @@ class BrandRepository {
   /// uniqueness during an edit.
   Future<bool> existsByName(String name, {int? excludeId}) async {
     final normalized = name.trim().toLowerCase();
-    final row =
-        await (_database.select(_database.brands)..where((t) {
-              final matches = t.brandName.lower().equals(normalized);
-              if (excludeId == null) {
-                return matches;
-              }
-              return matches & t.id.isNotValue(excludeId);
-            }))
-            .getSingleOrNull();
+    final t = _database.brands;
+    final condition = excludeId == null
+        ? t.brandName.lower().equals(normalized)
+        : t.brandName.lower().equals(normalized) & t.id.isNotValue(excludeId);
+    final row = await (_database.selectOnly(t)
+          ..addColumns([t.id])
+          ..where(condition)
+          ..limit(1))
+        .getSingleOrNull();
     return row != null;
   }
 
   /// Creates a brand and returns the stored entity.
   ///
   /// Throws [BrandAlreadyExistsException] when the name is already taken.
-  Future<Brand> createBrand({
-    required String name,
-    String? description,
-  }) async {
+  Future<Brand> createBrand({required String name, String? description}) async {
     final trimmedName = name.trim();
     final trimmedDescription = _normalizeDescription(description);
 
@@ -106,13 +105,15 @@ class BrandRepository {
     }
 
     try {
-      final id = await _database.into(_database.brands).insert(
-        db.BrandsCompanion.insert(
-          brandCode: 'BRD_${DateTime.now().microsecondsSinceEpoch}',
-          brandName: trimmedName,
-          description: Value(trimmedDescription),
-        ),
-      );
+      final id = await _database
+          .into(_database.brands)
+          .insert(
+            db.BrandsCompanion.insert(
+              brandCode: 'BRD_${DateTime.now().microsecondsSinceEpoch}',
+              brandName: trimmedName,
+              description: Value(trimmedDescription),
+            ),
+          );
       return _toEntity(await _getById(id), productCount: 0);
     } on Exception catch (error, stackTrace) {
       if (_isUniqueViolation(error) && await existsByName(trimmedName)) {
@@ -214,8 +215,9 @@ class BrandRepository {
   }
 
   Future<int> _getProductCountForBrand(int brandId) async {
-    final rows = await (_database.select(_database.products)
-      ..where((t) => t.brandId.equals(brandId))).get();
+    final rows = await (_database.select(
+      _database.products,
+    )..where((t) => t.brandId.equals(brandId))).get();
     return rows.length;
   }
 

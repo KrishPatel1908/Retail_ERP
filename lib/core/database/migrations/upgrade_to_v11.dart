@@ -30,7 +30,9 @@ Future<void> _upgradeToV11(Migrator migrator, AppDatabase database) async {
       await database.customStatement('DROP INDEX IF EXISTS $index');
     }
 
-    await database.customStatement('DROP TABLE IF EXISTS inventory_transaction_new');
+    await database.customStatement(
+      'DROP TABLE IF EXISTS inventory_transaction_new',
+    );
     await database.customStatement('''
       CREATE TABLE inventory_transaction_new (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -81,7 +83,9 @@ Future<void> _upgradeToV11(Migrator migrator, AppDatabase database) async {
   // favour of a unique index, matching the fresh-create schema so upgraded and
   // freshly-created databases converge on an identical shape.
   if (await _tableExists(database, 'current_stock')) {
-    await database.customStatement('DROP INDEX IF EXISTS idx_stock_product_variant');
+    await database.customStatement(
+      'DROP INDEX IF EXISTS idx_stock_product_variant',
+    );
 
     await database.customStatement('DROP TABLE IF EXISTS current_stock_new');
     await database.customStatement('''
@@ -113,7 +117,9 @@ Future<void> _upgradeToV11(Migrator migrator, AppDatabase database) async {
   }
 
   // Step 3: Drop the obsolete warehouse table and its index.
-  await database.customStatement('DROP INDEX IF EXISTS idx_warehouse_name_nocase_unique');
+  await database.customStatement(
+    'DROP INDEX IF EXISTS idx_warehouse_name_nocase_unique',
+  );
   await database.customStatement('DROP TABLE IF EXISTS warehouse');
 }
 

@@ -27,7 +27,8 @@ class Products extends Table {
   IntColumn get id => integer().autoIncrement()();
   TextColumn get productCode => text().unique()();
   TextColumn get productName => text()();
-  IntColumn get categoryId => integer().nullable().references(Categories, #id)();
+  IntColumn get categoryId =>
+      integer().nullable().references(Categories, #id)();
   IntColumn get subCategoryId =>
       integer().nullable().references(SubCategories, #id)();
   IntColumn get brandId => integer().nullable().references(Brands, #id)();
@@ -41,6 +42,11 @@ class Products extends Table {
   IntColumn get taxTypeId => integer().nullable().references(TaxTypes, #id)();
   IntColumn get taxCategoryId =>
       integer().nullable().references(TaxCategories, #id)();
+
+  /// Minimum stock level below which the product is considered "Low Stock"
+  /// by the Inventory module. Zero disables the low-stock warning. Variants
+  /// inherit this threshold from their parent product.
+  IntColumn get minimumStock => integer().withDefault(const Constant(0))();
 
   /// Optional expiry date for the parent product (e.g. food, medicine).
   DateTimeColumn get expiryDate => dateTime().nullable()();

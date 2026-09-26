@@ -5,7 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:retail_erp/app/retail_erp_app.dart';
-import 'package:retail_erp/core/database/app_database.dart' hide CompanySettings;
+import 'package:retail_erp/core/database/app_database.dart'
+    hide CompanySettings;
 import 'package:retail_erp/features/company_settings/data/repositories/company_settings_repository.dart';
 import 'package:retail_erp/features/company_settings/domain/company_settings_enums.dart';
 import 'package:retail_erp/features/company_settings/domain/entities/company_settings.dart';
@@ -102,9 +103,7 @@ CompanySettingsDraft _validDraft() {
 }
 
 Widget _harness(CompanySettingsPage page) {
-  return MaterialApp(
-    home: Scaffold(body: page),
-  );
+  return MaterialApp(home: Scaffold(body: page));
 }
 
 void main() {
@@ -138,8 +137,11 @@ void main() {
             service: service,
             logoPicker: picker,
             logoStorage: storage,
-            bannerStorage: bannerStorage ??
-                CompanyBannerStorage(directoryProvider: () async => Directory.systemTemp),
+            bannerStorage:
+                bannerStorage ??
+                CompanyBannerStorage(
+                  directoryProvider: () async => Directory.systemTemp,
+                ),
           ),
         ),
       );
@@ -197,7 +199,9 @@ void main() {
       useTallViewport(tester);
       await pumpPage(tester);
 
-      await tester.ensureVisible(find.byKey(const ValueKey('company-settings-save')));
+      await tester.ensureVisible(
+        find.byKey(const ValueKey('company-settings-save')),
+      );
       await tester.tap(find.byKey(const ValueKey('company-settings-save')));
       await tester.pumpAndSettle();
 
@@ -250,14 +254,13 @@ void main() {
         '25',
       );
 
-      await tester.ensureVisible(find.byKey(const ValueKey('company-settings-save')));
+      await tester.ensureVisible(
+        find.byKey(const ValueKey('company-settings-save')),
+      );
       await tester.tap(find.byKey(const ValueKey('company-settings-save')));
       await tester.pumpAndSettle();
 
-      expect(
-        find.text('Company settings saved successfully.'),
-        findsOneWidget,
-      );
+      expect(find.text('Company settings saved successfully.'), findsOneWidget);
 
       // Persisted in the database — and no second row was created.
       final rows = await database.select(database.companySettingsTable).get();
@@ -314,17 +317,15 @@ void main() {
       tempFile.writeAsBytesSync(List.filled(10, 0));
       addTearDown(() => tempFile.parent.deleteSync(recursive: true));
 
-      await pumpPage(
-        tester,
-        picker: _FixedPicker(tempFile),
-        storage: storage,
-      );
+      await pumpPage(tester, picker: _FixedPicker(tempFile), storage: storage);
 
       // Upload: the picked file becomes the pending logo.
       await tester.ensureVisible(
         find.byKey(const ValueKey('company-settings-logo-upload')),
       );
-      await tester.tap(find.byKey(const ValueKey('company-settings-logo-upload')));
+      await tester.tap(
+        find.byKey(const ValueKey('company-settings-logo-upload')),
+      );
       await tester.pumpAndSettle();
       expect(find.text('Replace Logo'), findsOneWidget);
 
@@ -362,7 +363,9 @@ void main() {
         '1',
       );
 
-      await tester.ensureVisible(find.byKey(const ValueKey('company-settings-save')));
+      await tester.ensureVisible(
+        find.byKey(const ValueKey('company-settings-save')),
+      );
       await tester.tap(find.byKey(const ValueKey('company-settings-save')));
       await tester.pumpAndSettle();
 
@@ -374,13 +377,17 @@ void main() {
       await tester.ensureVisible(
         find.byKey(const ValueKey('company-profile-edit-button')),
       );
-      await tester.tap(find.byKey(const ValueKey('company-profile-edit-button')));
+      await tester.tap(
+        find.byKey(const ValueKey('company-profile-edit-button')),
+      );
       await tester.pumpAndSettle();
 
       await tester.ensureVisible(
         find.byKey(const ValueKey('company-settings-logo-remove')),
       );
-      await tester.tap(find.byKey(const ValueKey('company-settings-logo-remove')));
+      await tester.tap(
+        find.byKey(const ValueKey('company-settings-logo-remove')),
+      );
       await tester.pumpAndSettle();
       expect(find.text('Upload Logo'), findsOneWidget);
 
@@ -388,7 +395,9 @@ void main() {
       // not obscure the save button at the bottom of the form.
       await tester.pump(const Duration(seconds: 5));
       await tester.pumpAndSettle();
-      await tester.ensureVisible(find.byKey(const ValueKey('company-settings-save')));
+      await tester.ensureVisible(
+        find.byKey(const ValueKey('company-settings-save')),
+      );
       await tester.tap(find.byKey(const ValueKey('company-settings-save')));
       await tester.pumpAndSettle();
 
@@ -408,16 +417,14 @@ void main() {
       tempFile.writeAsBytesSync(List.filled(10, 0));
       addTearDown(() => tempFile.parent.deleteSync(recursive: true));
 
-      await pumpPage(
-        tester,
-        picker: _FixedPicker(tempFile),
-        storage: storage,
-      );
+      await pumpPage(tester, picker: _FixedPicker(tempFile), storage: storage);
 
       await tester.ensureVisible(
         find.byKey(const ValueKey('company-settings-logo-upload')),
       );
-      await tester.tap(find.byKey(const ValueKey('company-settings-logo-upload')));
+      await tester.tap(
+        find.byKey(const ValueKey('company-settings-logo-upload')),
+      );
       await tester.pumpAndSettle();
 
       expect(

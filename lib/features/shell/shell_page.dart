@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../core/constants/app_constants.dart';
 import '../../core/navigation/app_page.dart';
 import '../company_settings/presentation/pages/company_settings_page.dart';
+import '../inventory/presentation/pages/inventory_list_page.dart';
 import '../master_entry/brand/domain/entities/brand.dart';
 import '../master_entry/brand/presentation/pages/brand_list_page.dart';
 import '../master_entry/brand/presentation/pages/create_brand_page.dart';
@@ -21,6 +23,7 @@ import '../master_entry/sub_category/presentation/pages/sub_category_list_page.d
 import '../master_entry/supplier/domain/entities/supplier.dart';
 import '../master_entry/supplier/presentation/pages/create_supplier_page.dart';
 import '../master_entry/supplier/presentation/pages/supplier_list_page.dart';
+import '../purchase/presentation/pages/create_purchase_return_page.dart';
 import '../purchase/presentation/pages/create_purchase_page.dart';
 import '../purchase/presentation/pages/purchase_history_page.dart';
 import '../purchase/presentation/pages/purchase_returns_page.dart';
@@ -219,41 +222,36 @@ class _ShellPageState extends State<ShellPage> {
         ),
         AppPage.customer => CustomerListPage(
           onAddCustomer: () => _openCustomerForm(),
-          onEditCustomer: (customer) =>
-              _openCustomerForm(customer: customer),
+          onEditCustomer: (customer) => _openCustomerForm(customer: customer),
         ),
         AppPage.product => ProductListPage(
           onAddProduct: () => _openProductForm(),
-          onEditProduct: (product) =>
-              _openProductForm(product: product),
+          onEditProduct: (product) => _openProductForm(product: product),
         ),
         AppPage.supplier => SupplierListPage(
           onAddSupplier: () => _openSupplierForm(),
-          onEditSupplier: (supplier) =>
-              _openSupplierForm(supplier: supplier),
+          onEditSupplier: (supplier) => _openSupplierForm(supplier: supplier),
         ),
         AppPage.companySettings => const CompanySettingsPage(),
+        AppPage.inventory => const InventoryListPage(),
         AppPage.purchaseEntry => CreatePurchasePage(
-          onSave: () {
-            setState(() {
-              _contentStack
-                ..clear()
-                ..add(ModuleRoute(AppPage.purchaseHistory));
-            });
-            _onPageSelected(AppPage.purchaseHistory);
-          },
+          onSave: () => _onPageSelected(AppPage.purchaseHistory),
           onCancel: () => _onPageSelected(AppPage.purchaseHistory),
         ),
         AppPage.purchaseHistory => PurchaseHistoryPage(
           onNewPurchase: () => _onPageSelected(AppPage.purchaseEntry),
           onEditPurchase: (purchase) {
-            setState(() => _contentStack.add(
-              PurchaseFormRoute(purchase: purchase),
-            ));
+            setState(
+              () => _contentStack.add(PurchaseFormRoute(purchase: purchase)),
+            );
           },
         ),
-        AppPage.purchaseReturns => PurchaseReturnsPage(
-          onNewReturn: () {},
+        AppPage.purchaseReturns => PurchaseReturnHistoryPage(
+          onNewReturn: () {
+            setState(() {
+              _contentStack.add(const PurchaseReturnFormRoute());
+            });
+          },
         ),
         _ => PagePlaceholder(page: page),
       },
@@ -296,7 +294,7 @@ class _ShellPageState extends State<ShellPage> {
         onSave: _closeProductUomForm,
         onCancel: _closeProductUomForm,
         onNavigateToProducts: () => _onPageSelected(AppPage.product),
-        conversion: productUomDisplay as ProductUomDisplay?,
+        conversion: productUomDisplay,
       ),
       CustomerFormRoute(:final customer) => CreateCustomerPage(
         onSave: _closeCustomerForm,
@@ -323,6 +321,15 @@ class _ShellPageState extends State<ShellPage> {
         },
         purchase: purchase,
       ),
+      PurchaseReturnFormRoute() => CreatePurchaseReturnPage(
+        onSave: () {
+          setState(() => _contentStack.removeLast());
+          _onPageSelected(AppPage.purchaseReturns);
+        },
+        onCancel: () {
+          setState(() => _contentStack.removeLast());
+        },
+      ),
     };
   }
 
@@ -341,64 +348,88 @@ class _ShellPageState extends State<ShellPage> {
       ProductFormRoute() => 'product-form',
       SupplierFormRoute() => 'supplier-form',
       PurchaseFormRoute() => 'purchase-form',
+      PurchaseReturnFormRoute() => 'purchase-return-form',
     };
+  }
+
+  bool _popContent() {
+    if (_contentStack.length > 1) {
+      setState(() => _contentStack.removeLast());
+      return true;
+    }
+    return false;
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: LayoutBuilder(
-        builder: (context, constraints) {
-          final bool expanded =
-              _sidebarExpanded &&
-              constraints.maxWidth >=
-                  AppConstants.autoCollapseSidebarBelowWidth;
-
-          return Column(
-            children: [
-              AppTopBar(
-                onToggleSidebar: _toggleSidebar,
-                sidebarExpanded: expanded,
-              ),
-              Expanded(
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    AppSidebar(
-                      expanded: expanded,
-                      selectedPage: _selectedPage,
-                      onSelect: _onPageSelected,
-                    ),
-                    Expanded(
-                      child: AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 250),
-                        switchInCurve: Curves.easeOutCubic,
-                        switchOutCurve: Curves.easeInCubic,
-                        transitionBuilder: (child, animation) {
-                          return FadeTransition(
-                            opacity: animation,
-                            child: SlideTransition(
-                              position: Tween<Offset>(
-                                begin: const Offset(0.015, 0),
-                                end: Offset.zero,
-                              ).animate(animation),
-                              child: child,
-                            ),
-                          );
-                        },
-                        child: KeyedSubtree(
-                          key: ValueKey(_contentKey),
-                          child: _buildContentPage(_contentStack.last),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              StatusBar(selectedPage: _selectedPage),
-            ],
-          );
+    return CallbackShortcuts(
+      bindings: {
+        const SingleActivator(LogicalKeyboardKey.escape): () {
+          _popContent();
         },
+      },
+      child: PopScope(
+        canPop: _contentStack.length <= 1,
+        onPopInvokedWithResult: (didPop, _) {
+          if (!didPop) {
+            _popContent();
+          }
+        },
+        child: Scaffold(
+          body: LayoutBuilder(
+            builder: (context, constraints) {
+              final bool expanded =
+                  _sidebarExpanded &&
+                  constraints.maxWidth >=
+                      AppConstants.autoCollapseSidebarBelowWidth;
+
+              return Column(
+                children: [
+                  AppTopBar(
+                    onToggleSidebar: _toggleSidebar,
+                    sidebarExpanded: expanded,
+                  ),
+                  Expanded(
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        AppSidebar(
+                          expanded: expanded,
+                          selectedPage: _selectedPage,
+                          onSelect: _onPageSelected,
+                        ),
+                        Expanded(
+                          child: AnimatedSwitcher(
+                            duration: const Duration(milliseconds: 250),
+                            switchInCurve: Curves.easeOutCubic,
+                            switchOutCurve: Curves.easeInCubic,
+                            transitionBuilder: (child, animation) {
+                              return FadeTransition(
+                                opacity: animation,
+                                child: SlideTransition(
+                                  position: Tween<Offset>(
+                                    begin: const Offset(0.015, 0),
+                                    end: Offset.zero,
+                                  ).animate(animation),
+                                  child: child,
+                                ),
+                              );
+                            },
+                            child: KeyedSubtree(
+                              key: ValueKey(_contentKey),
+                              child: _buildContentPage(_contentStack.last),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  StatusBar(selectedPage: _selectedPage),
+                ],
+              );
+            },
+          ),
+        ),
       ),
     );
   }

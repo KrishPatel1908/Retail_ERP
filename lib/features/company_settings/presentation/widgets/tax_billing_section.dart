@@ -81,9 +81,7 @@ class TaxBillingSection extends StatelessWidget {
               focusNode: invoicePrefixFocusNode,
               containerKey: invoicePrefixContainerKey,
               fieldKey: const ValueKey('company-settings-invoice-prefix'),
-              inputFormatters: [
-                LengthLimitingTextInputFormatter(10),
-              ],
+              inputFormatters: [LengthLimitingTextInputFormatter(10)],
             ),
           ],
         ),

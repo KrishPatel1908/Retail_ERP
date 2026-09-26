@@ -67,6 +67,21 @@ class CompanyLogoStorage {
     }
     final target = File(p.join(directory.path, 'company_logo.$extension'));
     await source.copy(target.path);
+
+    // Clean up any stale logo files with different extensions.
+    for (final ext in supportedExtensions) {
+      if (ext.toLowerCase() != extension.toLowerCase()) {
+        final stale = File(p.join(directory.path, 'company_logo.$ext'));
+        if (await stale.exists()) {
+          try {
+            await stale.delete();
+          } catch (_) {
+            // Ignore non-fatal deletion failures.
+          }
+        }
+      }
+    }
+
     return target.path;
   }
 

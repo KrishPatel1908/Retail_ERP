@@ -34,13 +34,15 @@ class UnitRepository {
     if (normalized.isEmpty) {
       return getAllUnits();
     }
-    final rows = await (_database.select(
-      _database.units,
-    )..where(
-        (t) =>
-            t.unitName.lower().contains(normalized) |
-            t.unitSymbol.lower().contains(normalized),
-      )..orderBy([(t) => OrderingTerm.asc(t.unitName.lower())])).get();
+    final rows =
+        await (_database.select(_database.units)
+              ..where(
+                (t) =>
+                    t.unitName.lower().contains(normalized) |
+                    t.unitSymbol.lower().contains(normalized),
+              )
+              ..orderBy([(t) => OrderingTerm.asc(t.unitName.lower())]))
+            .get();
     return rows.map(_toEntity).toList();
   }
 
@@ -50,13 +52,15 @@ class UnitRepository {
   /// during an edit.
   Future<bool> existsByName(String name, {int? excludeId}) async {
     final normalized = name.trim().toLowerCase();
-    final row = await (_database.select(_database.units)..where((t) {
-      final matches = t.unitName.lower().equals(normalized);
-      if (excludeId == null) {
-        return matches;
-      }
-      return matches & t.id.isNotValue(excludeId);
-    })).getSingleOrNull();
+    final t = _database.units;
+    final condition = excludeId == null
+        ? t.unitName.lower().equals(normalized)
+        : t.unitName.lower().equals(normalized) & t.id.isNotValue(excludeId);
+    final row = await (_database.selectOnly(t)
+          ..addColumns([t.id])
+          ..where(condition)
+          ..limit(1))
+        .getSingleOrNull();
     return row != null;
   }
 
@@ -79,15 +83,17 @@ class UnitRepository {
     }
 
     try {
-      final id = await _database.into(_database.units).insert(
-        db.UnitsCompanion.insert(
-          unitName: trimmedName,
-          unitSymbol: trimmedSymbol,
-          unitFamily: Value(family),
-          description: Value(trimmedDescription),
-          isActive: Value(isActive),
-        ),
-      );
+      final id = await _database
+          .into(_database.units)
+          .insert(
+            db.UnitsCompanion.insert(
+              unitName: trimmedName,
+              unitSymbol: trimmedSymbol,
+              unitFamily: Value(family),
+              description: Value(trimmedDescription),
+              isActive: Value(isActive),
+            ),
+          );
       return _toEntity(await _getById(id));
     } on Exception catch (error, stackTrace) {
       if (_isUniqueViolation(error) && await existsByName(trimmedName)) {

@@ -30,9 +30,8 @@ class DescriptionPreview extends StatelessWidget {
 
     showDialog<void>(
       context: context,
-      builder: (dialogContext) => _DescriptionDialog(
-        description: description!.trim(),
-      ),
+      builder: (dialogContext) =>
+          _DescriptionDialog(description: description!.trim()),
     );
   }
 
@@ -47,10 +46,7 @@ class DescriptionPreview extends StatelessWidget {
     final effectiveStyle = style ?? defaultMutedStyle;
 
     if (!_hasDescription) {
-      return Text(
-        '—',
-        style: effectiveStyle,
-      );
+      return Text('—', style: effectiveStyle);
     }
 
     return Tooltip(
@@ -65,9 +61,7 @@ class DescriptionPreview extends StatelessWidget {
             description!.trim(),
             maxLines: maxLines,
             overflow: TextOverflow.ellipsis,
-            style: effectiveStyle?.copyWith(
-              decoration: TextDecoration.none,
-            ),
+            style: effectiveStyle?.copyWith(decoration: TextDecoration.none),
           ),
         ),
       ),
@@ -118,10 +112,7 @@ class _DescriptionDialogState extends State<_DescriptionDialog> {
       elevation: 4,
       backgroundColor: colorScheme.surface,
       child: ConstrainedBox(
-        constraints: const BoxConstraints(
-          maxWidth: 520,
-          maxHeight: 480,
-        ),
+        constraints: const BoxConstraints(maxWidth: 520, maxHeight: 480),
         child: Padding(
           padding: const EdgeInsets.all(24),
           child: Column(

@@ -69,38 +69,48 @@ void main() {
       expect(all, hasLength(2));
     });
 
-    test('rejects duplicate sub-category names under the same category', () async {
-      await repository.createSubCategory(
-        categoryId: electronicsId,
-        name: 'Mobile',
-      );
-
-      await expectLater(
-        repository.createSubCategory(
+    test(
+      'rejects duplicate sub-category names under the same category',
+      () async {
+        await repository.createSubCategory(
           categoryId: electronicsId,
-          name: 'mobile',
-        ),
-        throwsA(isA<SubCategoryAlreadyExistsException>()),
-      );
-    });
+          name: 'Mobile',
+        );
 
-    test('getAllSubCategories returns items ordered by sub-category name', () async {
-      await repository.createSubCategory(
-        categoryId: electronicsId,
-        name: 'Zebra',
-      );
-      await repository.createSubCategory(
-        categoryId: electronicsId,
-        name: 'apple',
-      );
-      await repository.createSubCategory(
-        categoryId: furnitureId,
-        name: 'Banana',
-      );
+        await expectLater(
+          repository.createSubCategory(
+            categoryId: electronicsId,
+            name: 'mobile',
+          ),
+          throwsA(isA<SubCategoryAlreadyExistsException>()),
+        );
+      },
+    );
 
-      final rows = await repository.getAllSubCategories();
-      expect(rows.map((s) => s.subCategoryName), ['apple', 'Banana', 'Zebra']);
-    });
+    test(
+      'getAllSubCategories returns items ordered by sub-category name',
+      () async {
+        await repository.createSubCategory(
+          categoryId: electronicsId,
+          name: 'Zebra',
+        );
+        await repository.createSubCategory(
+          categoryId: electronicsId,
+          name: 'apple',
+        );
+        await repository.createSubCategory(
+          categoryId: furnitureId,
+          name: 'Banana',
+        );
+
+        final rows = await repository.getAllSubCategories();
+        expect(rows.map((s) => s.subCategoryName), [
+          'apple',
+          'Banana',
+          'Zebra',
+        ]);
+      },
+    );
 
     test('updateSubCategory updates fields and persists new values', () async {
       final created = await repository.createSubCategory(
@@ -135,37 +145,48 @@ void main() {
       expect(await repository.getAllSubCategories(), isEmpty);
     });
 
-    test('searchSubCategories filters by category, sub-category, code, or description', () async {
-      await repository.createSubCategory(
-        categoryId: electronicsId,
-        name: 'Smartphones',
-        code: 'SUB-MOBILE',
-        description: 'Android & iOS',
-      );
-      await repository.createSubCategory(
-        categoryId: furnitureId,
-        name: 'Chairs',
-        code: 'SUB-CHAIR',
-        description: 'Office chairs',
-      );
+    test(
+      'searchSubCategories filters by category, sub-category, code, or description',
+      () async {
+        await repository.createSubCategory(
+          categoryId: electronicsId,
+          name: 'Smartphones',
+          code: 'SUB-MOBILE',
+          description: 'Android & iOS',
+        );
+        await repository.createSubCategory(
+          categoryId: furnitureId,
+          name: 'Chairs',
+          code: 'SUB-CHAIR',
+          description: 'Office chairs',
+        );
 
-      expect(
-        (await repository.searchSubCategories('Electronics')).map((s) => s.subCategoryName),
-        ['Smartphones'],
-      );
-      expect(
-        (await repository.searchSubCategories('chair')).map((s) => s.subCategoryName),
-        ['Chairs'],
-      );
-      expect(
-        (await repository.searchSubCategories('SUB-MOBILE')).map((s) => s.subCategoryName),
-        ['Smartphones'],
-      );
-      expect(
-        (await repository.searchSubCategories('Android')).map((s) => s.subCategoryName),
-        ['Smartphones'],
-      );
-    });
+        expect(
+          (await repository.searchSubCategories(
+            'Electronics',
+          )).map((s) => s.subCategoryName),
+          ['Smartphones'],
+        );
+        expect(
+          (await repository.searchSubCategories(
+            'chair',
+          )).map((s) => s.subCategoryName),
+          ['Chairs'],
+        );
+        expect(
+          (await repository.searchSubCategories(
+            'SUB-MOBILE',
+          )).map((s) => s.subCategoryName),
+          ['Smartphones'],
+        );
+        expect(
+          (await repository.searchSubCategories(
+            'Android',
+          )).map((s) => s.subCategoryName),
+          ['Smartphones'],
+        );
+      },
+    );
 
     test('persists data across restart (file database)', () async {
       driftRuntimeOptions.dontWarnAboutMultipleDatabases = true;
@@ -177,18 +198,19 @@ void main() {
 
       final firstSession = AppDatabase(NativeDatabase(file));
       await firstSession.customSelect('SELECT 1').get();
-      final cat = await CategoryRepository(database: firstSession)
-          .createCategory(name: 'Persisted Category');
-      await SubCategoryRepository(database: firstSession).createSubCategory(
-        categoryId: cat.id,
-        name: 'Persisted SubCategory',
-      );
+      final cat = await CategoryRepository(
+        database: firstSession,
+      ).createCategory(name: 'Persisted Category');
+      await SubCategoryRepository(
+        database: firstSession,
+      ).createSubCategory(categoryId: cat.id, name: 'Persisted SubCategory');
       await firstSession.close();
 
       final secondSession = AppDatabase(NativeDatabase(file));
       await secondSession.customSelect('SELECT 1').get();
-      final rows = await SubCategoryRepository(database: secondSession)
-          .getAllSubCategories();
+      final rows = await SubCategoryRepository(
+        database: secondSession,
+      ).getAllSubCategories();
       expect(rows, hasLength(1));
       expect(rows.single.subCategoryName, 'Persisted SubCategory');
       expect(rows.single.categoryName, 'Persisted Category');

@@ -113,9 +113,7 @@ class _ProductUomTableState extends State<ProductUomTable> {
         cellBuilder: (context, conversion) {
           return Text(
             conversion.factorText,
-            style: textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
+            style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
           );
         },
       ),

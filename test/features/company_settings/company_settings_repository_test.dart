@@ -2,7 +2,8 @@ import 'package:drift/drift.dart' hide isNotNull, isNull;
 import 'package:drift/native.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:retail_erp/core/database/app_database.dart' hide CompanySettings;
+import 'package:retail_erp/core/database/app_database.dart'
+    hide CompanySettings;
 import 'package:retail_erp/core/database/app_database.dart' as db;
 import 'package:retail_erp/features/company_settings/data/repositories/company_settings_repository.dart';
 import 'package:retail_erp/features/company_settings/domain/company_settings_enums.dart';
@@ -63,28 +64,32 @@ void main() {
     tearDown(() => database.close());
 
     Future<int> rowCount() async {
-      return (await database.select(database.companySettingsTable).get()).length;
+      return (await database.select(database.companySettingsTable).get())
+          .length;
     }
 
-    test('getOrCreate creates the default singleton row on first access', () async {
-      final settings = await repository.getOrCreate();
+    test(
+      'getOrCreate creates the default singleton row on first access',
+      () async {
+        final settings = await repository.getOrCreate();
 
-      expect(settings.id, CompanySettings.singletonId);
-      expect(await rowCount(), 1);
-      // Defaults from the schema.
-      expect(settings.companyName, '');
-      expect(settings.currencyCode, 'INR');
-      expect(settings.currencySymbol, '₹');
-      expect(settings.decimalPlaces, 2);
-      expect(settings.financialYearStartMonth, 4);
-      expect(settings.invoicePrefix, 'INV-');
-      expect(settings.invoiceStartNumber, 1);
-      expect(settings.businessType, BusinessType.proprietorship);
-      expect(settings.gstRegistered, isFalse);
-      expect(settings.defaultTaxType, TaxTreatment.exclusive);
-      expect(settings.showLogoOnInvoice, isTrue);
-      expect(settings.country, isNull);
-    });
+        expect(settings.id, CompanySettings.singletonId);
+        expect(await rowCount(), 1);
+        // Defaults from the schema.
+        expect(settings.companyName, '');
+        expect(settings.currencyCode, 'INR');
+        expect(settings.currencySymbol, '₹');
+        expect(settings.decimalPlaces, 2);
+        expect(settings.financialYearStartMonth, 4);
+        expect(settings.invoicePrefix, 'INV-');
+        expect(settings.invoiceStartNumber, 1);
+        expect(settings.businessType, BusinessType.proprietorship);
+        expect(settings.gstRegistered, isFalse);
+        expect(settings.defaultTaxType, TaxTreatment.exclusive);
+        expect(settings.showLogoOnInvoice, isTrue);
+        expect(settings.country, isNull);
+      },
+    );
 
     test('getOrCreate never duplicates the row', () async {
       await repository.getOrCreate();
@@ -101,15 +106,18 @@ void main() {
       expect(await rowCount(), 1);
     });
 
-    test('save updates the existing row instead of creating a second one', () async {
-      await repository.getOrCreate();
-      final saved = await repository.save(_validDraft());
-      final again = await repository.save(_validDraft());
+    test(
+      'save updates the existing row instead of creating a second one',
+      () async {
+        await repository.getOrCreate();
+        final saved = await repository.save(_validDraft());
+        final again = await repository.save(_validDraft());
 
-      expect(await rowCount(), 1);
-      expect(saved.id, CompanySettings.singletonId);
-      expect(again.companyName, 'Acme Retailers');
-    });
+        expect(await rowCount(), 1);
+        expect(saved.id, CompanySettings.singletonId);
+        expect(again.companyName, 'Acme Retailers');
+      },
+    );
 
     test('save trims and normalizes values', () async {
       final saved = await repository.save(_validDraft());
@@ -134,22 +142,22 @@ void main() {
 
     test('save preserves fields not surfaced in the UI', () async {
       // Pre-seed the row with a purchase prefix, timezone and active flag.
-      await database.into(database.companySettingsTable).insert(
-        db.CompanySettingsTableCompanion.insert(
-          id: const Value(1),
-          companyName: 'Old',
-          purchasePrefix: const Value('PO-'),
-          timezone: const Value('Asia/Calcutta'),
-          isActive: const Value(false),
-        ),
-      );
+      await database
+          .into(database.companySettingsTable)
+          .insert(
+            db.CompanySettingsTableCompanion.insert(
+              id: const Value(1),
+              companyName: 'Old',
+              purchasePrefix: const Value('PO-'),
+              timezone: const Value('Asia/Calcutta'),
+              isActive: const Value(false),
+            ),
+          );
 
       await repository.save(_validDraft());
 
-      final row = (await database
-              .select(database.companySettingsTable)
-              .get())
-          .single;
+      final row =
+          (await database.select(database.companySettingsTable).get()).single;
       expect(row.purchasePrefix, 'PO-');
       expect(row.timezone, 'Asia/Calcutta');
       expect(row.isActive, isFalse);
@@ -158,14 +166,16 @@ void main() {
     test('keeps createdAt and refreshes updatedAt', () async {
       // Seed a row created long ago; the save must keep createdAt and bump
       // updatedAt to now.
-      await database.into(database.companySettingsTable).insert(
-        db.CompanySettingsTableCompanion.insert(
-          id: const Value(1),
-          companyName: 'Old',
-          createdAt: Value(DateTime(2025, 1, 1)),
-          updatedAt: Value(DateTime(2025, 1, 1)),
-        ),
-      );
+      await database
+          .into(database.companySettingsTable)
+          .insert(
+            db.CompanySettingsTableCompanion.insert(
+              id: const Value(1),
+              companyName: 'Old',
+              createdAt: Value(DateTime(2025, 1, 1)),
+              updatedAt: Value(DateTime(2025, 1, 1)),
+            ),
+          );
 
       final saved = await repository.save(_validDraft());
 
@@ -177,12 +187,14 @@ void main() {
       await repository.getOrCreate();
 
       await expectLater(
-        database.into(database.companySettingsTable).insert(
-          db.CompanySettingsTableCompanion.insert(
-            id: const Value(2),
-            companyName: 'Second company',
-          ),
-        ),
+        database
+            .into(database.companySettingsTable)
+            .insert(
+              db.CompanySettingsTableCompanion.insert(
+                id: const Value(2),
+                companyName: 'Second company',
+              ),
+            ),
         throwsA(anyOf(isA<SqliteException>(), isA<DriftWrappedException>())),
       );
       expect(await rowCount(), 1);

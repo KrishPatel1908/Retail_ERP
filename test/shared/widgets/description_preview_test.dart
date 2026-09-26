@@ -8,14 +8,12 @@ void main() {
   setUp(() {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(SystemChannels.platform, (methodCall) async {
-      return null;
-    });
+          return null;
+        });
   });
   Widget wrapWidget(Widget child) {
     return MaterialApp(
-      home: Scaffold(
-        body: Center(child: child),
-      ),
+      home: Scaffold(body: Center(child: child)),
     );
   }
 
@@ -80,9 +78,7 @@ void main() {
 
   testWidgets('closing dialog removes modal', (tester) async {
     await tester.pumpWidget(
-      wrapWidget(
-        const DescriptionPreview(description: 'Test close behavior'),
-      ),
+      wrapWidget(const DescriptionPreview(description: 'Test close behavior')),
     );
 
     await tester.tap(find.text('Test close behavior'));
@@ -100,9 +96,7 @@ void main() {
     tester,
   ) async {
     await tester.pumpWidget(
-      wrapWidget(
-        const DescriptionPreview(description: 'Text to copy'),
-      ),
+      wrapWidget(const DescriptionPreview(description: 'Text to copy')),
     );
 
     await tester.tap(find.text('Text to copy'));

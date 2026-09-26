@@ -21,12 +21,14 @@ class TaxComponentsPreview extends StatelessWidget {
 
   static String formatComponents(List<TaxCategoryComponent> components) {
     if (components.isEmpty) return '—';
-    return components.map((c) {
-      final formattedPct = c.percentage.toStringAsFixed(
-        c.percentage.truncateToDouble() == c.percentage ? 0 : 2,
-      );
-      return '${c.taxTypeName} $formattedPct%';
-    }).join(' + ');
+    return components
+        .map((c) {
+          final formattedPct = c.percentage.toStringAsFixed(
+            c.percentage.truncateToDouble() == c.percentage ? 0 : 2,
+          );
+          return '${c.taxTypeName} $formattedPct%';
+        })
+        .join(' + ');
   }
 
   bool get _hasComponents => components.isNotEmpty;
@@ -36,9 +38,7 @@ class TaxComponentsPreview extends StatelessWidget {
 
     showDialog<void>(
       context: context,
-      builder: (dialogContext) => _TaxComponentsDialog(
-        components: components,
-      ),
+      builder: (dialogContext) => _TaxComponentsDialog(components: components),
     );
   }
 
@@ -69,9 +69,7 @@ class TaxComponentsPreview extends StatelessWidget {
             formattedText,
             maxLines: maxLines,
             overflow: TextOverflow.ellipsis,
-            style: effectiveStyle?.copyWith(
-              decoration: TextDecoration.none,
-            ),
+            style: effectiveStyle?.copyWith(decoration: TextDecoration.none),
           ),
         ),
       ),
@@ -91,7 +89,8 @@ class _TaxComponentsDialog extends StatefulWidget {
 class _TaxComponentsDialogState extends State<_TaxComponentsDialog> {
   bool _copied = false;
 
-  String get _plainTextSummary => TaxComponentsPreview.formatComponents(widget.components);
+  String get _plainTextSummary =>
+      TaxComponentsPreview.formatComponents(widget.components);
 
   Future<void> _copyToClipboard() async {
     await Clipboard.setData(ClipboardData(text: _plainTextSummary));
@@ -131,10 +130,7 @@ class _TaxComponentsDialogState extends State<_TaxComponentsDialog> {
       elevation: 4,
       backgroundColor: colorScheme.surface,
       child: ConstrainedBox(
-        constraints: const BoxConstraints(
-          maxWidth: 520,
-          maxHeight: 480,
-        ),
+        constraints: const BoxConstraints(maxWidth: 520, maxHeight: 480),
         child: Padding(
           padding: const EdgeInsets.all(24),
           child: Column(
@@ -179,7 +175,9 @@ class _TaxComponentsDialogState extends State<_TaxComponentsDialog> {
                   child: Column(
                     children: widget.components.map((comp) {
                       final formattedPct = comp.percentage.toStringAsFixed(
-                        comp.percentage.truncateToDouble() == comp.percentage ? 0 : 2,
+                        comp.percentage.truncateToDouble() == comp.percentage
+                            ? 0
+                            : 2,
                       );
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 6),

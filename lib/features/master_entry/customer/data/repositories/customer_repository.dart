@@ -89,10 +89,7 @@ class CustomerRepository extends PartyRepositoryBase {
       ..limit(pageSize, offset: (effectivePage - 1) * pageSize);
 
     final rows = await rowsQuery.get();
-    return PartyPage(
-      items: rows.map(_toEntity).toList(),
-      totalCount: total,
-    );
+    return PartyPage(items: rows.map(_toEntity).toList(), totalCount: total);
   }
 
   /// Distinct, non-empty cities, case-insensitively sorted — for the city
@@ -135,12 +132,16 @@ class CustomerRepository extends PartyRepositoryBase {
     Expression<bool> Function(db.$CustomersTable t) matches, {
     int? excludeId,
   }) async {
-    final query = database.select(database.customers)..where((t) {
-      final condition = matches(t);
-      if (excludeId == null) return condition;
-      return condition & t.id.isNotValue(excludeId);
-    });
-    return (await query.getSingleOrNull()) != null;
+    final t = database.customers;
+    final condition = excludeId == null
+        ? matches(t)
+        : matches(t) & t.id.isNotValue(excludeId);
+    final row = await (database.selectOnly(t)
+          ..addColumns([t.id])
+          ..where(condition)
+          ..limit(1))
+        .getSingleOrNull();
+    return row != null;
   }
 
   // --- Mutations -----------------------------------------------------------
@@ -193,36 +194,38 @@ class CustomerRepository extends PartyRepositoryBase {
           column: 'customer_code',
           prefix: _codePrefix,
         );
-        return database.into(database.customers).insert(
-          db.CustomersCompanion.insert(
-            customerCode: code,
-            customerName: trimmedName,
-            gstNumber: Value(normalizedGst),
-            panNumber: Value(normalizedPan),
-            mobile: Value(normalizeOptional(mobile)),
-            alternateMobile: Value(normalizeOptional(alternateMobile)),
-            email: Value(normalizedEmail),
-            addressLine1: Value(normalizeOptional(addressLine1)),
-            addressLine2: Value(normalizeOptional(addressLine2)),
-            city: Value(normalizeOptional(city)),
-            state: Value(normalizeOptional(state)),
-            stateCode: Value(normalizeOptional(stateCode)),
-            country: Value(normalizeOptional(country)),
-            pincode: Value(normalizeOptional(pincode)),
-            creditLimit: Value(creditLimit),
-            openingBalance: Value(openingBalance),
-            outstandingBalance: Value(openingBalance),
-            balanceType: Value(balanceType.dbValue),
-            paymentDueDate: Value(paymentDueDate),
-            accountName: Value(normalizeOptional(accountName)),
-            accountNumber: Value(normalizeOptional(accountNumber)),
-            bankName: Value(normalizeOptional(bankName)),
-            branchName: Value(normalizeOptional(branchName)),
-            ifscCode: Value(normalizedIfsc),
-            notes: Value(normalizeOptional(notes)),
-            isActive: Value(isActive),
-          ),
-        );
+        return database
+            .into(database.customers)
+            .insert(
+              db.CustomersCompanion.insert(
+                customerCode: code,
+                customerName: trimmedName,
+                gstNumber: Value(normalizedGst),
+                panNumber: Value(normalizedPan),
+                mobile: Value(normalizeOptional(mobile)),
+                alternateMobile: Value(normalizeOptional(alternateMobile)),
+                email: Value(normalizedEmail),
+                addressLine1: Value(normalizeOptional(addressLine1)),
+                addressLine2: Value(normalizeOptional(addressLine2)),
+                city: Value(normalizeOptional(city)),
+                state: Value(normalizeOptional(state)),
+                stateCode: Value(normalizeOptional(stateCode)),
+                country: Value(normalizeOptional(country)),
+                pincode: Value(normalizeOptional(pincode)),
+                creditLimit: Value(creditLimit),
+                openingBalance: Value(openingBalance),
+                outstandingBalance: Value(openingBalance),
+                balanceType: Value(balanceType.dbValue),
+                paymentDueDate: Value(paymentDueDate),
+                accountName: Value(normalizeOptional(accountName)),
+                accountNumber: Value(normalizeOptional(accountNumber)),
+                bankName: Value(normalizeOptional(bankName)),
+                branchName: Value(normalizeOptional(branchName)),
+                ifscCode: Value(normalizedIfsc),
+                notes: Value(normalizeOptional(notes)),
+                isActive: Value(isActive),
+              ),
+            );
       });
       return _toEntity(await _getById(id));
     } on Exception catch (error, stackTrace) {
@@ -279,39 +282,40 @@ class CustomerRepository extends PartyRepositoryBase {
     await _rejectDuplicates(normalizedGst, normalizedEmail, excludeId: id);
 
     try {
-      final updatedRows = await (database.update(
-        database.customers,
-      )..where((t) => t.id.equals(id))).write(
-        db.CustomersCompanion(
-          customerName: Value(trimmedName),
-          gstNumber: Value(normalizedGst),
-          panNumber: Value(normalizedPan),
-          mobile: Value(normalizeOptional(mobile)),
-          alternateMobile: Value(normalizeOptional(alternateMobile)),
-          email: Value(normalizedEmail),
-          addressLine1: Value(normalizeOptional(addressLine1)),
-          addressLine2: Value(normalizeOptional(addressLine2)),
-          city: Value(normalizeOptional(city)),
-          state: Value(normalizeOptional(state)),
-          stateCode: Value(normalizeOptional(stateCode)),
-          country: Value(normalizeOptional(country)),
-          pincode: Value(normalizeOptional(pincode)),
-          creditLimit: Value(creditLimit),
-          openingBalance: Value(openingBalance),
-          balanceType: Value(balanceType.dbValue),
-          paymentDueDate: Value(paymentDueDate),
-          accountName: Value(normalizeOptional(accountName)),
-          accountNumber: Value(normalizeOptional(accountNumber)),
-          bankName: Value(normalizeOptional(bankName)),
-          branchName: Value(normalizeOptional(branchName)),
-          ifscCode: Value(normalizedIfsc),
-          notes: Value(normalizeOptional(notes)),
-          isActive: isActive == null
-              ? const Value.absent()
-              : Value(isActive),
-          updatedAt: Value(DateTime.now()),
-        ),
-      );
+      final updatedRows =
+          await (database.update(
+            database.customers,
+          )..where((t) => t.id.equals(id))).write(
+            db.CustomersCompanion(
+              customerName: Value(trimmedName),
+              gstNumber: Value(normalizedGst),
+              panNumber: Value(normalizedPan),
+              mobile: Value(normalizeOptional(mobile)),
+              alternateMobile: Value(normalizeOptional(alternateMobile)),
+              email: Value(normalizedEmail),
+              addressLine1: Value(normalizeOptional(addressLine1)),
+              addressLine2: Value(normalizeOptional(addressLine2)),
+              city: Value(normalizeOptional(city)),
+              state: Value(normalizeOptional(state)),
+              stateCode: Value(normalizeOptional(stateCode)),
+              country: Value(normalizeOptional(country)),
+              pincode: Value(normalizeOptional(pincode)),
+              creditLimit: Value(creditLimit),
+              openingBalance: Value(openingBalance),
+              balanceType: Value(balanceType.dbValue),
+              paymentDueDate: Value(paymentDueDate),
+              accountName: Value(normalizeOptional(accountName)),
+              accountNumber: Value(normalizeOptional(accountNumber)),
+              bankName: Value(normalizeOptional(bankName)),
+              branchName: Value(normalizeOptional(branchName)),
+              ifscCode: Value(normalizedIfsc),
+              notes: Value(normalizeOptional(notes)),
+              isActive: isActive == null
+                  ? const Value.absent()
+                  : Value(isActive),
+              updatedAt: Value(DateTime.now()),
+            ),
+          );
       if (updatedRows == 0) {
         throw CustomerNotFoundException(id);
       }

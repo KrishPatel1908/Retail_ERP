@@ -67,8 +67,7 @@ class _CreateTaxTypePageState extends State<CreateTaxTypePage> {
     final description = _descriptionController.text.trim();
 
     final nameError = TaxTypeValidator.validateName(name);
-    final descriptionError =
-        TaxTypeValidator.validateDescription(description);
+    final descriptionError = TaxTypeValidator.validateDescription(description);
     if (nameError != null || descriptionError != null) {
       setState(() {
         _nameError = nameError;
@@ -100,10 +99,7 @@ class _CreateTaxTypePageState extends State<CreateTaxTypePage> {
           description: description,
         );
       } else {
-        await _repository.createTaxType(
-          name: name,
-          description: description,
-        );
+        await _repository.createTaxType(name: name, description: description);
       }
 
       if (!mounted) return;

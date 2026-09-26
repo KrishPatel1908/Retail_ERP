@@ -25,8 +25,16 @@ void main() {
         name: 'Custom GST 18%',
         description: 'Standard Electronics Tax',
         components: const [
-          TaxCategoryComponent(taxTypeId: 2, taxTypeName: 'CGST', percentage: 9.0),
-          TaxCategoryComponent(taxTypeId: 3, taxTypeName: 'SGST', percentage: 9.0),
+          TaxCategoryComponent(
+            taxTypeId: 2,
+            taxTypeName: 'CGST',
+            percentage: 9.0,
+          ),
+          TaxCategoryComponent(
+            taxTypeId: 3,
+            taxTypeName: 'SGST',
+            percentage: 9.0,
+          ),
         ],
       );
 
@@ -42,7 +50,11 @@ void main() {
         name: '   Custom GST 12%   ',
         description: '   Sub category tax   ',
         components: const [
-          TaxCategoryComponent(taxTypeId: 4, taxTypeName: 'IGST', percentage: 12.0),
+          TaxCategoryComponent(
+            taxTypeId: 4,
+            taxTypeName: 'IGST',
+            percentage: 12.0,
+          ),
         ],
       );
 
@@ -50,35 +62,64 @@ void main() {
       expect(created.description, 'Sub category tax');
     });
 
-    test('getAllTaxCategories returns tax categories ordered by name', () async {
-      await repository.createTaxCategory(
-        name: 'Z_Tax',
-        components: const [TaxCategoryComponent(taxTypeId: 2, taxTypeName: 'CGST', percentage: 5.0)],
-      );
-      await repository.createTaxCategory(
-        name: 'a_Tax',
-        components: const [TaxCategoryComponent(taxTypeId: 3, taxTypeName: 'SGST', percentage: 5.0)],
-      );
+    test(
+      'getAllTaxCategories returns tax categories ordered by name',
+      () async {
+        await repository.createTaxCategory(
+          name: 'Z_Tax',
+          components: const [
+            TaxCategoryComponent(
+              taxTypeId: 2,
+              taxTypeName: 'CGST',
+              percentage: 5.0,
+            ),
+          ],
+        );
+        await repository.createTaxCategory(
+          name: 'a_Tax',
+          components: const [
+            TaxCategoryComponent(
+              taxTypeId: 3,
+              taxTypeName: 'SGST',
+              percentage: 5.0,
+            ),
+          ],
+        );
 
-      final categories = await repository.getAllTaxCategories();
-      final names = categories.map((c) => c.taxCategoryName).toList();
-      expect(names.contains('a_Tax'), isTrue);
-      expect(names.contains('Z_Tax'), isTrue);
-    });
+        final categories = await repository.getAllTaxCategories();
+        final names = categories.map((c) => c.taxCategoryName).toList();
+        expect(names.contains('a_Tax'), isTrue);
+        expect(names.contains('Z_Tax'), isTrue);
+      },
+    );
 
     test('searchTaxCategories filters by name and description', () async {
       await repository.createTaxCategory(
         name: 'Custom GST 28%',
         description: 'Luxury items tax',
-        components: const [TaxCategoryComponent(taxTypeId: 2, taxTypeName: 'CGST', percentage: 14.0)],
+        components: const [
+          TaxCategoryComponent(
+            taxTypeId: 2,
+            taxTypeName: 'CGST',
+            percentage: 14.0,
+          ),
+        ],
       );
       await repository.createTaxCategory(
         name: 'Special Tax Free',
         description: 'Zero rate items',
-        components: const [TaxCategoryComponent(taxTypeId: 2, taxTypeName: 'CGST', percentage: 0.0)],
+        components: const [
+          TaxCategoryComponent(
+            taxTypeId: 2,
+            taxTypeName: 'CGST',
+            percentage: 0.0,
+          ),
+        ],
       );
 
-      final searchByName = await repository.searchTaxCategories('Custom GST 28%');
+      final searchByName = await repository.searchTaxCategories(
+        'Custom GST 28%',
+      );
       expect(searchByName.length, 1);
       expect(searchByName.first.taxCategoryName, 'Custom GST 28%');
 
@@ -90,13 +131,25 @@ void main() {
     test('prevents creating duplicate category name', () async {
       await repository.createTaxCategory(
         name: 'Unique GST 18%',
-        components: const [TaxCategoryComponent(taxTypeId: 2, taxTypeName: 'CGST', percentage: 9.0)],
+        components: const [
+          TaxCategoryComponent(
+            taxTypeId: 2,
+            taxTypeName: 'CGST',
+            percentage: 9.0,
+          ),
+        ],
       );
 
       expect(
         () => repository.createTaxCategory(
           name: 'unique gst 18%',
-          components: const [TaxCategoryComponent(taxTypeId: 2, taxTypeName: 'CGST', percentage: 9.0)],
+          components: const [
+            TaxCategoryComponent(
+              taxTypeId: 2,
+              taxTypeName: 'CGST',
+              percentage: 9.0,
+            ),
+          ],
         ),
         throwsA(isA<TaxCategoryAlreadyExistsException>()),
       );
@@ -105,7 +158,13 @@ void main() {
     test('updates tax category and replaces components', () async {
       final created = await repository.createTaxCategory(
         name: 'Custom GST 5%',
-        components: const [TaxCategoryComponent(taxTypeId: 2, taxTypeName: 'CGST', percentage: 2.5)],
+        components: const [
+          TaxCategoryComponent(
+            taxTypeId: 2,
+            taxTypeName: 'CGST',
+            percentage: 2.5,
+          ),
+        ],
       );
 
       final updated = await repository.updateTaxCategory(
@@ -113,8 +172,16 @@ void main() {
         name: 'Custom GST 5% Updated',
         description: 'Updated note',
         components: const [
-          TaxCategoryComponent(taxTypeId: 2, taxTypeName: 'CGST', percentage: 2.5),
-          TaxCategoryComponent(taxTypeId: 3, taxTypeName: 'SGST', percentage: 2.5),
+          TaxCategoryComponent(
+            taxTypeId: 2,
+            taxTypeName: 'CGST',
+            percentage: 2.5,
+          ),
+          TaxCategoryComponent(
+            taxTypeId: 3,
+            taxTypeName: 'SGST',
+            percentage: 2.5,
+          ),
         ],
       );
 
@@ -127,7 +194,13 @@ void main() {
     test('deletes tax category when not in use', () async {
       final created = await repository.createTaxCategory(
         name: 'Temporary Tax',
-        components: const [TaxCategoryComponent(taxTypeId: 2, taxTypeName: 'CGST', percentage: 1.0)],
+        components: const [
+          TaxCategoryComponent(
+            taxTypeId: 2,
+            taxTypeName: 'CGST',
+            percentage: 1.0,
+          ),
+        ],
       );
 
       await repository.deleteTaxCategory(created.id);
@@ -138,41 +211,59 @@ void main() {
     test('delete protected when product uses tax category', () async {
       final category = await repository.createTaxCategory(
         name: 'Product Tax',
-        components: const [TaxCategoryComponent(taxTypeId: 2, taxTypeName: 'CGST', percentage: 5.0)],
+        components: const [
+          TaxCategoryComponent(
+            taxTypeId: 2,
+            taxTypeName: 'CGST',
+            percentage: 5.0,
+          ),
+        ],
       );
 
       // Seed a category for productFK
-      await database.into(database.categories).insert(
-        CategoriesCompanion.insert(id: const Value(1), categoryCode: 'CAT1', categoryName: 'General'),
-      );
+      await database
+          .into(database.categories)
+          .insert(
+            CategoriesCompanion.insert(
+              id: const Value(1),
+              categoryCode: 'CAT1',
+              categoryName: 'General',
+            ),
+          );
 
       // Create a tax type and link it to this category via tax_category_rate
-      final taxTypeId = await database.into(database.taxTypes).insert(
-        TaxTypesCompanion.insert(
-          taxTypeCode: 'TEST-TT',
-          taxTypeName: 'Test Tax Type',
-        ),
-      );
-      await database.into(database.taxCategoryRates).insert(
-        TaxCategoryRatesCompanion.insert(
-          taxCategoryId: category.id,
-          taxTypeId: taxTypeId,
-          ratePercent: 18,
-        ),
-      );
+      final taxTypeId = await database
+          .into(database.taxTypes)
+          .insert(
+            TaxTypesCompanion.insert(
+              taxTypeCode: 'TEST-TT',
+              taxTypeName: 'Test Tax Type',
+            ),
+          );
+      await database
+          .into(database.taxCategoryRates)
+          .insert(
+            TaxCategoryRatesCompanion.insert(
+              taxCategoryId: category.id,
+              taxTypeId: taxTypeId,
+              ratePercent: 18,
+            ),
+          );
 
       // Insert a product referencing that tax type
-      await database.into(database.products).insert(
-        ProductsCompanion.insert(
-          id: const Value(100),
-          productCode: 'PROD100',
-          productName: 'Sample Product',
-          categoryId: const Value(1),
-          brandId: const Value(1),
-          unitId: 1,
-          taxTypeId: Value(taxTypeId),
-        ),
-      );
+      await database
+          .into(database.products)
+          .insert(
+            ProductsCompanion.insert(
+              id: const Value(100),
+              productCode: 'PROD100',
+              productName: 'Sample Product',
+              categoryId: const Value(1),
+              brandId: const Value(1),
+              unitId: 1,
+              taxTypeId: Value(taxTypeId),
+            ),
+          );
 
       expect(
         () => repository.deleteTaxCategory(category.id),

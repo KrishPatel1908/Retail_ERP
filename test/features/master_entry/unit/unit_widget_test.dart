@@ -74,9 +74,7 @@ void main() {
     expect(find.text('No units found'), findsOneWidget);
   });
 
-  testWidgets('edit pre-fills the form and updates the record', (
-    tester,
-  ) async {
+  testWidgets('edit pre-fills the form and updates the record', (tester) async {
     final unit = await seedUnit('Aardvark', symbol: 'aa');
 
     await openUnitPage(tester);
@@ -161,10 +159,7 @@ void main() {
     await tester.tap(find.text('Save'));
     await tester.pumpAndSettle();
 
-    expect(
-      find.text('A unit with this name already exists.'),
-      findsOneWidget,
-    );
+    expect(find.text('A unit with this name already exists.'), findsOneWidget);
     expect(find.text('Create Unit'), findsWidgets);
   });
 

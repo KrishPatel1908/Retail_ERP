@@ -75,10 +75,7 @@ void main() {
     expect(find.text('Edit Tax Type'), findsNWidgets(2));
     expect(find.widgetWithText(TextField, 'AAA_OldTaxName'), findsOneWidget);
 
-    await tester.enterText(
-      find.byType(TextField).first,
-      'AAA_NewTaxName',
-    );
+    await tester.enterText(find.byType(TextField).first, 'AAA_NewTaxName');
     await tester.ensureVisible(find.text('Save'));
     await tester.tap(find.text('Save'));
     await tester.pumpAndSettle();

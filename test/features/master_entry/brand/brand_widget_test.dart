@@ -66,19 +66,14 @@ void main() {
     final brand = await seedBrand('SonyAudio');
 
     await openBrandPage(tester);
-    await tester.ensureVisible(
-      find.byKey(ValueKey('edit-brand-${brand.id}')),
-    );
+    await tester.ensureVisible(find.byKey(ValueKey('edit-brand-${brand.id}')));
     await tester.tap(find.byKey(ValueKey('edit-brand-${brand.id}')));
     await tester.pumpAndSettle();
 
     expect(find.text('Edit Brand'), findsNWidgets(2));
     expect(find.widgetWithText(TextField, 'SonyAudio'), findsOneWidget);
 
-    await tester.enterText(
-      find.byType(TextField).first,
-      'Sony Electronics',
-    );
+    await tester.enterText(find.byType(TextField).first, 'Sony Electronics');
     await tester.ensureVisible(find.text('Save'));
     await tester.tap(find.text('Save'));
     await tester.pumpAndSettle();
@@ -152,10 +147,7 @@ void main() {
     await tester.tap(find.text('Save'));
     await tester.pumpAndSettle();
 
-    expect(
-      find.text('A brand with this name already exists.'),
-      findsOneWidget,
-    );
+    expect(find.text('A brand with this name already exists.'), findsOneWidget);
     expect(find.text('Create Brand'), findsWidgets);
   });
 }

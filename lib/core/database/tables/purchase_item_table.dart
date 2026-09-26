@@ -19,7 +19,8 @@ class PurchaseItems extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get purchaseId => integer().references(Purchases, #id)();
   IntColumn get productId => integer().references(Products, #id)();
-  IntColumn get variantId => integer().nullable().references(ProductVariants, #id)();
+  IntColumn get variantId =>
+      integer().nullable().references(ProductVariants, #id)();
 
   /// Quantity purchased.
   IntColumn get quantity => integer()();

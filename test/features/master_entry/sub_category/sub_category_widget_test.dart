@@ -83,10 +83,7 @@ void main() {
 
     expect(find.text('Edit Sub Category'), findsNWidgets(2));
 
-    await tester.enterText(
-      find.byType(TextField).first,
-      'Smart Phones',
-    );
+    await tester.enterText(find.byType(TextField).first, 'Smart Phones');
     await tester.ensureVisible(find.text('Save'));
     await tester.tap(find.text('Save'));
     await tester.pumpAndSettle();

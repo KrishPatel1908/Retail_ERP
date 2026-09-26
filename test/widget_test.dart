@@ -31,8 +31,9 @@ void main() {
     await tester.tap(find.text('Inventory'));
     await tester.pumpAndSettle();
 
-    // The Inventory page placeholder should be visible.
-    expect(find.byKey(const ValueKey('page-title')), findsOneWidget);
+    // The Inventory page should be visible.
+    expect(find.text('Stock Adjustment'), findsOneWidget);
+    expect(find.text('Search product, variant, barcode...'), findsOneWidget);
   });
 
   testWidgets('master entry expands and a child page can be selected', (
@@ -231,19 +232,18 @@ void main() {
       await tester.pumpAndSettle();
     }
 
-    testWidgets(
-      'list page shows breadcrumb, title, search and add button',
-      (tester) async {
-        await openUomConversionPage(tester);
+    testWidgets('list page shows breadcrumb, title, search and add button', (
+      tester,
+    ) async {
+      await openUomConversionPage(tester);
 
-        // Breadcrumb + sidebar group label.
-        expect(find.text('Master Entry'), findsNWidgets(2));
-        // Sidebar item + page title + breadcrumb + status bar.
-        expect(find.text('UOM Conversion'), findsNWidgets(4));
-        expect(find.text('Add Conversion'), findsOneWidget);
-        expect(find.text('Search conversions'), findsOneWidget);
-      },
-    );
+      // Breadcrumb + sidebar group label.
+      expect(find.text('Master Entry'), findsNWidgets(2));
+      // Sidebar item + page title + breadcrumb + status bar.
+      expect(find.text('UOM Conversion'), findsNWidgets(4));
+      expect(find.text('Add Conversion'), findsOneWidget);
+      expect(find.text('Search conversions'), findsOneWidget);
+    });
 
     testWidgets('add conversion opens the create page with all fields', (
       tester,

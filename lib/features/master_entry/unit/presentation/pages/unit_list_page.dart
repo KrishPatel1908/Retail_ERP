@@ -176,8 +176,7 @@ class _UnitListPageState extends State<UnitListPage> {
           children: [
             PageHeader(
               title: 'Unit Master',
-              description:
-                  'Manage the units of measure used across the ERP.',
+              description: 'Manage the units of measure used across the ERP.',
               breadcrumbs: const ['Master Entry', 'Unit Master'],
               actions: [
                 SearchField(

@@ -115,11 +115,13 @@ class _HeroProfileCard extends StatelessWidget {
     final textTheme = Theme.of(context).textTheme;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    final hasLogo = settings.logoPath != null &&
+    final hasLogo =
+        settings.logoPath != null &&
         settings.logoPath!.isNotEmpty &&
         File(settings.logoPath!).existsSync();
 
-    final hasBanner = bannerPath != null &&
+    final hasBanner =
+        bannerPath != null &&
         bannerPath!.isNotEmpty &&
         File(bannerPath!).existsSync();
 
@@ -155,7 +157,9 @@ class _HeroProfileCard extends StatelessWidget {
             children: [
               // Banner cover area with rounded top corners.
               ClipRRect(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(20),
+                ),
                 child: SizedBox(
                   height: 150,
                   child: Stack(
@@ -214,10 +218,14 @@ class _HeroProfileCard extends StatelessWidget {
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               FilledButton.tonalIcon(
-                                key: const ValueKey('company-profile-banner-upload'),
+                                key: const ValueKey(
+                                  'company-profile-banner-upload',
+                                ),
                                 onPressed: onUploadBanner,
                                 style: FilledButton.styleFrom(
-                                  backgroundColor: Colors.black.withValues(alpha: 0.45),
+                                  backgroundColor: Colors.black.withValues(
+                                    alpha: 0.45,
+                                  ),
                                   foregroundColor: Colors.white,
                                   padding: const EdgeInsets.symmetric(
                                     horizontal: 12,
@@ -232,16 +240,21 @@ class _HeroProfileCard extends StatelessWidget {
                                   Icons.camera_alt_outlined,
                                   size: 15,
                                 ),
-                                label: Text(hasBanner ? 'Change Cover' : 'Add Cover'),
+                                label: Text(
+                                  hasBanner ? 'Change Cover' : 'Add Cover',
+                                ),
                               ),
                               if (hasBanner && onRemoveBanner != null) ...[
                                 const SizedBox(width: 8),
                                 IconButton.filledTonal(
-                                  key: const ValueKey('company-profile-banner-remove'),
+                                  key: const ValueKey(
+                                    'company-profile-banner-remove',
+                                  ),
                                   onPressed: onRemoveBanner,
                                   style: IconButton.styleFrom(
-                                    backgroundColor:
-                                        Colors.black.withValues(alpha: 0.45),
+                                    backgroundColor: Colors.black.withValues(
+                                      alpha: 0.45,
+                                    ),
                                     foregroundColor: Colors.white,
                                     padding: const EdgeInsets.all(8),
                                   ),
@@ -309,8 +322,8 @@ class _HeroProfileCard extends StatelessWidget {
                         _BadgePill(
                           icon: Icons.business_center_outlined,
                           label: settings.businessType.label,
-                          backgroundColor:
-                              colorScheme.secondaryContainer.withValues(alpha: 0.5),
+                          backgroundColor: colorScheme.secondaryContainer
+                              .withValues(alpha: 0.5),
                           textColor: colorScheme.onSecondaryContainer,
                         ),
                         if (settings.gstRegistered &&
@@ -319,8 +332,9 @@ class _HeroProfileCard extends StatelessWidget {
                           _BadgePill(
                             icon: Icons.receipt_long_outlined,
                             label: 'GSTIN: ${settings.gstNumber}',
-                            backgroundColor:
-                                Colors.green.withValues(alpha: 0.12),
+                            backgroundColor: Colors.green.withValues(
+                              alpha: 0.12,
+                            ),
                             textColor: Colors.green.shade800,
                           ),
                         if (locationText.isNotEmpty)
@@ -332,9 +346,12 @@ class _HeroProfileCard extends StatelessWidget {
                           ),
                       ],
                     ),
-                    if ((settings.mobile != null && settings.mobile!.isNotEmpty) ||
-                        (settings.email != null && settings.email!.isNotEmpty) ||
-                        (settings.website != null && settings.website!.isNotEmpty)) ...[
+                    if ((settings.mobile != null &&
+                            settings.mobile!.isNotEmpty) ||
+                        (settings.email != null &&
+                            settings.email!.isNotEmpty) ||
+                        (settings.website != null &&
+                            settings.website!.isNotEmpty)) ...[
                       const SizedBox(height: 14),
                       Wrap(
                         spacing: 16,
@@ -374,9 +391,7 @@ class _HeroProfileCard extends StatelessWidget {
               clipBehavior: Clip.none,
               children: [
                 Tooltip(
-                  message: onUploadLogo != null
-                      ? 'Click to change logo'
-                      : '',
+                  message: onUploadLogo != null ? 'Click to change logo' : '',
                   child: InkWell(
                     onTap: onUploadLogo,
                     borderRadius: BorderRadius.circular(54),
@@ -409,19 +424,16 @@ class _HeroProfileCard extends StatelessWidget {
                                     '${settings.logoPath}_${File(settings.logoPath!).existsSync() ? File(settings.logoPath!).lastModifiedSync().millisecondsSinceEpoch : 0}',
                                   ),
                                   fit: BoxFit.contain,
-                                  errorBuilder:
-                                      (context, error, stackTrace) =>
-                                          _InitialsAvatar(
-                                    initials: _getInitials(
-                                      settings.companyName,
-                                    ),
-                                  ),
+                                  errorBuilder: (context, error, stackTrace) =>
+                                      _InitialsAvatar(
+                                        initials: _getInitials(
+                                          settings.companyName,
+                                        ),
+                                      ),
                                 ),
                               )
                             : _InitialsAvatar(
-                                initials: _getInitials(
-                                  settings.companyName,
-                                ),
+                                initials: _getInitials(settings.companyName),
                               ),
                       ),
                     ),
@@ -471,10 +483,7 @@ class _InitialsAvatar extends StatelessWidget {
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            colorScheme.primary,
-            colorScheme.secondary,
-          ],
+          colors: [colorScheme.primary, colorScheme.secondary],
         ),
       ),
       child: Center(
@@ -711,9 +720,10 @@ class _ProfileContentGrid extends StatelessWidget {
       'September',
       'October',
       'November',
-      'December'
+      'December',
     ];
-    final monthName = (settings.financialYearStartMonth >= 1 &&
+    final monthName =
+        (settings.financialYearStartMonth >= 1 &&
             settings.financialYearStartMonth <= 12)
         ? monthNames[settings.financialYearStartMonth]
         : 'Month ${settings.financialYearStartMonth}';
@@ -747,10 +757,7 @@ class _ProfileContentGrid extends StatelessWidget {
           _InfoRow(label: 'Account Name', value: settings.bankAccountName!),
         if (settings.bankAccountNumber != null &&
             settings.bankAccountNumber!.isNotEmpty)
-          _InfoRow(
-            label: 'Account Number',
-            value: settings.bankAccountNumber!,
-          ),
+          _InfoRow(label: 'Account Number', value: settings.bankAccountNumber!),
         if (settings.bankIfsc != null && settings.bankIfsc!.isNotEmpty)
           _InfoRow(label: 'IFSC Code', value: settings.bankIfsc!),
         if (settings.bankBranch != null && settings.bankBranch!.isNotEmpty)

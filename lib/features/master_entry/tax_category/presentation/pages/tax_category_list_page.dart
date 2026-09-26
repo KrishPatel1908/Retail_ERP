@@ -150,7 +150,9 @@ class _TaxCategoryListPageState extends State<TaxCategoryListPage> {
     if (_taxCategories.isEmpty) {
       return EmptyState(
         icon: Icons.request_quote_outlined,
-        title: _query.isEmpty ? 'No tax categories yet' : 'No tax categories found',
+        title: _query.isEmpty
+            ? 'No tax categories yet'
+            : 'No tax categories found',
         message: _query.isEmpty
             ? 'Click "Add Tax Category" to create your first tax category configuration.'
             : 'Try a different search term.',

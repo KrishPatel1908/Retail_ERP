@@ -20,9 +20,7 @@ void main() {
   });
 
   Widget wrapWithMaterial(Widget child) {
-    return MaterialApp(
-      home: Scaffold(body: child),
-    );
+    return MaterialApp(home: Scaffold(body: child));
   }
 
   group('TaxCategoryListPage Widget Tests', () {
@@ -47,27 +45,30 @@ void main() {
       expect(find.byType(TextField), findsOneWidget); // Search field
     });
 
-    testWidgets('triggers onAddTaxCategory callback when clicking Add Tax Category', (tester) async {
-      tester.view.physicalSize = const Size(1280, 900);
-      tester.view.devicePixelRatio = 1.0;
-      addTearDown(tester.view.resetPhysicalSize);
+    testWidgets(
+      'triggers onAddTaxCategory callback when clicking Add Tax Category',
+      (tester) async {
+        tester.view.physicalSize = const Size(1280, 900);
+        tester.view.devicePixelRatio = 1.0;
+        addTearDown(tester.view.resetPhysicalSize);
 
-      bool added = false;
-      await tester.pumpWidget(
-        wrapWithMaterial(
-          TaxCategoryListPage(
-            onAddTaxCategory: () => added = true,
-            onEditTaxCategory: (_) {},
+        bool added = false;
+        await tester.pumpWidget(
+          wrapWithMaterial(
+            TaxCategoryListPage(
+              onAddTaxCategory: () => added = true,
+              onEditTaxCategory: (_) {},
+            ),
           ),
-        ),
-      );
+        );
 
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Add Tax Category'));
-      await tester.pumpAndSettle();
+        await tester.pumpAndSettle();
+        await tester.tap(find.text('Add Tax Category'));
+        await tester.pumpAndSettle();
 
-      expect(added, isTrue);
-    });
+        expect(added, isTrue);
+      },
+    );
   });
 
   group('CreateTaxCategoryPage Widget Tests', () {
@@ -77,12 +78,7 @@ void main() {
       addTearDown(tester.view.resetPhysicalSize);
 
       await tester.pumpWidget(
-        wrapWithMaterial(
-          CreateTaxCategoryPage(
-            onSave: () {},
-            onCancel: () {},
-          ),
-        ),
+        wrapWithMaterial(CreateTaxCategoryPage(onSave: () {}, onCancel: () {})),
       );
 
       await tester.pumpAndSettle();
@@ -95,18 +91,15 @@ void main() {
       expect(find.text('Cancel'), findsOneWidget);
     });
 
-    testWidgets('shows validation error when tax category name is empty', (tester) async {
+    testWidgets('shows validation error when tax category name is empty', (
+      tester,
+    ) async {
       tester.view.physicalSize = const Size(1280, 900);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
 
       await tester.pumpWidget(
-        wrapWithMaterial(
-          CreateTaxCategoryPage(
-            onSave: () {},
-            onCancel: () {},
-          ),
-        ),
+        wrapWithMaterial(CreateTaxCategoryPage(onSave: () {}, onCancel: () {})),
       );
 
       await tester.pumpAndSettle();
@@ -119,7 +112,9 @@ void main() {
       expect(find.text('Tax Category Name is required.'), findsOneWidget);
     });
 
-    testWidgets('pre-fills data when editing existing Tax Category', (tester) async {
+    testWidgets('pre-fills data when editing existing Tax Category', (
+      tester,
+    ) async {
       tester.view.physicalSize = const Size(1280, 900);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);
@@ -131,8 +126,16 @@ void main() {
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
         components: const [
-          TaxCategoryComponent(taxTypeId: 2, taxTypeName: 'CGST', percentage: 9.0),
-          TaxCategoryComponent(taxTypeId: 3, taxTypeName: 'SGST', percentage: 9.0),
+          TaxCategoryComponent(
+            taxTypeId: 2,
+            taxTypeName: 'CGST',
+            percentage: 9.0,
+          ),
+          TaxCategoryComponent(
+            taxTypeId: 3,
+            taxTypeName: 'SGST',
+            percentage: 9.0,
+          ),
         ],
       );
 
@@ -153,7 +156,9 @@ void main() {
       expect(find.text('Total Tax: 18%'), findsOneWidget);
     });
 
-    testWidgets('triggers onCancel when Cancel button is pressed', (tester) async {
+    testWidgets('triggers onCancel when Cancel button is pressed', (
+      tester,
+    ) async {
       tester.view.physicalSize = const Size(1280, 900);
       tester.view.devicePixelRatio = 1.0;
       addTearDown(tester.view.resetPhysicalSize);

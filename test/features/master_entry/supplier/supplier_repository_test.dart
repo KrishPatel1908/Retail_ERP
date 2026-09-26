@@ -33,20 +33,22 @@ void main() {
       bool isActive = true,
       int openingBalance = 0,
     }) {
-      return database.into(database.suppliers).insertReturning(
-        db.SuppliersCompanion.insert(
-          supplierCode: code,
-          supplierName: name,
-          gstNumber: Value(gst),
-          email: Value(email),
-          city: Value(city),
-          state: Value(state),
-          openingBalance: Value(openingBalance),
-          isActive: Value(isActive),
-          createdAt: Value(createdAt ?? DateTime(2026, 1, 1, 12)),
-          updatedAt: Value(createdAt ?? DateTime(2026, 1, 1, 12)),
-        ),
-      );
+      return database
+          .into(database.suppliers)
+          .insertReturning(
+            db.SuppliersCompanion.insert(
+              supplierCode: code,
+              supplierName: name,
+              gstNumber: Value(gst),
+              email: Value(email),
+              city: Value(city),
+              state: Value(state),
+              openingBalance: Value(openingBalance),
+              isActive: Value(isActive),
+              createdAt: Value(createdAt ?? DateTime(2026, 1, 1, 12)),
+              updatedAt: Value(createdAt ?? DateTime(2026, 1, 1, 12)),
+            ),
+          );
     }
 
     test('creates a supplier with a sequential auto-generated code', () async {
@@ -180,10 +182,13 @@ void main() {
         sortAscending: true,
         pageSize: 50,
       );
-      expect(
-        sorted.items.map((s) => s.supplierName),
-        ['apple', 'banana', 'kiwi', 'Mango', 'Zebra'],
-      );
+      expect(sorted.items.map((s) => s.supplierName), [
+        'apple',
+        'banana',
+        'kiwi',
+        'Mango',
+        'Zebra',
+      ]);
 
       final firstPage = await repository.fetchPage(page: 1, pageSize: 2);
       expect(firstPage.items, hasLength(2));
@@ -259,22 +264,25 @@ void main() {
       expect(reloaded.supplierName, 'New Name');
     });
 
-    test('updateSupplier rejects a GST collision with another supplier', () async {
-      await repository.createSupplier(
-        supplierName: 'First',
-        gstNumber: '27ABCDE1234F1Z5',
-      );
-      final second = await repository.createSupplier(supplierName: 'Second');
-
-      await expectLater(
-        repository.updateSupplier(
-          second.id,
-          supplierName: 'Second',
+    test(
+      'updateSupplier rejects a GST collision with another supplier',
+      () async {
+        await repository.createSupplier(
+          supplierName: 'First',
           gstNumber: '27ABCDE1234F1Z5',
-        ),
-        throwsA(isA<SupplierDuplicateException>()),
-      );
-    });
+        );
+        final second = await repository.createSupplier(supplierName: 'Second');
+
+        await expectLater(
+          repository.updateSupplier(
+            second.id,
+            supplierName: 'Second',
+            gstNumber: '27ABCDE1234F1Z5',
+          ),
+          throwsA(isA<SupplierDuplicateException>()),
+        );
+      },
+    );
 
     test('updateSupplier keeps its own GST number when unchanged', () async {
       final first = await repository.createSupplier(
@@ -291,12 +299,15 @@ void main() {
       expect(updated.supplierName, 'First Updated');
     });
 
-    test('updateSupplier throws SupplierNotFoundException for unknown ids', () async {
-      await expectLater(
-        repository.updateSupplier(9999, supplierName: 'Missing'),
-        throwsA(isA<SupplierNotFoundException>()),
-      );
-    });
+    test(
+      'updateSupplier throws SupplierNotFoundException for unknown ids',
+      () async {
+        await expectLater(
+          repository.updateSupplier(9999, supplierName: 'Missing'),
+          throwsA(isA<SupplierNotFoundException>()),
+        );
+      },
+    );
 
     test('deleteSupplier removes the supplier', () async {
       final created = await repository.createSupplier(supplierName: 'Gone');
@@ -306,27 +317,30 @@ void main() {
       expect((await repository.fetchPage()).totalCount, 0);
     });
 
-    test('creates supplier with credit limit, bank details and payment due date', () async {
-      final dueDate = DateTime(2026, 10, 20);
-      final created = await repository.createSupplier(
-        supplierName: 'Bank Supplier',
-        creditLimit: 5000000,
-        paymentDueDate: dueDate,
-        accountName: 'Beta Supplies',
-        accountNumber: '9876543210',
-        bankName: 'ICICI Bank',
-        branchName: 'Andheri Branch',
-        ifscCode: 'icic0004321',
-      );
+    test(
+      'creates supplier with credit limit, bank details and payment due date',
+      () async {
+        final dueDate = DateTime(2026, 10, 20);
+        final created = await repository.createSupplier(
+          supplierName: 'Bank Supplier',
+          creditLimit: 5000000,
+          paymentDueDate: dueDate,
+          accountName: 'Beta Supplies',
+          accountNumber: '9876543210',
+          bankName: 'ICICI Bank',
+          branchName: 'Andheri Branch',
+          ifscCode: 'icic0004321',
+        );
 
-      expect(created.creditLimit, 5000000);
-      expect(created.paymentDueDate, dueDate);
-      expect(created.accountName, 'Beta Supplies');
-      expect(created.accountNumber, '9876543210');
-      expect(created.bankName, 'ICICI Bank');
-      expect(created.branchName, 'Andheri Branch');
-      expect(created.ifscCode, 'ICIC0004321');
-    });
+        expect(created.creditLimit, 5000000);
+        expect(created.paymentDueDate, dueDate);
+        expect(created.accountName, 'Beta Supplies');
+        expect(created.accountNumber, '9876543210');
+        expect(created.bankName, 'ICICI Bank');
+        expect(created.branchName, 'Andheri Branch');
+        expect(created.ifscCode, 'ICIC0004321');
+      },
+    );
 
     test('updateSupplier preserves original createdAt timestamp', () async {
       final initialCreated = DateTime(2025, 4, 1, 10, 0);
@@ -345,13 +359,16 @@ void main() {
       expect(updated.updatedAt.isAfter(initialCreated), isTrue);
     });
 
-    test('distinctCities and distinctStates return sorted unique values', () async {
-      await insertSupplierRaw('SUP-C1', 'One', city: 'Mumbai', state: 'MH');
-      await insertSupplierRaw('SUP-C2', 'Two', city: 'Pune', state: 'MH');
-      await insertSupplierRaw('SUP-C3', 'Three', city: 'mumbai', state: 'KA');
+    test(
+      'distinctCities and distinctStates return sorted unique values',
+      () async {
+        await insertSupplierRaw('SUP-C1', 'One', city: 'Mumbai', state: 'MH');
+        await insertSupplierRaw('SUP-C2', 'Two', city: 'Pune', state: 'MH');
+        await insertSupplierRaw('SUP-C3', 'Three', city: 'mumbai', state: 'KA');
 
-      expect(await repository.distinctCities(), ['Mumbai', 'Pune']);
-      expect(await repository.distinctStates(), ['KA', 'MH']);
-    });
+        expect(await repository.distinctCities(), ['Mumbai', 'Pune']);
+        expect(await repository.distinctStates(), ['KA', 'MH']);
+      },
+    );
   });
 }

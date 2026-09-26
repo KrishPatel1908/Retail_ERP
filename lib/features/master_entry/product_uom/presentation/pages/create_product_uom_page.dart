@@ -243,8 +243,9 @@ class _CreateProductUomPageState extends State<CreateProductUomPage> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final title =
-        _isEditing ? 'Edit Product Conversion' : 'Create Product Conversion';
+    final title = _isEditing
+        ? 'Edit Product Conversion'
+        : 'Create Product Conversion';
     final subtitle = _isEditing
         ? 'Update this product-specific unit conversion.'
         : 'Define a conversion rule specific to a single product.';

@@ -11,7 +11,8 @@ class FormFocusController {
   final Map<String, FocusNode> _nodes = {};
   final Map<String, GlobalKey> _keys = {};
 
-  static final Map<FocusNode, NumericFocusOrder> _focusOrders = {};
+  static final Expando<NumericFocusOrder> _focusOrders =
+      Expando<NumericFocusOrder>('FormFocusController.focusOrders');
 
   FocusNode node(String fieldKey) {
     return _nodes.putIfAbsent(fieldKey, () {
@@ -66,7 +67,7 @@ class FormFocusController {
 
   void dispose() {
     for (final node in _nodes.values) {
-      _focusOrders.remove(node);
+      _focusOrders[node] = null;
       node.dispose();
     }
     _nodes.clear();

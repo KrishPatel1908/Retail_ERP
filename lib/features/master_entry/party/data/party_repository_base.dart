@@ -114,7 +114,8 @@ abstract class PartyRepositoryBase {
         gst.isNotNull() & gst.lower().contains(normalized),
         city.isNotNull() & city.lower().contains(normalized),
         state.isNotNull() & state.lower().contains(normalized),
-        if (email != null) email.isNotNull() & email.lower().contains(normalized),
+        if (email != null)
+          email.isNotNull() & email.lower().contains(normalized),
         if (pan != null) pan.isNotNull() & pan.lower().contains(normalized),
         if (addressLine1 != null)
           addressLine1.isNotNull() & addressLine1.lower().contains(normalized),
@@ -123,20 +124,22 @@ abstract class PartyRepositoryBase {
         if (pincode != null)
           pincode.isNotNull() & pincode.lower().contains(normalized),
         if (contactPerson != null)
-          contactPerson.isNotNull() & contactPerson.lower().contains(normalized),
+          contactPerson.isNotNull() &
+              contactPerson.lower().contains(normalized),
       ]);
     }
 
     final conditions = <Expression<bool>>[
-      if (searchConditions.isNotEmpty)
-        searchConditions.reduce((a, b) => a | b),
+      if (searchConditions.isNotEmpty) searchConditions.reduce((a, b) => a | b),
       if (filters.isActive != null) isActive.equals(filters.isActive!),
       if (filters.city != null) city.equals(filters.city!),
       if (filters.state != null) state.equals(filters.state!),
       if (openingBalance != null) ...[
-        if (filters.openingBalanceOption == OpeningBalanceFilterOption.debit && balanceType != null)
+        if (filters.openingBalanceOption == OpeningBalanceFilterOption.debit &&
+            balanceType != null)
           balanceType.equals('DEBIT') & openingBalance.isNotValue(0),
-        if (filters.openingBalanceOption == OpeningBalanceFilterOption.credit && balanceType != null)
+        if (filters.openingBalanceOption == OpeningBalanceFilterOption.credit &&
+            balanceType != null)
           balanceType.equals('CREDIT') & openingBalance.isNotValue(0),
         if (filters.minOpeningBalance != null)
           openingBalance.isBiggerOrEqualValue(filters.minOpeningBalance!),
@@ -188,13 +191,6 @@ abstract class PartyRepositoryBase {
   static DateTime startOfDay(DateTime date) =>
       DateTime(date.year, date.month, date.day);
 
-  static DateTime endOfDay(DateTime date) => DateTime(
-    date.year,
-    date.month,
-    date.day,
-    23,
-    59,
-    59,
-    999,
-  );
+  static DateTime endOfDay(DateTime date) =>
+      DateTime(date.year, date.month, date.day, 23, 59, 59, 999);
 }

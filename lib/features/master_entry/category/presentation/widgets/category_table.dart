@@ -124,10 +124,7 @@ class _CategoryTableState extends State<CategoryTable> {
         width: 140,
         sortable: true,
         cellBuilder: (context, category) {
-          return Text(
-            _formatDate(category.createdAt),
-            style: mutedStyle,
-          );
+          return Text(_formatDate(category.createdAt), style: mutedStyle);
         },
       ),
       AppDataTableColumn<Category>(

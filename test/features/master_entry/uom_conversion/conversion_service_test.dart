@@ -42,24 +42,26 @@ void main() {
       expect(result, 1000.0);
     });
 
-    test('falls back to the global conversion when the product has none',
-        () async {
-      final kilogram = await unitByName('Kilogram');
-      final gram = await unitByName('Gram');
+    test(
+      'falls back to the global conversion when the product has none',
+      () async {
+        final kilogram = await unitByName('Kilogram');
+        final gram = await unitByName('Gram');
 
-      final service = ConversionService(
-        uomRepository: uomRepository,
-        productLookup: (productId, from, to) async => null,
-      );
+        final service = ConversionService(
+          uomRepository: uomRepository,
+          productLookup: (productId, from, to) async => null,
+        );
 
-      final result = await service.convert(
-        productId: 1,
-        fromUnitId: kilogram.id,
-        toUnitId: gram.id,
-        quantity: 2,
-      );
-      expect(result, 2000.0);
-    });
+        final result = await service.convert(
+          productId: 1,
+          fromUnitId: kilogram.id,
+          toUnitId: gram.id,
+          quantity: 2,
+        );
+        expect(result, 2000.0);
+      },
+    );
 
     test('uses the global reverse conversion automatically', () async {
       final kilogram = await unitByName('Kilogram');
@@ -75,23 +77,25 @@ void main() {
       expect(result, closeTo(1.0, 1e-9));
     });
 
-    test('without a product id the global conversion is used directly',
-        () async {
-      final kilogram = await unitByName('Kilogram');
-      final gram = await unitByName('Gram');
+    test(
+      'without a product id the global conversion is used directly',
+      () async {
+        final kilogram = await unitByName('Kilogram');
+        final gram = await unitByName('Gram');
 
-      final service = ConversionService(
-        uomRepository: uomRepository,
-        productLookup: (productId, from, to) async => 500,
-      );
+        final service = ConversionService(
+          uomRepository: uomRepository,
+          productLookup: (productId, from, to) async => 500,
+        );
 
-      final result = await service.convert(
-        fromUnitId: kilogram.id,
-        toUnitId: gram.id,
-        quantity: 1,
-      );
-      expect(result, 1000.0);
-    });
+        final result = await service.convert(
+          fromUnitId: kilogram.id,
+          toUnitId: gram.id,
+          quantity: 1,
+        );
+        expect(result, 1000.0);
+      },
+    );
 
     test('throws a friendly error when no conversion exists', () async {
       final box = await unitByName('Box');

@@ -62,6 +62,16 @@ abstract final class DatabaseSchemaVersion {
   /// components sum to its intended total.
   static const int v12 = 12;
 
-  /// The current schema version of the application.
-  static const int latest = v12;
+  /// Schema version 13 — append-only purchase financial transactions.
+  static const int v13 = 13;
+
+  /// Schema version 14 — adds purchase_return and purchase_return_item tables
+  /// for dedicated purchase return tracking with view/revert/delete workflow.
+  static const int v14 = 14;
+
+  /// Schema version 15 — adds the `minimum_stock` column to the product table
+  /// for the Inventory module's low-stock status.
+  static const int v15 = 15;
+
+  static const int latest = v15;
 }

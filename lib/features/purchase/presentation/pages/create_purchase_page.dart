@@ -1,15 +1,15 @@
-import 'package:drift/drift.dart' hide Column;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import 'package:retail_erp/core/database/app_database.dart' as db;
-import 'package:retail_erp/core/database/database_provider.dart';
 import 'package:retail_erp/core/database/exceptions/database_exceptions.dart';
 import 'package:retail_erp/features/company_settings/services/company_settings_service.dart';
 import 'package:retail_erp/features/master_entry/product/data/repositories/product_repository.dart';
 import 'package:retail_erp/features/master_entry/product/domain/entities/product.dart';
 import 'package:retail_erp/features/master_entry/product/presentation/pages/create_product_page.dart';
 import 'package:retail_erp/features/master_entry/product/services/product_validator.dart';
+import 'package:retail_erp/features/master_entry/supplier/data/repositories/supplier_repository.dart';
+import 'package:retail_erp/features/master_entry/supplier/domain/entities/supplier.dart';
+import 'package:retail_erp/features/master_entry/tax_category/data/repositories/tax_category_repository.dart';
 
 import '../../../../app/theme/app_theme.dart';
 import '../../../../shared/utils/form_focus_controller.dart';
@@ -40,27 +40,27 @@ class _ProductOption {
   });
 
   _ProductOption.base(ProductEntity product, {double? taxRate})
-      : this(
-          product: product,
-          variant: null,
-          label: product.productName,
-          barcode: product.barcode,
-          purchasePrice: product.purchasePrice,
-          taxRate: taxRate,
-        );
+    : this(
+        product: product,
+        variant: null,
+        label: product.productName,
+        barcode: product.barcode,
+        purchasePrice: product.purchasePrice,
+        taxRate: taxRate,
+      );
 
   _ProductOption.forVariant(
     ProductEntity product,
     ProductVariantEntity variant, {
     double? taxRate,
   }) : this(
-          product: product,
-          variant: variant,
-          label: variant.variantName,
-          barcode: variant.barcode ?? product.barcode,
-          purchasePrice: variant.purchasePrice ?? product.purchasePrice,
-          taxRate: taxRate,
-        );
+         product: product,
+         variant: variant,
+         label: variant.variantName,
+         barcode: variant.barcode ?? product.barcode,
+         purchasePrice: variant.purchasePrice ?? product.purchasePrice,
+         taxRate: taxRate,
+       );
 
   final ProductEntity product;
   final ProductVariantEntity? variant;
@@ -95,7 +95,7 @@ class _ProductRow {
     required this.priceController,
     required this.discountController,
     required this.taxController,
-    this.discountType = _DiscountType.amount,
+    this.locked = false,
   });
 
   final TextEditingController productController;
@@ -112,7 +112,11 @@ class _ProductRow {
   String? unitName;
 
   /// Whether [discountController] holds a percentage or a currency amount.
-  _DiscountType discountType;
+  _DiscountType discountType = _DiscountType.amount;
+
+  /// When true, product identity fields (product dropdown, barcode) are
+  /// read-only. Set for rows that already existed in an edited purchase.
+  bool locked;
 
   /// Set when a scanned barcode matched nothing. Cleared on the next keystroke.
   String? barcodeError;
@@ -151,8 +155,9 @@ class _ProductRow {
     quantityFocusNode = FocusNode(debugLabel: 'purchase-qty-$index');
     priceFocusNode = FocusNode(debugLabel: 'purchase-price-$index');
     discountFocusNode = FocusNode(debugLabel: 'purchase-discount-$index');
-    discountTypeFocusNode =
-        FocusNode(debugLabel: 'purchase-discount-type-$index');
+    discountTypeFocusNode = FocusNode(
+      debugLabel: 'purchase-discount-type-$index',
+    );
     taxFocusNode = FocusNode(debugLabel: 'purchase-tax-$index');
     productContainerKey = GlobalKey();
     barcodeContainerKey = GlobalKey();
@@ -227,7 +232,7 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
   List<_ProductRow> _productRows = [];
 
   // Dropdown data.
-  List<db.Supplier> _suppliers = const [];
+  List<Supplier> _suppliers = const [];
   List<ProductEntity> _products = const [];
 
   /// Flattened, variant-level product options in dropdown order.
@@ -266,8 +271,9 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
       _purchaseDate = purchase.purchaseDate;
       _invoiceController.text = purchase.invoiceNumber ?? '';
       _notesController.text = purchase.notes ?? '';
-      _paidAmountController.text =
-          ProductValidator.formatPaise(purchase.paidAmount);
+      _paidAmountController.text = ProductValidator.formatPaise(
+        purchase.paidAmount,
+      );
       _paymentMethod = purchase.paymentMethod ?? 'Cash';
 
       // Build product rows from existing items.
@@ -276,10 +282,8 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
           productController: TextEditingController(
             text: _sellableName(item.productName, item.variantName),
           ),
-          barcodeController: TextEditingController(),
-          quantityController: TextEditingController(
-            text: '${item.quantity}',
-          ),
+          barcodeController: TextEditingController(text: item.barcode ?? ''),
+          quantityController: TextEditingController(text: '${item.quantity}'),
           priceController: TextEditingController(
             text: ProductValidator.formatPaise(item.purchasePrice),
           ),
@@ -290,6 +294,8 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
           taxController: TextEditingController(
             text: item.taxRate.toStringAsFixed(1),
           ),
+          // Product identity is locked for pre-existing lines in edit mode.
+          locked: true,
         );
         row.productId = item.productId;
         row.variantId = item.variantId;
@@ -322,15 +328,9 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
 
   Future<void> _loadDropdowns() async {
     try {
-      final database = DatabaseProvider.instance.database;
-      final suppliers = await (database.select(database.suppliers)
-            ..where((t) => t.isActive.equals(true))
-            ..orderBy([(t) => OrderingTerm.asc(t.supplierName.lower())]))
-          .get();
-
+      final suppliers = await SupplierRepository().fetchAllActive();
       final productRepository = ProductRepository();
       final allProducts = await productRepository.fetchAllWithVariants();
-
       final taxRates = await _loadTaxRates();
 
       String symbol = '';
@@ -339,8 +339,8 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
         symbol = settings.currencySymbol.trim().isNotEmpty
             ? settings.currencySymbol.trim()
             : settings.currencyCode.trim();
-      } catch (_) {
-        // Settings are optional for the purchase form; fall back below.
+      } catch (e) {
+        debugPrint('Settings error: $e');
       }
 
       if (!mounted) return;
@@ -351,7 +351,9 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
         _currencySymbol = symbol.isEmpty ? '₹' : symbol;
         _rebuildProductOptions();
       });
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('Failed to load purchase dropdowns: $e');
+    }
   }
 
   /// Reloads products only, so newly created records show up immediately.
@@ -365,28 +367,23 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
         _taxRateByCategory = taxRates;
         _rebuildProductOptions();
       });
-    } catch (_) {}
+    } catch (e) {
+      debugPrint('Failed to reload products: $e');
+    }
   }
 
   /// Resolves the configured total tax rate (%) for each Tax Category from
-  /// Product Master's `tax_category_rate` table.
-  ///
-  /// A category's total is the sum of its active component rates (e.g.
-  /// GST 18% = CGST 9 + SGST 9). This matches the "total tax %" shown in the
-  /// Tax Category master and the seeded reference data.
+  /// Product Master's `TaxCategoryRepository`.
   Future<Map<int, double>> _loadTaxRates() async {
-    final database = DatabaseProvider.instance.database;
     try {
-      final rows = await (database.select(database.taxCategoryRates)
-            ..where((t) => t.isActive.equals(true)))
-          .get();
+      final categories = await TaxCategoryRepository().getAllTaxCategories();
       final result = <int, double>{};
-      for (final row in rows) {
-        result[row.taxCategoryId] =
-            (result[row.taxCategoryId] ?? 0) + row.ratePercent;
+      for (final cat in categories) {
+        result[cat.id] = cat.totalTaxPercentage;
       }
       return result;
-    } catch (_) {
+    } catch (e) {
+      debugPrint('Failed to load tax categories: $e');
       return const {};
     }
   }
@@ -450,6 +447,15 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
 
     _productOptions = options;
     _optionsByKey = byKey;
+
+    for (final row in _productRows) {
+      if (row.barcodeController.text.trim().isEmpty && row.optionKey != null) {
+        final opt = byKey[row.optionKey];
+        if (opt?.barcode != null && opt!.barcode!.trim().isNotEmpty) {
+          row.barcodeController.text = opt.barcode!.trim();
+        }
+      }
+    }
   }
 
   /// The configured total purchase tax rate (%) for [product]'s Tax Category,
@@ -502,6 +508,8 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
     // shown always belongs to the product on the line.
     if (option.barcode != null && option.barcode!.trim().isNotEmpty) {
       row.barcodeController.text = option.barcode!.trim();
+    } else {
+      row.barcodeController.clear();
     }
 
     final price = option.purchasePrice;
@@ -513,10 +521,9 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
 
     final taxRate = option.taxRate;
     if (taxRate != null) {
-      row.taxController.text =
-          taxRate == taxRate.roundToDouble()
-              ? taxRate.round().toString()
-              : taxRate.toStringAsFixed(1);
+      row.taxController.text = taxRate == taxRate.roundToDouble()
+          ? taxRate.round().toString()
+          : taxRate.toStringAsFixed(1);
     } else {
       row.taxController.text = '0';
     }
@@ -616,9 +623,13 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
       builder: (dialogContext) {
         return Dialog(
           clipBehavior: Clip.antiAlias,
-          insetPadding: const EdgeInsets.symmetric(horizontal: 40, vertical: 32),
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 860, maxHeight: 760),
+          insetPadding: const EdgeInsets.symmetric(
+            horizontal: 40,
+            vertical: 32,
+          ),
+          child: SizedBox(
+            width: 860,
+            height: 760,
             child: CreateProductPage(
               showBreadcrumbs: false,
               onSaved: (product) => created = product,
@@ -661,7 +672,8 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
 
   int _calculateLineSubtotal(_ProductRow row) {
     final qty = int.tryParse(row.quantityController.text) ?? 0;
-    final price = ProductValidator.parseRupeesToPaise(row.priceController.text) ?? 0;
+    final price =
+        ProductValidator.parseRupeesToPaise(row.priceController.text) ?? 0;
     return qty * price;
   }
 
@@ -804,6 +816,8 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
   }
 
   Future<void> _save() async {
+    if (_saving) return;
+
     // Validate supplier.
     final supplierErr = _supplierId == null ? 'Supplier is required.' : null;
 
@@ -824,7 +838,8 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
             'This product is already added. Update the existing quantity instead.';
       }
 
-      final qty = int.tryParse(row.quantityController.text) ?? 0;
+      final qtyText = row.quantityController.text.trim();
+      final qty = int.tryParse(qtyText) ?? 0;
       if (qty <= 0) {
         rowErrors['qty_$i'] = 'Quantity must be greater than 0.';
       }
@@ -845,10 +860,7 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
       }
     }
 
-    final errors = <String, String?>{
-      'supplier': supplierErr,
-      ...rowErrors,
-    };
+    final errors = <String, String?>{'supplier': supplierErr, ...rowErrors};
 
     final hasErrors = errors.values.any((e) => e != null);
     if (hasErrors) {
@@ -864,17 +876,21 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
 
     try {
       final items = _productRows.map((row) {
+        final parsedPrice = ProductValidator.parseRupeesToPaise(
+          row.priceController.text.trim(),
+        ) ?? 0;
+        final parsedQty = int.tryParse(row.quantityController.text.trim()) ?? 1;
+
         return PurchaseItemInput(
           productId: row.productId!,
           variantId: row.variantId,
-          quantity: int.parse(row.quantityController.text),
+          quantity: parsedQty,
           unitId: row.unitId!,
-          purchasePrice:
-              ProductValidator.parseRupeesToPaise(row.priceController.text)!,
+          purchasePrice: parsedPrice,
           // Percentage discounts are resolved to paise here, so the stored value
           // always matches the amount shown in the summary.
           discount: _calculateLineDiscount(row),
-          taxRate: double.tryParse(row.taxController.text) ?? 0,
+          taxRate: double.tryParse(row.taxController.text.trim()) ?? 0,
         );
       }).toList();
 
@@ -904,17 +920,20 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
       if (!mounted) return;
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
-        ..showSnackBar(SnackBar(
-          content: Text(_isEditing
-              ? 'Purchase updated successfully.'
-              : 'Purchase created successfully.'),
-        ));
+        ..showSnackBar(
+          SnackBar(
+            content: Text(
+              _isEditing
+                  ? 'Purchase updated successfully.'
+                  : 'Purchase created successfully.',
+            ),
+          ),
+        );
       widget.onSave();
-    } on PurchaseValidationException catch (e) {
-      _showFailure(e.message);
     } on AppDatabaseException catch (error) {
       _showFailure('Failed to save purchase. ${error.message}');
-    } catch (_) {
+    } catch (error, st) {
+      debugPrint('Error saving purchase: $error\n$st');
       _showFailure('Failed to save purchase. Please try again.');
     }
   }
@@ -949,7 +968,10 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Breadcrumbs(
-                    items: ['Purchase', _isEditing ? 'Edit Purchase' : 'Purchase Entry'],
+                    items: [
+                      'Purchase',
+                      _isEditing ? 'Edit Purchase' : 'Purchase Entry',
+                    ],
                   ),
                   const SizedBox(height: 12),
                   Text(
@@ -974,7 +996,10 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        _SectionTitle(textTheme: textTheme, title: 'Purchase Information'),
+                        _SectionTitle(
+                          textTheme: textTheme,
+                          title: 'Purchase Information',
+                        ),
                         const SizedBox(height: 16),
                         _buildFormRow([
                           _buildSupplierField(textTheme, colorScheme),
@@ -1011,16 +1036,23 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
                       children: [
                         Row(
                           children: [
-                            _SectionTitle(textTheme: textTheme, title: 'Products'),
+                            _SectionTitle(
+                              textTheme: textTheme,
+                              title: 'Products',
+                            ),
                             const Spacer(),
                             OutlinedButton.icon(
                               onPressed: _addProductRow,
                               icon: const Icon(Icons.add_rounded, size: 16),
-                              label: const Text('Add Product',
-                                  style: TextStyle(fontSize: 12)),
+                              label: const Text(
+                                'Add Product',
+                                style: TextStyle(fontSize: 12),
+                              ),
                               style: OutlinedButton.styleFrom(
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 12, vertical: 8),
+                                  horizontal: 12,
+                                  vertical: 8,
+                                ),
                                 minimumSize: Size.zero,
                               ),
                             ),
@@ -1063,8 +1095,9 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
                             errorText: _errors['paidAmount'],
                             focusNode: _focusController.node('paymentAmount'),
                             containerKey: _focusController.key('paymentAmount'),
-                            keyboardType:
-                                const TextInputType.numberWithOptions(decimal: true),
+                            keyboardType: const TextInputType.numberWithOptions(
+                              decimal: true,
+                            ),
                             inputFormatters: [
                               FilteringTextInputFormatter.allow(
                                 RegExp(r'^\d*\.?\d{0,2}'),
@@ -1103,7 +1136,9 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
                               ? const SizedBox(
                                   width: 16,
                                   height: 16,
-                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
                                 )
                               : const Icon(Icons.check_rounded, size: 18),
                           label: Text(
@@ -1129,12 +1164,20 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Supplier',
-                style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+            Text(
+              'Supplier',
+              style: textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
             const SizedBox(width: 4),
-            Text('*',
-                style: textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.error, fontWeight: FontWeight.w600)),
+            Text(
+              '*',
+              style: textTheme.bodyMedium?.copyWith(
+                color: colorScheme.error,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ],
         ),
         const SizedBox(height: 8),
@@ -1172,12 +1215,20 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Purchase Date',
-                style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+            Text(
+              'Purchase Date',
+              style: textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
             const SizedBox(width: 4),
-            Text('*',
-                style: textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.error, fontWeight: FontWeight.w600)),
+            Text(
+              '*',
+              style: textTheme.bodyMedium?.copyWith(
+                color: colorScheme.error,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ],
         ),
         const SizedBox(height: 8),
@@ -1201,19 +1252,26 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
     );
   }
 
-  Widget _buildPaymentMethodField(TextTheme textTheme, ColorScheme colorScheme) {
+  Widget _buildPaymentMethodField(
+    TextTheme textTheme,
+    ColorScheme colorScheme,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Payment Method',
-            style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+        Text(
+          'Payment Method',
+          style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+        ),
         const SizedBox(height: 8),
         DropdownButtonFormField<String>(
           initialValue: _paymentMethod,
           isExpanded: true,
           isDense: true,
           items: PaymentMethod.values
-              .map((m) => DropdownMenuItem(value: m.label, child: Text(m.label)))
+              .map(
+                (m) => DropdownMenuItem(value: m.label, child: Text(m.label)),
+              )
               .toList(),
           onChanged: (value) {
             if (value != null) setState(() => _paymentMethod = value);
@@ -1223,7 +1281,11 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
     );
   }
 
-  Widget _buildProductRow(int index, TextTheme textTheme, ColorScheme colorScheme) {
+  Widget _buildProductRow(
+    int index,
+    TextTheme textTheme,
+    ColorScheme colorScheme,
+  ) {
     final row = _productRows[index];
     row.initFocusNodes(index);
 
@@ -1240,10 +1302,14 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
         children: [
           Row(
             children: [
-              Text('Item ${index + 1}',
-                  style: textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700)),
+              Text(
+                'Item ${index + 1}',
+                style: textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
               const Spacer(),
-              if (_productRows.length > 1)
+              if (_productRows.length > 1 && !row.locked)
                 _rowFocusOrder(
                   index,
                   7,
@@ -1263,7 +1329,11 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
               0,
               _buildProductDropdown(index, row, textTheme, colorScheme),
             ),
-            _rowFocusOrder(index, 1, _buildBarcodeField(index, row)),
+            _rowFocusOrder(
+              index,
+              1,
+              _buildBarcodeField(index, row, textTheme, colorScheme),
+            ),
           ]),
           const SizedBox(height: 12),
           _buildFormRow([
@@ -1294,8 +1364,9 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
                 errorText: _errors['price_$index'],
                 focusNode: row.priceFocusNode,
                 containerKey: row.priceContainerKey,
-                keyboardType:
-                    const TextInputType.numberWithOptions(decimal: true),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
                 inputFormatters: [
                   FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
                 ],
@@ -1315,8 +1386,9 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
                 controller: row.taxController,
                 focusNode: row.taxFocusNode,
                 containerKey: row.taxContainerKey,
-                keyboardType:
-                    const TextInputType.numberWithOptions(decimal: true),
+                keyboardType: const TextInputType.numberWithOptions(
+                  decimal: true,
+                ),
                 inputFormatters: [
                   FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
                 ],
@@ -1326,18 +1398,28 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
           ]),
           if (row.unitName != null) ...[
             const SizedBox(height: 8),
-            Text('Unit: ${row.unitName}',
-                style: textTheme.bodySmall?.copyWith(color: AppTheme.textSecondary)),
+            Text(
+              'Unit: ${row.unitName}',
+              style: textTheme.bodySmall?.copyWith(
+                color: AppTheme.textSecondary,
+              ),
+            ),
           ],
           const SizedBox(height: 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
-              Text('Line Total: ',
-                  style: textTheme.bodySmall?.copyWith(color: AppTheme.textSecondary)),
+              Text(
+                'Line Total: ',
+                style: textTheme.bodySmall?.copyWith(
+                  color: AppTheme.textSecondary,
+                ),
+              ),
               Text(
                 _formatCurrency(_calculateLineTotal(row)),
-                style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700),
+                style: textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
               ),
             ],
           ),
@@ -1347,15 +1429,83 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
   }
 
   Widget _buildProductDropdown(
-    int index, _ProductRow row, TextTheme textTheme, ColorScheme colorScheme,
+    int index,
+    _ProductRow row,
+    TextTheme textTheme,
+    ColorScheme colorScheme,
   ) {
     // Only offer a selected value the dropdown can actually match, otherwise it
     // asserts. The row keeps its IDs either way.
     final selectedKey = row.optionKey;
     final initialValue =
         selectedKey != null && _optionsByKey.containsKey(selectedKey)
-            ? selectedKey
-            : null;
+        ? selectedKey
+        : null;
+
+    // A pre-existing line's product identity is locked: it is shown read-only
+    // instead of as an editable dropdown. This prevents replacing the product,
+    // but does not affect the "+ Add New Product" flow.
+    if (row.locked) {
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                'Product',
+                style: textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(width: 4),
+              Text(
+                '*',
+                style: textTheme.bodyMedium?.copyWith(
+                  color: colorScheme.error,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          InputDecorator(
+            decoration: InputDecoration(
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(color: colorScheme.outlineVariant),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(color: colorScheme.outlineVariant),
+              ),
+              isDense: true,
+              errorText: _errors['product_$index'],
+              errorMaxLines: 2,
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    row.productController.text.trim().isEmpty
+                        ? 'No product selected'
+                        : row.productController.text.trim(),
+                    overflow: TextOverflow.ellipsis,
+                    style: textTheme.bodyLarge,
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Icon(
+                  Icons.lock_outline_rounded,
+                  size: 16,
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ],
+            ),
+          ),
+        ],
+      );
+    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -1363,12 +1513,20 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text('Product',
-                style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+            Text(
+              'Product',
+              style: textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+            ),
             const SizedBox(width: 4),
-            Text('*',
-                style: textTheme.bodyMedium?.copyWith(
-                    color: colorScheme.error, fontWeight: FontWeight.w600)),
+            Text(
+              '*',
+              style: textTheme.bodyMedium?.copyWith(
+                color: colorScheme.error,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
           ],
         ),
         const SizedBox(height: 8),
@@ -1383,7 +1541,9 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
           onChanged: (value) {
             if (value == null) return;
             if (value == _addNewProductValue) {
-              _openAddProductDialog(index);
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (mounted) _openAddProductDialog(index);
+              });
               return;
             }
             final option = _optionsByKey[value];
@@ -1433,7 +1593,62 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
   /// Scanner-friendly barcode entry for a line.
   ///
   /// Scanners send the code followed by Enter, which lands on [onSubmitted].
-  Widget _buildBarcodeField(int index, _ProductRow row) {
+  Widget _buildBarcodeField(
+    int index,
+    _ProductRow row,
+    TextTheme textTheme,
+    ColorScheme colorScheme,
+  ) {
+    if (row.locked) {
+      final barcode = row.barcodeController.text.trim();
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Barcode',
+            style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 8),
+          InputDecorator(
+            decoration: InputDecoration(
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(color: colorScheme.outlineVariant),
+              ),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide(color: colorScheme.outlineVariant),
+              ),
+              isDense: true,
+              errorText: row.barcodeError,
+              errorMaxLines: 2,
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    barcode.isEmpty ? '—' : barcode,
+                    overflow: TextOverflow.ellipsis,
+                    style: textTheme.bodyLarge?.copyWith(
+                      color: barcode.isEmpty
+                          ? colorScheme.onSurfaceVariant
+                          : null,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Icon(
+                  Icons.lock_outline_rounded,
+                  size: 16,
+                  color: colorScheme.onSurfaceVariant,
+                ),
+              ],
+            ),
+          ),
+        ],
+      );
+    }
+
     return LabelledField(
       label: 'Barcode',
       hintText: 'Scan or enter barcode',
@@ -1441,6 +1656,8 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
       errorText: row.barcodeError,
       focusNode: row.barcodeFocusNode,
       containerKey: row.barcodeContainerKey,
+      // Product identity on a pre-existing line is locked in edit mode.
+      readOnly: row.locked,
       textInputAction: TextInputAction.done,
       onChanged: (_) {
         // Clear the rejection as soon as a new code starts arriving.
@@ -1527,10 +1744,17 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           _SummaryRow(label: 'Subtotal', value: _formatCurrency(_subtotal)),
-          _SummaryRow(label: 'Discount', value: '- ${_formatCurrency(_totalDiscount)}'),
+          _SummaryRow(
+            label: 'Discount',
+            value: '- ${_formatCurrency(_totalDiscount)}',
+          ),
           _SummaryRow(label: 'Tax', value: _formatCurrency(_totalTax)),
           Divider(color: colorScheme.outlineVariant),
-          _SummaryRow(label: 'Grand Total', value: _formatCurrency(_grandTotal), bold: true),
+          _SummaryRow(
+            label: 'Grand Total',
+            value: _formatCurrency(_grandTotal),
+            bold: true,
+          ),
         ],
       ),
     );
@@ -1552,11 +1776,16 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _SummaryRow(label: 'Grand Total', value: _formatCurrency(_grandTotal)),
+          _SummaryRow(
+            label: 'Grand Total',
+            value: _formatCurrency(_grandTotal),
+          ),
           _SummaryRow(
             label: 'Debit Amount',
             value: _formatCurrency(_paidAmount),
-            valueColor: _paidAmount > 0 ? AppTheme.success : AppTheme.textPrimary,
+            valueColor: _paidAmount > 0
+                ? AppTheme.success
+                : AppTheme.textPrimary,
           ),
           _SummaryRow(
             label: 'Credit Amount',
@@ -1567,17 +1796,28 @@ class _CreatePurchasePageState extends State<CreatePurchasePage> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Status',
-                  style: textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600)),
+              Text(
+                'Status',
+                style: textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: statusColor.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
                   _paymentStatus.label,
-                  style: TextStyle(color: statusColor, fontWeight: FontWeight.w600, fontSize: 13),
+                  style: TextStyle(
+                    color: statusColor,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 13,
+                  ),
                 ),
               ),
             ],
@@ -1658,10 +1898,19 @@ class _SectionTitle extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        Icon(Icons.circle, size: 6, color: Theme.of(context).colorScheme.primary),
+        Icon(
+          Icons.circle,
+          size: 6,
+          color: Theme.of(context).colorScheme.primary,
+        ),
         const SizedBox(width: 8),
-        Text(title,
-            style: textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700, letterSpacing: 0.2)),
+        Text(
+          title,
+          style: textTheme.titleSmall?.copyWith(
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.2,
+          ),
+        ),
       ],
     );
   }
@@ -1688,13 +1937,19 @@ class _SummaryRow extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label,
-              style: textTheme.bodyMedium?.copyWith(
-                  fontWeight: bold ? FontWeight.w700 : FontWeight.w400)),
-          Text(value,
-              style: textTheme.bodyMedium?.copyWith(
-                  fontWeight: bold ? FontWeight.w700 : FontWeight.w600,
-                  color: valueColor ?? AppTheme.textPrimary)),
+          Text(
+            label,
+            style: textTheme.bodyMedium?.copyWith(
+              fontWeight: bold ? FontWeight.w700 : FontWeight.w400,
+            ),
+          ),
+          Text(
+            value,
+            style: textTheme.bodyMedium?.copyWith(
+              fontWeight: bold ? FontWeight.w700 : FontWeight.w600,
+              color: valueColor ?? AppTheme.textPrimary,
+            ),
+          ),
         ],
       ),
     );

@@ -65,7 +65,10 @@ void main() {
       expect(errors['pincode'], 'Pincode is required.');
       expect(errors['phone'], 'Phone number is required.');
       expect(errors['invoicePrefix'], 'Invoice prefix is required.');
-      expect(errors['invoiceStartNumber'], 'Starting invoice number is required.');
+      expect(
+        errors['invoiceStartNumber'],
+        'Starting invoice number is required.',
+      );
     });
 
     test('requires GSTIN only when GST registration is enabled', () {
@@ -146,10 +149,7 @@ void main() {
       // Valid CIN passes for incorporated types.
       expect(
         CompanySettingsValidator.validate(
-          withType(
-            BusinessType.privateLimited,
-            cin: 'U12345MH2024PTC123456',
-          ),
+          withType(BusinessType.privateLimited, cin: 'U12345MH2024PTC123456'),
         )['cin'],
         isNull,
       );
@@ -158,18 +158,9 @@ void main() {
 
   group('field validators', () {
     test('GSTIN format', () {
-      expect(
-        CompanySettingsValidator.validateGstin('27ABCDE1234F1Z5'),
-        isNull,
-      );
-      expect(
-        CompanySettingsValidator.validateGstin('27abcde1234f1z5'),
-        isNull,
-      );
-      expect(
-        CompanySettingsValidator.validateGstin('12345'),
-        isNotNull,
-      );
+      expect(CompanySettingsValidator.validateGstin('27ABCDE1234F1Z5'), isNull);
+      expect(CompanySettingsValidator.validateGstin('27abcde1234f1z5'), isNull);
+      expect(CompanySettingsValidator.validateGstin('12345'), isNotNull);
     });
 
     test('PAN format', () {
@@ -202,7 +193,10 @@ void main() {
     });
 
     test('email format', () {
-      expect(CompanySettingsValidator.validateEmail('acme@example.com'), isNull);
+      expect(
+        CompanySettingsValidator.validateEmail('acme@example.com'),
+        isNull,
+      );
       expect(CompanySettingsValidator.validateEmail('not-an-email'), isNotNull);
       expect(CompanySettingsValidator.validateEmail(''), isNull);
     });
@@ -223,14 +217,8 @@ void main() {
     });
 
     test('IFSC code', () {
-      expect(
-        CompanySettingsValidator.validateIfsc('SBIN0001234'),
-        isNull,
-      );
-      expect(
-        CompanySettingsValidator.validateIfsc('sbin0001234'),
-        isNull,
-      );
+      expect(CompanySettingsValidator.validateIfsc('SBIN0001234'), isNull);
+      expect(CompanySettingsValidator.validateIfsc('sbin0001234'), isNull);
       expect(CompanySettingsValidator.validateIfsc('SBIN123'), isNotNull);
     });
 
@@ -240,24 +228,51 @@ void main() {
       expect(CompanySettingsValidator.validateUpiId('acme'), isNotNull);
     });
 
-    test('invoice prefix trims, caps length and rejects invalid characters', () {
-      expect(CompanySettingsValidator.validateInvoicePrefix('  INV-2026  '), isNull);
-      expect(CompanySettingsValidator.validateInvoicePrefix('INV 2026'), isNotNull);
-      expect(CompanySettingsValidator.validateInvoicePrefix('INV/2026'), isNotNull);
-      expect(
-        CompanySettingsValidator.validateInvoicePrefix('ABCDEFGHIJK'),
-        isNotNull,
-      );
-      expect(CompanySettingsValidator.validateInvoicePrefix(''), isNotNull);
-    });
+    test(
+      'invoice prefix trims, caps length and rejects invalid characters',
+      () {
+        expect(
+          CompanySettingsValidator.validateInvoicePrefix('  INV-2026  '),
+          isNull,
+        );
+        expect(
+          CompanySettingsValidator.validateInvoicePrefix('INV 2026'),
+          isNotNull,
+        );
+        expect(
+          CompanySettingsValidator.validateInvoicePrefix('INV/2026'),
+          isNotNull,
+        );
+        expect(
+          CompanySettingsValidator.validateInvoicePrefix('ABCDEFGHIJK'),
+          isNotNull,
+        );
+        expect(CompanySettingsValidator.validateInvoicePrefix(''), isNotNull);
+      },
+    );
 
     test('invoice start number must be a positive integer', () {
       expect(CompanySettingsValidator.validateInvoiceStartNumber('1'), isNull);
-      expect(CompanySettingsValidator.validateInvoiceStartNumber('500'), isNull);
-      expect(CompanySettingsValidator.validateInvoiceStartNumber('0'), isNotNull);
-      expect(CompanySettingsValidator.validateInvoiceStartNumber('-3'), isNotNull);
-      expect(CompanySettingsValidator.validateInvoiceStartNumber('1.5'), isNotNull);
-      expect(CompanySettingsValidator.validateInvoiceStartNumber('abc'), isNotNull);
+      expect(
+        CompanySettingsValidator.validateInvoiceStartNumber('500'),
+        isNull,
+      );
+      expect(
+        CompanySettingsValidator.validateInvoiceStartNumber('0'),
+        isNotNull,
+      );
+      expect(
+        CompanySettingsValidator.validateInvoiceStartNumber('-3'),
+        isNotNull,
+      );
+      expect(
+        CompanySettingsValidator.validateInvoiceStartNumber('1.5'),
+        isNotNull,
+      );
+      expect(
+        CompanySettingsValidator.validateInvoiceStartNumber('abc'),
+        isNotNull,
+      );
     });
 
     test('currency code is a 3-letter code', () {

@@ -22,8 +22,9 @@ class TaxCategoryRepository {
 
   /// All tax categories, ordered case-insensitively by name.
   Future<List<TaxCategory>> getAllTaxCategories() async {
-    final catRows = await (_database.select(_database.taxCategories)
-      ..orderBy([(t) => OrderingTerm.asc(t.taxCategoryName.lower())])).get();
+    final catRows = await (_database.select(
+      _database.taxCategories,
+    )..orderBy([(t) => OrderingTerm.asc(t.taxCategoryName.lower())])).get();
 
     return _mapCategoriesWithComponents(catRows);
   }
@@ -36,22 +37,25 @@ class TaxCategoryRepository {
       return getAllTaxCategories();
     }
 
-    final catRows = await (_database.select(_database.taxCategories)
-      ..where(
-        (t) =>
-            t.taxCategoryName.lower().contains(normalized) |
-            (t.description.isNotNull() &
-                t.description.lower().contains(normalized)),
-      )
-      ..orderBy([(t) => OrderingTerm.asc(t.taxCategoryName.lower())])).get();
+    final catRows =
+        await (_database.select(_database.taxCategories)
+              ..where(
+                (t) =>
+                    t.taxCategoryName.lower().contains(normalized) |
+                    (t.description.isNotNull() &
+                        t.description.lower().contains(normalized)),
+              )
+              ..orderBy([(t) => OrderingTerm.asc(t.taxCategoryName.lower())]))
+            .get();
 
     return _mapCategoriesWithComponents(catRows);
   }
 
   /// Gets a tax category by its unique [id], or null if not found.
   Future<TaxCategory?> getById(int id) async {
-    final catRow = await (_database.select(_database.taxCategories)
-      ..where((t) => t.id.equals(id))).getSingleOrNull();
+    final catRow = await (_database.select(
+      _database.taxCategories,
+    )..where((t) => t.id.equals(id))).getSingleOrNull();
 
     if (catRow == null) return null;
 
@@ -65,13 +69,16 @@ class TaxCategoryRepository {
   /// uniqueness during an edit.
   Future<bool> existsByName(String name, {int? excludeId}) async {
     final normalized = name.trim().toLowerCase();
-    final row = await (_database.select(_database.taxCategories)..where((t) {
-          final matches = t.taxCategoryName.lower().equals(normalized);
-          if (excludeId == null) {
-            return matches;
-          }
-          return matches & t.id.isNotValue(excludeId);
-        })).getSingleOrNull();
+    final t = _database.taxCategories;
+    final condition = excludeId == null
+        ? t.taxCategoryName.lower().equals(normalized)
+        : t.taxCategoryName.lower().equals(normalized) &
+            t.id.isNotValue(excludeId);
+    final row = await (_database.selectOnly(t)
+          ..addColumns([t.id])
+          ..where(condition)
+          ..limit(1))
+        .getSingleOrNull();
     return row != null;
   }
 
@@ -92,22 +99,26 @@ class TaxCategoryRepository {
 
     try {
       final createdId = await _database.transaction(() async {
-        final id = await _database.into(_database.taxCategories).insert(
-          db.TaxCategoriesCompanion.insert(
-            taxCategoryCode: 'TC_${DateTime.now().microsecondsSinceEpoch}',
-            taxCategoryName: trimmedName,
-            description: Value(trimmedDescription),
-          ),
-        );
+        final id = await _database
+            .into(_database.taxCategories)
+            .insert(
+              db.TaxCategoriesCompanion.insert(
+                taxCategoryCode: 'TC_${DateTime.now().microsecondsSinceEpoch}',
+                taxCategoryName: trimmedName,
+                description: Value(trimmedDescription),
+              ),
+            );
 
         for (final comp in components) {
-          await _database.into(_database.taxCategoryRates).insert(
-            db.TaxCategoryRatesCompanion.insert(
-              taxCategoryId: id,
-              taxTypeId: comp.taxTypeId,
-              ratePercent: comp.percentage,
-            ),
-          );
+          await _database
+              .into(_database.taxCategoryRates)
+              .insert(
+                db.TaxCategoryRatesCompanion.insert(
+                  taxCategoryId: id,
+                  taxTypeId: comp.taxTypeId,
+                  ratePercent: comp.percentage,
+                ),
+              );
         }
 
         return id;
@@ -149,31 +160,36 @@ class TaxCategoryRepository {
 
     try {
       await _database.transaction(() async {
-        final updatedRows = await (_database.update(_database.taxCategories)
-          ..where((t) => t.id.equals(id))).write(
-          db.TaxCategoriesCompanion(
-            taxCategoryName: Value(trimmedName),
-            description: Value(trimmedDescription),
-            updatedAt: Value(DateTime.now()),
-          ),
-        );
+        final updatedRows =
+            await (_database.update(
+              _database.taxCategories,
+            )..where((t) => t.id.equals(id))).write(
+              db.TaxCategoriesCompanion(
+                taxCategoryName: Value(trimmedName),
+                description: Value(trimmedDescription),
+                updatedAt: Value(DateTime.now()),
+              ),
+            );
 
         if (updatedRows == 0) {
           throw TaxCategoryNotFoundException(id);
         }
 
         // Replace rate components
-        await (_database.delete(_database.taxCategoryRates)
-          ..where((t) => t.taxCategoryId.equals(id))).go();
+        await (_database.delete(
+          _database.taxCategoryRates,
+        )..where((t) => t.taxCategoryId.equals(id))).go();
 
         for (final comp in components) {
-          await _database.into(_database.taxCategoryRates).insert(
-            db.TaxCategoryRatesCompanion.insert(
-              taxCategoryId: id,
-              taxTypeId: comp.taxTypeId,
-              ratePercent: comp.percentage,
-            ),
-          );
+          await _database
+              .into(_database.taxCategoryRates)
+              .insert(
+                db.TaxCategoryRatesCompanion.insert(
+                  taxCategoryId: id,
+                  taxTypeId: comp.taxTypeId,
+                  ratePercent: comp.percentage,
+                ),
+              );
         }
       });
 
@@ -209,10 +225,11 @@ class TaxCategoryRepository {
 
     int productCount = 0;
     if (taxTypeIds.isNotEmpty) {
-      productCount = await (_database.select(_database.products)
-        ..where((t) => t.taxTypeId.isIn(taxTypeIds.toList())))
-          .get()
-          .then((l) => l.length);
+      productCount =
+          await (_database.select(_database.products)
+                ..where((t) => t.taxTypeId.isIn(taxTypeIds.toList())))
+              .get()
+              .then((l) => l.length);
     }
 
     if (productCount > 0) {
@@ -221,11 +238,13 @@ class TaxCategoryRepository {
 
     try {
       await _database.transaction(() async {
-        await (_database.delete(_database.taxCategoryRates)
-          ..where((t) => t.taxCategoryId.equals(id))).go();
+        await (_database.delete(
+          _database.taxCategoryRates,
+        )..where((t) => t.taxCategoryId.equals(id))).go();
 
-        final deletedRows = await (_database.delete(_database.taxCategories)
-          ..where((t) => t.id.equals(id))).go();
+        final deletedRows = await (_database.delete(
+          _database.taxCategories,
+        )..where((t) => t.id.equals(id))).go();
 
         if (deletedRows == 0) {
           throw TaxCategoryNotFoundException(id);
@@ -272,13 +291,15 @@ class TaxCategoryRepository {
       final rate = row.readTable(_database.taxCategoryRates);
       final type = row.readTable(_database.taxTypes);
 
-      map.putIfAbsent(rate.taxCategoryId, () => []).add(
-        TaxCategoryComponent(
-          taxTypeId: type.id,
-          taxTypeName: type.taxTypeName,
-          percentage: rate.ratePercent,
-        ),
-      );
+      map
+          .putIfAbsent(rate.taxCategoryId, () => [])
+          .add(
+            TaxCategoryComponent(
+              taxTypeId: type.id,
+              taxTypeName: type.taxTypeName,
+              percentage: rate.ratePercent,
+            ),
+          );
     }
 
     return catRows.map((c) {

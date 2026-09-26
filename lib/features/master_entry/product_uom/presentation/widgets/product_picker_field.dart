@@ -72,10 +72,7 @@ class ProductPickerField extends StatelessWidget {
           onTap: () => _openPicker(context),
           borderRadius: BorderRadius.circular(10),
           child: InputDecorator(
-            decoration: InputDecoration(
-              errorText: errorText,
-              errorMaxLines: 2,
-            ),
+            decoration: InputDecoration(errorText: errorText, errorMaxLines: 2),
             child: Row(
               children: [
                 Expanded(
@@ -195,51 +192,51 @@ class _ProductPickerDialogState extends State<_ProductPickerDialog> {
                       ),
                     )
                   : filtered.isEmpty
-                      ? Center(
-                          child: Text(
-                            'No products match your search.',
+                  ? Center(
+                      child: Text(
+                        'No products match your search.',
+                        style: textTheme.bodyMedium?.copyWith(
+                          color: colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    )
+                  : ListView.separated(
+                      itemCount: filtered.length,
+                      separatorBuilder: (context, index) =>
+                          const Divider(height: 1),
+                      itemBuilder: (context, index) {
+                        final product = filtered[index];
+                        final isSelected = product.id == widget.selectedId;
+                        return ListTile(
+                          dense: true,
+                          title: Text(
+                            product.productName,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
                             style: textTheme.bodyMedium?.copyWith(
-                              color: colorScheme.onSurfaceVariant,
+                              fontWeight: isSelected
+                                  ? FontWeight.w700
+                                  : FontWeight.w500,
+                              color: isSelected
+                                  ? AppTheme.primary
+                                  : AppTheme.textPrimary,
                             ),
                           ),
-                        )
-                      : ListView.separated(
-                          itemCount: filtered.length,
-                          separatorBuilder: (context, index) =>
-                              const Divider(height: 1),
-                          itemBuilder: (context, index) {
-                            final product = filtered[index];
-                            final isSelected = product.id == widget.selectedId;
-                            return ListTile(
-                              dense: true,
-                              title: Text(
-                                product.productName,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: textTheme.bodyMedium?.copyWith(
-                                  fontWeight: isSelected
-                                      ? FontWeight.w700
-                                      : FontWeight.w500,
-                                  color: isSelected
-                                      ? AppTheme.primary
-                                      : AppTheme.textPrimary,
-                                ),
-                              ),
-                              subtitle: Text(
-                                product.productCode,
-                                style: textTheme.bodySmall,
-                              ),
-                              trailing: isSelected
-                                  ? const Icon(
-                                      Icons.check_rounded,
-                                      size: 18,
-                                      color: AppTheme.primary,
-                                    )
-                                  : null,
-                              onTap: () => Navigator.of(context).pop(product.id),
-                            );
-                          },
-                        ),
+                          subtitle: Text(
+                            product.productCode,
+                            style: textTheme.bodySmall,
+                          ),
+                          trailing: isSelected
+                              ? const Icon(
+                                  Icons.check_rounded,
+                                  size: 18,
+                                  color: AppTheme.primary,
+                                )
+                              : null,
+                          onTap: () => Navigator.of(context).pop(product.id),
+                        );
+                      },
+                    ),
             ),
           ],
         ),

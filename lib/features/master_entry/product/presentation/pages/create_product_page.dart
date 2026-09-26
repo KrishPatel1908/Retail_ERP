@@ -68,11 +68,13 @@ class _VariantRow {
     _focusInitialized = true;
     nameFocusNode = FocusNode(debugLabel: 'variant-$variantIndex-name');
     priceFocusNode = FocusNode(debugLabel: 'variant-$variantIndex-price');
-    purchasePriceFocusNode =
-        FocusNode(debugLabel: 'variant-$variantIndex-purchase-price');
+    purchasePriceFocusNode = FocusNode(
+      debugLabel: 'variant-$variantIndex-purchase-price',
+    );
     mrpFocusNode = FocusNode(debugLabel: 'variant-$variantIndex-mrp');
-    wholesalePriceFocusNode =
-        FocusNode(debugLabel: 'variant-$variantIndex-wholesale-price');
+    wholesalePriceFocusNode = FocusNode(
+      debugLabel: 'variant-$variantIndex-wholesale-price',
+    );
     barcodeFocusNode = FocusNode(debugLabel: 'variant-$variantIndex-barcode');
     hsnCodeFocusNode = FocusNode(debugLabel: 'variant-$variantIndex-hsn-code');
     expiryFocusNode = FocusNode(debugLabel: 'variant-$variantIndex-expiry');
@@ -184,6 +186,10 @@ class _CreateProductPageState extends State<CreateProductPage> {
   int? _unitId;
   int? _taxCategoryId;
 
+  // Minimum stock threshold for the Inventory module.
+  final TextEditingController _minimumStockController =
+      TextEditingController();
+
   // Expiry date
   DateTime? _expiryDate;
 
@@ -199,6 +205,7 @@ class _CreateProductPageState extends State<CreateProductPage> {
 
   Map<String, String?> _errors = const {};
   bool _saving = false;
+  final ScrollController _scrollController = ScrollController();
 
   bool get _isEditing => widget.product != null;
   bool get _hasVariants => _variantRows.isNotEmpty;
@@ -234,6 +241,9 @@ class _CreateProductPageState extends State<CreateProductPage> {
     );
     _barcodeController = TextEditingController(text: product?.barcode);
     _hsnCodeController = TextEditingController(text: product?.hsnCode);
+    _minimumStockController.text = product == null || product.minimumStock == 0
+        ? ''
+        : '${product.minimumStock}';
     _notesController = TextEditingController(text: product?.notes);
 
     _categoryId = product?.categoryId;
@@ -291,45 +301,48 @@ class _CreateProductPageState extends State<CreateProductPage> {
     _wholesalePriceController.dispose();
     _barcodeController.dispose();
     _hsnCodeController.dispose();
+    _minimumStockController.dispose();
     _notesController.dispose();
     for (final row in _variantRows) {
       row.dispose();
     }
+    _scrollController.dispose();
     super.dispose();
   }
 
   Future<void> _loadDropdowns() async {
     final database = DatabaseProvider.instance.database;
     try {
-      final categories = await (database.select(database.categories)
-            ..orderBy([(t) => OrderingTerm.asc(t.categoryName.lower())]))
-          .get();
-      final brands = await (database.select(database.brands)
-            ..orderBy([(t) => OrderingTerm.asc(t.brandName.lower())]))
-          .get();
-      final units = await (database.select(database.units)
-            ..where((t) => t.isActive.equals(true))
-            ..orderBy([(t) => OrderingTerm.asc(t.unitName.lower())]))
-          .get();
-      final taxCategories = await (database.select(database.taxCategories)
-            ..where((t) => t.isActive.equals(true))
-            ..orderBy([(t) => OrderingTerm.asc(t.taxCategoryName.lower())]))
-          .get();
+      final categories = await (database.select(
+        database.categories,
+      )..orderBy([(t) => OrderingTerm.asc(t.categoryName.lower())])).get();
+      final brands = await (database.select(
+        database.brands,
+      )..orderBy([(t) => OrderingTerm.asc(t.brandName.lower())])).get();
+      final units =
+          await (database.select(database.units)
+                ..where((t) => t.isActive.equals(true))
+                ..orderBy([(t) => OrderingTerm.asc(t.unitName.lower())]))
+              .get();
+      final taxCategories =
+          await (database.select(database.taxCategories)
+                ..where((t) => t.isActive.equals(true))
+                ..orderBy([(t) => OrderingTerm.asc(t.taxCategoryName.lower())]))
+              .get();
 
       List<db.SubCategory> subCategories = const [];
       if (_categoryId != null) {
-        subCategories = await (database.select(database.subCategories)
-              ..where((t) => t.categoryId.equals(_categoryId!))
-              ..orderBy([
-                (t) => OrderingTerm.asc(t.subCategoryName.lower()),
-              ]))
-            .get();
+        subCategories =
+            await (database.select(database.subCategories)
+                  ..where((t) => t.categoryId.equals(_categoryId!))
+                  ..orderBy([
+                    (t) => OrderingTerm.asc(t.subCategoryName.lower()),
+                  ]))
+                .get();
       } else {
-        subCategories = await (database.select(database.subCategories)
-              ..orderBy([
-                (t) => OrderingTerm.asc(t.subCategoryName.lower()),
-              ]))
-            .get();
+        subCategories = await (database.select(
+          database.subCategories,
+        )..orderBy([(t) => OrderingTerm.asc(t.subCategoryName.lower())])).get();
       }
 
       if (!mounted) return;
@@ -354,9 +367,7 @@ class _CreateProductPageState extends State<CreateProductPage> {
     final database = DatabaseProvider.instance.database;
     try {
       final query = database.select(database.subCategories)
-        ..orderBy([
-          (t) => OrderingTerm.asc(t.subCategoryName.lower()),
-        ]);
+        ..orderBy([(t) => OrderingTerm.asc(t.subCategoryName.lower())]);
       if (categoryId != null) {
         query.where((t) => t.categoryId.equals(categoryId));
       }
@@ -489,11 +500,13 @@ class _CreateProductPageState extends State<CreateProductPage> {
 
       final nameErr = ProductValidator.validateVariantName(vName);
       final priceErr = ProductValidator.validateVariantSellingPrice(vPrice);
-      final purchaseErr =
-          ProductValidator.validatePurchasePrice(vPurchasePrice);
+      final purchaseErr = ProductValidator.validatePurchasePrice(
+        vPurchasePrice,
+      );
       final mrpErr = ProductValidator.validateMrp(vMrp);
-      final wholesaleErr =
-          ProductValidator.validateWholesalePrice(vWholesalePrice);
+      final wholesaleErr = ProductValidator.validateWholesalePrice(
+        vWholesalePrice,
+      );
       final barcodeErr = ProductValidator.validateBarcode(vBarcode);
       final hsnErr = ProductValidator.validateHsnCode(vHsn);
 
@@ -502,12 +515,18 @@ class _CreateProductPageState extends State<CreateProductPage> {
       if (purchaseErr != null) {
         variantErrors['variant_${i}_purchase_price'] = purchaseErr;
       }
-      if (mrpErr != null) variantErrors['variant_${i}_mrp'] = mrpErr;
+      if (mrpErr != null) {
+        variantErrors['variant_${i}_mrp'] = mrpErr;
+      }
       if (wholesaleErr != null) {
         variantErrors['variant_${i}_wholesale_price'] = wholesaleErr;
       }
-      if (barcodeErr != null) variantErrors['variant_${i}_barcode'] = barcodeErr;
-      if (hsnErr != null) variantErrors['variant_${i}_hsn'] = hsnErr;
+      if (barcodeErr != null) {
+        variantErrors['variant_${i}_barcode'] = barcodeErr;
+      }
+      if (hsnErr != null) {
+        variantErrors['variant_${i}_hsn'] = hsnErr;
+      }
 
       if (nameErr == null &&
           priceErr == null &&
@@ -516,17 +535,21 @@ class _CreateProductPageState extends State<CreateProductPage> {
           wholesaleErr == null &&
           barcodeErr == null &&
           hsnErr == null) {
-        variantInputs.add(VariantInput(
-          variantName: vName,
-          sellingPrice: ProductValidator.parseRupeesToPaise(vPrice) ?? 0,
-          purchasePrice: ProductValidator.parseRupeesToPaise(vPurchasePrice),
-          mrp: ProductValidator.parseRupeesToPaise(vMrp),
-          wholesalePrice: ProductValidator.parseRupeesToPaise(vWholesalePrice),
-          barcode: vBarcode.isEmpty ? null : vBarcode,
-          hsnCode: vHsn.isEmpty ? null : vHsn,
-          expiryDate: row.expiryDate,
-          notes: vNotes.isEmpty ? null : vNotes,
-        ));
+        variantInputs.add(
+          VariantInput(
+            variantName: vName,
+            sellingPrice: ProductValidator.parseRupeesToPaise(vPrice) ?? 0,
+            purchasePrice: ProductValidator.parseRupeesToPaise(vPurchasePrice),
+            mrp: ProductValidator.parseRupeesToPaise(vMrp),
+            wholesalePrice: ProductValidator.parseRupeesToPaise(
+              vWholesalePrice,
+            ),
+            barcode: vBarcode.isEmpty ? null : vBarcode,
+            hsnCode: vHsn.isEmpty ? null : vHsn,
+            expiryDate: row.expiryDate,
+            notes: vNotes.isEmpty ? null : vNotes,
+          ),
+        );
       }
     }
 
@@ -538,8 +561,8 @@ class _CreateProductPageState extends State<CreateProductPage> {
     // Check for duplicate variant barcodes.
     final duplicateBarcodeCheck =
         ProductValidator.validateVariantBarcodesUnique(
-      _variantRows.map((r) => r.barcodeController.text).toList(),
-    );
+          _variantRows.map((r) => r.barcodeController.text).toList(),
+        );
 
     final errors = <String, String?>{
       'name': ProductValidator.validateName(name),
@@ -549,12 +572,18 @@ class _CreateProductPageState extends State<CreateProductPage> {
         sellingPriceText,
         hasVariants: _hasVariants,
       ),
-      'purchasePrice': ProductValidator.validatePurchasePrice(purchasePriceText),
+      'purchasePrice': ProductValidator.validatePurchasePrice(
+        purchasePriceText,
+      ),
       'mrp': ProductValidator.validateMrp(mrpText),
-      'wholesalePrice':
-          ProductValidator.validateWholesalePrice(wholesalePriceText),
+      'wholesalePrice': ProductValidator.validateWholesalePrice(
+        wholesalePriceText,
+      ),
       'barcode': ProductValidator.validateBarcode(barcode),
       'hsnCode': ProductValidator.validateHsnCode(hsnCode),
+      'minimumStock': ProductValidator.validateMinimumStock(
+        _minimumStockController.text,
+      ),
       'notes': ProductValidator.validateNotes(notes),
       'variantDuplicate': duplicateNameCheck ?? duplicateBarcodeCheck,
       ...variantErrors,
@@ -574,11 +603,17 @@ class _CreateProductPageState extends State<CreateProductPage> {
 
     final sellingPrice =
         ProductValidator.parseRupeesToPaise(sellingPriceText) ?? 0;
-    final purchasePrice =
-        ProductValidator.parseRupeesToPaise(purchasePriceText);
+    final minimumStock = int.tryParse(
+          _minimumStockController.text.trim().replaceAll(',', ''),
+        ) ??
+        0;
+    final purchasePrice = ProductValidator.parseRupeesToPaise(
+      purchasePriceText,
+    );
     final mrp = ProductValidator.parseRupeesToPaise(mrpText);
-    final wholesalePrice =
-        ProductValidator.parseRupeesToPaise(wholesalePriceText);
+    final wholesalePrice = ProductValidator.parseRupeesToPaise(
+      wholesalePriceText,
+    );
 
     try {
       ProductEntity saved;
@@ -597,6 +632,7 @@ class _CreateProductPageState extends State<CreateProductPage> {
           barcode: barcode.isNotEmpty ? barcode : null,
           hsnCode: hsnCode.isNotEmpty ? hsnCode : null,
           taxCategoryId: _taxCategoryId,
+          minimumStock: minimumStock,
           expiryDate: _expiryDate,
           notes: notes,
         );
@@ -618,6 +654,7 @@ class _CreateProductPageState extends State<CreateProductPage> {
           barcode: barcode.isNotEmpty ? barcode : null,
           hsnCode: hsnCode.isNotEmpty ? hsnCode : null,
           taxCategoryId: _taxCategoryId,
+          minimumStock: minimumStock,
           expiryDate: _expiryDate,
           notes: notes,
           variants: variantInputs,
@@ -668,13 +705,16 @@ class _CreateProductPageState extends State<CreateProductPage> {
     for (final row in _variantRows) {
       final vName = row.nameController.text.trim();
       final vPrice =
-          ProductValidator.parseRupeesToPaise(row.priceController.text.trim()) ??
-              0;
+          ProductValidator.parseRupeesToPaise(
+            row.priceController.text.trim(),
+          ) ??
+          0;
       final vPurchasePrice = ProductValidator.parseRupeesToPaise(
         row.purchasePriceController.text.trim(),
       );
-      final vMrp =
-          ProductValidator.parseRupeesToPaise(row.mrpController.text.trim());
+      final vMrp = ProductValidator.parseRupeesToPaise(
+        row.mrpController.text.trim(),
+      );
       final vWholesalePrice = ProductValidator.parseRupeesToPaise(
         row.wholesalePriceController.text.trim(),
       );
@@ -757,6 +797,7 @@ class _CreateProductPageState extends State<CreateProductPage> {
     return ColoredBox(
       color: Theme.of(context).scaffoldBackgroundColor,
       child: SingleChildScrollView(
+        controller: _scrollController,
         padding: const EdgeInsets.fromLTRB(32, 28, 32, 28),
         child: Center(
           child: ConstrainedBox(
@@ -931,8 +972,7 @@ class _CreateProductPageState extends State<CreateProductPage> {
                             focusNode: _focusController.node('sellingPrice'),
                             containerKey: _focusController.key('sellingPrice'),
                             fieldKey: const ValueKey('product-selling-price'),
-                            keyboardType:
-                                const TextInputType.numberWithOptions(
+                            keyboardType: const TextInputType.numberWithOptions(
                               decimal: true,
                             ),
                             inputFormatters: [
@@ -949,8 +989,7 @@ class _CreateProductPageState extends State<CreateProductPage> {
                             focusNode: _focusController.node('purchasePrice'),
                             containerKey: _focusController.key('purchasePrice'),
                             fieldKey: const ValueKey('product-purchase-price'),
-                            keyboardType:
-                                const TextInputType.numberWithOptions(
+                            keyboardType: const TextInputType.numberWithOptions(
                               decimal: true,
                             ),
                             inputFormatters: [
@@ -970,8 +1009,7 @@ class _CreateProductPageState extends State<CreateProductPage> {
                             focusNode: _focusController.node('mrp'),
                             containerKey: _focusController.key('mrp'),
                             fieldKey: const ValueKey('product-mrp'),
-                            keyboardType:
-                                const TextInputType.numberWithOptions(
+                            keyboardType: const TextInputType.numberWithOptions(
                               decimal: true,
                             ),
                             inputFormatters: [
@@ -986,11 +1024,11 @@ class _CreateProductPageState extends State<CreateProductPage> {
                             controller: _wholesalePriceController,
                             errorText: _errors['wholesalePrice'],
                             focusNode: _focusController.node('wholesalePrice'),
-                            containerKey:
-                                _focusController.key('wholesalePrice'),
+                            containerKey: _focusController.key(
+                              'wholesalePrice',
+                            ),
                             fieldKey: const ValueKey('product-wholesale-price'),
-                            keyboardType:
-                                const TextInputType.numberWithOptions(
+                            keyboardType: const TextInputType.numberWithOptions(
                               decimal: true,
                             ),
                             inputFormatters: [
@@ -1017,6 +1055,20 @@ class _CreateProductPageState extends State<CreateProductPage> {
                           ],
                           onChanged: (value) =>
                               setState(() => _taxCategoryId = value),
+                        ),
+                        const SizedBox(height: 20),
+                        LabelledField(
+                          label: 'Minimum Stock',
+                          hintText: 'Optional — low stock alert level, e.g. 5',
+                          controller: _minimumStockController,
+                          errorText: _errors['minimumStock'],
+                          focusNode: _focusController.node('minimumStock'),
+                          containerKey: _focusController.key('minimumStock'),
+                          fieldKey: const ValueKey('product-minimum-stock'),
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [
+                            FilteringTextInputFormatter.digitsOnly,
+                          ],
                         ),
                         const SizedBox(height: 28),
 
@@ -1085,8 +1137,9 @@ class _CreateProductPageState extends State<CreateProductPage> {
                               ? const SizedBox(
                                   width: 16,
                                   height: 16,
-                                  child:
-                                      CircularProgressIndicator(strokeWidth: 2),
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                  ),
                                 )
                               : const Icon(Icons.check_rounded, size: 18),
                           label: Text(
@@ -1118,9 +1171,9 @@ class _CreateProductPageState extends State<CreateProductPage> {
         children: [
           Text(
             'Expiry Date',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 8),
           InkWell(
@@ -1156,10 +1209,9 @@ class _CreateProductPageState extends State<CreateProductPage> {
                 style: TextStyle(
                   fontSize: 14,
                   color: formatted.isEmpty
-                      ? Theme.of(context)
-                          .colorScheme
-                          .onSurfaceVariant
-                          .withValues(alpha: 0.6)
+                      ? Theme.of(
+                          context,
+                        ).colorScheme.onSurfaceVariant.withValues(alpha: 0.6)
                       : null,
                 ),
               ),
@@ -1197,9 +1249,9 @@ class _CreateProductPageState extends State<CreateProductPage> {
             children: [
               Text(
                 'Variant ${index + 1}',
-                style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w700,
-                ),
+                style: Theme.of(
+                  context,
+                ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
               ),
               const Spacer(),
               IconButton(
@@ -1236,9 +1288,7 @@ class _CreateProductPageState extends State<CreateProductPage> {
                 decimal: true,
               ),
               inputFormatters: [
-                FilteringTextInputFormatter.allow(
-                  RegExp(r'^\d*\.?\d{0,2}'),
-                ),
+                FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
               ],
             ),
             LabelledField(
@@ -1253,9 +1303,7 @@ class _CreateProductPageState extends State<CreateProductPage> {
                 decimal: true,
               ),
               inputFormatters: [
-                FilteringTextInputFormatter.allow(
-                  RegExp(r'^\d*\.?\d{0,2}'),
-                ),
+                FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
               ],
             ),
           ]),
@@ -1273,9 +1321,7 @@ class _CreateProductPageState extends State<CreateProductPage> {
                 decimal: true,
               ),
               inputFormatters: [
-                FilteringTextInputFormatter.allow(
-                  RegExp(r'^\d*\.?\d{0,2}'),
-                ),
+                FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
               ],
             ),
             LabelledField(
@@ -1290,9 +1336,7 @@ class _CreateProductPageState extends State<CreateProductPage> {
                 decimal: true,
               ),
               inputFormatters: [
-                FilteringTextInputFormatter.allow(
-                  RegExp(r'^\d*\.?\d{0,2}'),
-                ),
+                FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d{0,2}')),
               ],
             ),
           ]),
@@ -1347,9 +1391,9 @@ class _CreateProductPageState extends State<CreateProductPage> {
         children: [
           Text(
             'Expiry Date',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-            ),
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 8),
           InkWell(
@@ -1385,10 +1429,9 @@ class _CreateProductPageState extends State<CreateProductPage> {
                 style: TextStyle(
                   fontSize: 14,
                   color: formatted.isEmpty
-                      ? Theme.of(context)
-                          .colorScheme
-                          .onSurfaceVariant
-                          .withValues(alpha: 0.6)
+                      ? Theme.of(
+                          context,
+                        ).colorScheme.onSurfaceVariant.withValues(alpha: 0.6)
                       : null,
                 ),
               ),

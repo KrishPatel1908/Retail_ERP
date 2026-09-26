@@ -153,10 +153,7 @@ Future<bool> _tableExists(AppDatabase database, String tableName) async {
   return rows.isNotEmpty;
 }
 
-Future<bool> _sequenceExists(
-  AppDatabase database,
-  String documentType,
-) async {
+Future<bool> _sequenceExists(AppDatabase database, String documentType) async {
   final rows = await database
       .customSelect(
         "SELECT 1 FROM document_number_sequence WHERE document_type = ?",

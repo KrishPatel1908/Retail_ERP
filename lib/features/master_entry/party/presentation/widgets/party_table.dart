@@ -99,7 +99,8 @@ class PartyTable<T> extends StatelessWidget {
       color: AppTheme.textPrimary,
     );
 
-    String dash(String? value) => (value == null || value.trim().isEmpty) ? '—' : value.trim();
+    String dash(String? value) =>
+        (value == null || value.trim().isEmpty) ? '—' : value.trim();
 
     String formatDate(DateTime? date) {
       if (date == null) return '—';
@@ -198,7 +199,10 @@ class PartyTable<T> extends StatelessWidget {
         sortable: true,
         cellBuilder: (context, item) {
           final val = mobileOf(item);
-          return Text(dash(val), style: val == null || val.trim().isEmpty ? mutedStyle : normalStyle);
+          return Text(
+            dash(val),
+            style: val == null || val.trim().isEmpty ? mutedStyle : normalStyle,
+          );
         },
       ),
       // 6. Opening Balance
@@ -243,7 +247,10 @@ class PartyTable<T> extends StatelessWidget {
         sortable: true,
         cellBuilder: (context, item) {
           final val = cityOf(item);
-          return Text(dash(val), style: val == null || val.trim().isEmpty ? mutedStyle : normalStyle);
+          return Text(
+            dash(val),
+            style: val == null || val.trim().isEmpty ? mutedStyle : normalStyle,
+          );
         },
       ),
       // 9. State
@@ -254,7 +261,10 @@ class PartyTable<T> extends StatelessWidget {
         sortable: true,
         cellBuilder: (context, item) {
           final val = stateOf(item);
-          return Text(dash(val), style: val == null || val.trim().isEmpty ? mutedStyle : normalStyle);
+          return Text(
+            dash(val),
+            style: val == null || val.trim().isEmpty ? mutedStyle : normalStyle,
+          );
         },
       ),
       // 10. Credit Limit

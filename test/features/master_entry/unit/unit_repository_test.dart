@@ -101,10 +101,9 @@ void main() {
         ['TestWidget'],
       );
       // By symbol.
-      expect(
-        (await repository.searchUnits('TW')).map((u) => u.unitName),
-        ['TestWidget'],
-      );
+      expect((await repository.searchUnits('TW')).map((u) => u.unitName), [
+        'TestWidget',
+      ]);
       expect(await repository.searchUnits('zzz'), isEmpty);
       expect(await repository.searchUnits(''), hasLength(seededUnitCount + 1));
     });
@@ -284,9 +283,7 @@ void main() {
       // Second session: the same file reopens and still contains the data.
       final secondSession = db.AppDatabase(NativeDatabase(file));
       await secondSession.customSelect('SELECT 1').get();
-      final rows = await UnitRepository(
-        database: secondSession,
-      ).getAllUnits();
+      final rows = await UnitRepository(database: secondSession).getAllUnits();
       expect(rows.any((u) => u.unitName == 'Persisted'), isTrue);
       await secondSession.close();
     });

@@ -11,11 +11,7 @@ enum AppPage {
   subCategory('Sub Category', Icons.account_tree_outlined, Icons.account_tree),
   brand('Brand', Icons.local_offer_outlined, Icons.local_offer),
   unitMaster('Unit Master', Icons.straighten_outlined, Icons.straighten),
-  uomConversion(
-    'UOM Conversion',
-    Icons.swap_horiz_outlined,
-    Icons.swap_horiz,
-  ),
+  uomConversion('UOM Conversion', Icons.swap_horiz_outlined, Icons.swap_horiz),
   productUomConversion(
     'Product UOM Conversion',
     Icons.transform_outlined,
@@ -30,9 +26,21 @@ enum AppPage {
   customer('Customer', Icons.group_outlined, Icons.group),
   supplier('Supplier', Icons.local_shipping_outlined, Icons.local_shipping),
   product('Product Master', Icons.inventory_2_outlined, Icons.inventory_2),
-  purchaseEntry('Purchase Entry', Icons.add_shopping_cart_outlined, Icons.add_shopping_cart),
-  purchaseHistory('Purchase History', Icons.receipt_long_outlined, Icons.receipt_long),
-  purchaseReturns('Purchase Returns', Icons.assignment_return_outlined, Icons.assignment_return),
+  purchaseEntry(
+    'Purchase Entry',
+    Icons.add_shopping_cart_outlined,
+    Icons.add_shopping_cart,
+  ),
+  purchaseHistory(
+    'Purchase History',
+    Icons.receipt_long_outlined,
+    Icons.receipt_long,
+  ),
+  purchaseReturns(
+    'Purchase Returns',
+    Icons.assignment_return_outlined,
+    Icons.assignment_return,
+  ),
   salesPos('Sales (POS)', Icons.point_of_sale_outlined, Icons.point_of_sale),
   inventory('Inventory', Icons.warehouse_outlined, Icons.warehouse),
   reports('Reports', Icons.bar_chart_outlined, Icons.bar_chart),

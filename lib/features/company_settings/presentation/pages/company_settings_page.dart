@@ -340,7 +340,9 @@ class _CompanySettingsPageState extends State<CompanySettingsPage> {
       _showMessage(error.message);
     } catch (error) {
       if (!mounted) return;
-      _showMessage('Could not read the selected image file. Please try another image.');
+      _showMessage(
+        'Could not read the selected image file. Please try another image.',
+      );
     }
   }
 
@@ -449,7 +451,9 @@ class _CompanySettingsPageState extends State<CompanySettingsPage> {
       _showMessage(error.message);
     } on CompanySettingsValidationException catch (_) {
       if (!mounted) return;
-      _showMessage('Please complete required company information in Edit Profile first.');
+      _showMessage(
+        'Please complete required company information in Edit Profile first.',
+      );
     } catch (error) {
       if (!mounted) return;
       _showMessage('Failed to update company logo: $error');
@@ -526,7 +530,8 @@ class _CompanySettingsPageState extends State<CompanySettingsPage> {
       child: EmptyState(
         icon: Icons.error_outline_rounded,
         title: 'Could not load company settings',
-        message: 'Something went wrong while reading your company '
+        message:
+            'Something went wrong while reading your company '
             'configuration. Please try again.',
         action: FilledButton.icon(
           onPressed: _load,
@@ -540,7 +545,8 @@ class _CompanySettingsPageState extends State<CompanySettingsPage> {
   Widget _buildForm(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final textTheme = Theme.of(context).textTheme;
-    final canCancel = _loadedSettings != null &&
+    final canCancel =
+        _loadedSettings != null &&
         _loadedSettings!.companyName.trim().isNotEmpty;
 
     return ColoredBox(
@@ -615,7 +621,8 @@ class _CompanySettingsPageState extends State<CompanySettingsPage> {
                 // 2. Company Information (no Legal Name).
                 SettingsSectionCard(
                   title: 'Company Information',
-                  description: 'Basic identity of your business, shown '
+                  description:
+                      'Basic identity of your business, shown '
                       'throughout the ERP.',
                   child: CompanyInformationSection(
                     businessNameController: _businessNameController,
@@ -719,9 +726,7 @@ class _CompanySettingsPageState extends State<CompanySettingsPage> {
                     onDefaultTaxTypeChanged: (treatment) =>
                         setState(() => _defaultTaxType = treatment),
                     defaultTaxTypeFocusNode: _focusController.node('taxType'),
-                    defaultTaxTypeContainerKey: _focusController.key(
-                      'taxType',
-                    ),
+                    defaultTaxTypeContainerKey: _focusController.key('taxType'),
                     invoicePrefixController: _invoicePrefixController,
                     invoicePrefixError: _errors['invoicePrefix'],
                     invoicePrefixFocusNode: _focusController.node(
@@ -750,9 +755,8 @@ class _CompanySettingsPageState extends State<CompanySettingsPage> {
                   description: 'Financial year, currency and rounding.',
                   child: FinancialSettingsSection(
                     financialYearStartMonth: _financialYearStartMonth,
-                    onFinancialYearStartMonthChanged: (month) => setState(
-                      () => _financialYearStartMonth = month,
-                    ),
+                    onFinancialYearStartMonthChanged: (month) =>
+                        setState(() => _financialYearStartMonth = month),
                     financialYearStartFocusNode: _focusController.node(
                       'financialYearStart',
                     ),

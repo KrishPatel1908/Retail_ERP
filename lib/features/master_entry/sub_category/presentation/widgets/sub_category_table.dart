@@ -159,10 +159,7 @@ class _SubCategoryTableState extends State<SubCategoryTable> {
         width: 140,
         sortable: true,
         cellBuilder: (context, subCat) {
-          return Text(
-            _formatDate(subCat.createdAt),
-            style: mutedStyle,
-          );
+          return Text(_formatDate(subCat.createdAt), style: mutedStyle);
         },
       ),
       AppDataTableColumn<SubCategory>(

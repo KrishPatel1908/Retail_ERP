@@ -29,7 +29,8 @@ class CompanySettingsTable extends Table {
 
   /// Whether the business is registered for GST; when true the GSTIN is
   /// required by the application layer.
-  BoolColumn get gstRegistered => boolean().withDefault(const Constant(false))();
+  BoolColumn get gstRegistered =>
+      boolean().withDefault(const Constant(false))();
   TextColumn get gstNumber => text().nullable()();
   TextColumn get panNumber => text().nullable()();
   TextColumn get cin => text().nullable()();
@@ -58,7 +59,8 @@ class CompanySettingsTable extends Table {
   BoolColumn get pricesInclusiveOfTax =>
       boolean().withDefault(const Constant(false))();
   TextColumn get invoicePrefix => text().withDefault(const Constant('INV-'))();
-  IntColumn get invoiceStartNumber => integer().withDefault(const Constant(1))();
+  IntColumn get invoiceStartNumber =>
+      integer().withDefault(const Constant(1))();
   TextColumn get purchasePrefix => text().withDefault(const Constant('PUR-'))();
   TextColumn get receiptPrefix => text().withDefault(const Constant('RCT-'))();
 
@@ -88,7 +90,8 @@ class CompanySettingsTable extends Table {
   TextColumn get invoiceFooter => text().nullable()();
   TextColumn get invoiceTerms => text().nullable()();
   TextColumn get invoiceThankYouMessage => text().nullable()();
-  BoolColumn get showLogoOnInvoice => boolean().withDefault(const Constant(true))();
+  BoolColumn get showLogoOnInvoice =>
+      boolean().withDefault(const Constant(true))();
   BoolColumn get showBankDetailsOnInvoice =>
       boolean().withDefault(const Constant(true))();
   BoolColumn get showGstDetailsOnInvoice =>

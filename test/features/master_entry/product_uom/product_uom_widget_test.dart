@@ -11,21 +11,25 @@ void main() {
 
   Future<void> seedTestProduct() async {
     final database = DatabaseProvider.instance.database;
-    final categoryId = await database.into(database.categories).insert(
-      db.CategoriesCompanion.insert(
-        categoryCode: 'CAT-TEST',
-        categoryName: 'General Category',
-      ),
-    );
-    await database.into(database.products).insert(
-      db.ProductsCompanion.insert(
-        productCode: 'PROD-1',
-        productName: 'Test Biscuit',
-        categoryId: Value(categoryId),
-        brandId: const Value(1),
-        unitId: 1,
-      ),
-    );
+    final categoryId = await database
+        .into(database.categories)
+        .insert(
+          db.CategoriesCompanion.insert(
+            categoryCode: 'CAT-TEST',
+            categoryName: 'General Category',
+          ),
+        );
+    await database
+        .into(database.products)
+        .insert(
+          db.ProductsCompanion.insert(
+            productCode: 'PROD-1',
+            productName: 'Test Biscuit',
+            categoryId: Value(categoryId),
+            brandId: const Value(1),
+            unitId: 1,
+          ),
+        );
   }
 
   Future<void> openProductUomPage(WidgetTester tester) async {
@@ -38,7 +42,9 @@ void main() {
     await tester.pumpAndSettle();
   }
 
-  testWidgets('renders Product UOM Conversion page with empty state', (tester) async {
+  testWidgets('renders Product UOM Conversion page with empty state', (
+    tester,
+  ) async {
     await openProductUomPage(tester);
 
     expect(find.text('Product UOM Conversion'), findsWidgets);
@@ -61,7 +67,9 @@ void main() {
     expect(find.text('Save'), findsOneWidget);
   });
 
-  testWidgets('shows empty products warning when no products exist in DB', (tester) async {
+  testWidgets('shows empty products warning when no products exist in DB', (
+    tester,
+  ) async {
     await openProductUomPage(tester);
 
     await tester.tap(find.text('Add Product Conversion'));
@@ -70,7 +78,10 @@ void main() {
     await tester.tap(find.text('Select a product'));
     await tester.pumpAndSettle();
 
-    expect(find.text('No products found. Please create a product first.'), findsOneWidget);
+    expect(
+      find.text('No products found. Please create a product first.'),
+      findsOneWidget,
+    );
     expect(find.text('Go to Product Master'), findsOneWidget);
   });
 }

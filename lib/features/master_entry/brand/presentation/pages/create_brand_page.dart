@@ -46,7 +46,7 @@ class _CreateBrandPageState extends State<CreateBrandPage> {
   void initState() {
     super.initState();
     _repository = BrandRepository();
-    _focusController = FormFocusController();
+    _focusController = FormFocusController(_fieldOrder);
 
     final brand = widget.brand;
     _nameController = TextEditingController(text: brand?.brandName);
@@ -101,10 +101,7 @@ class _CreateBrandPageState extends State<CreateBrandPage> {
           description: description,
         );
       } else {
-        await _repository.createBrand(
-          name: name,
-          description: description,
-        );
+        await _repository.createBrand(name: name, description: description);
       }
 
       if (!mounted) return;

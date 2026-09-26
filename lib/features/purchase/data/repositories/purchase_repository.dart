@@ -2,6 +2,7 @@ import 'package:drift/drift.dart';
 
 import 'package:retail_erp/core/database/app_database.dart' as db;
 import 'package:retail_erp/core/database/database_provider.dart';
+import 'package:retail_erp/features/inventory/domain/services/stock_service.dart';
 import '../../domain/entities/purchase.dart';
 
 /// Filter parameters for the purchase list.
@@ -53,6 +54,28 @@ class PurchasePage {
   final int totalCount;
 }
 
+/// A row displayed in Purchase History. Unlike [PurchaseEntity], this is one
+/// immutable financial event, not the current purchase snapshot.
+class PurchaseTransactionHistoryEntry {
+  const PurchaseTransactionHistoryEntry({
+    required this.transaction,
+    required this.purchase,
+  });
+
+  final PurchaseTransactionEntity transaction;
+  final PurchaseEntity purchase;
+}
+
+class PurchaseTransactionHistoryPage {
+  const PurchaseTransactionHistoryPage({
+    required this.items,
+    required this.totalCount,
+  });
+
+  final List<PurchaseTransactionHistoryEntry> items;
+  final int totalCount;
+}
+
 /// Input data for a purchase line item.
 class PurchaseItemInput {
   const PurchaseItemInput({
@@ -87,9 +110,11 @@ class PurchaseItemInput {
 /// updates inventory and supplier payable atomically.
 class PurchaseRepository {
   PurchaseRepository({db.AppDatabase? database})
-      : _database = database ?? DatabaseProvider.instance.database;
+    : _database = database ?? DatabaseProvider.instance.database,
+      _stockService = StockService(database: database);
 
   final db.AppDatabase _database;
+  final StockService _stockService;
 
   // ──────────────────── LISTING ────────────────────
 
@@ -173,6 +198,63 @@ class PurchaseRepository {
     );
   }
 
+  /// Returns the append-only financial events for Purchase History.
+  Future<PurchaseTransactionHistoryPage> fetchTransactionHistoryPage({
+    String query = '',
+    PurchaseFilters filters = const PurchaseFilters(),
+    bool sortAscending = false,
+    int page = 1,
+    int pageSize = 25,
+  }) async {
+    final p = _database.purchases;
+    final s = _database.suppliers;
+    final h = _database.purchaseTransactions;
+    final predicate = _buildPredicate(
+      t: p,
+      s: s,
+      normalizedQuery: query.trim().toLowerCase(),
+      filters: filters,
+    );
+    final queryBuilder = _database.select(h).join([
+      innerJoin(p, p.id.equalsExp(h.purchaseId)),
+      innerJoin(s, s.id.equalsExp(p.supplierId)),
+    ]);
+    if (predicate != null) queryBuilder.where(predicate);
+    // Purchase History is an event stream, so date filtering must apply to
+    // the event date rather than the immutable opening purchase date.
+    if (filters.purchaseDateFrom != null) {
+      queryBuilder.where(
+        h.transactionDate.isBiggerOrEqualValue(filters.purchaseDateFrom!),
+      );
+    }
+    if (filters.purchaseDateTo != null) {
+      queryBuilder.where(
+        h.transactionDate.isSmallerOrEqualValue(filters.purchaseDateTo!),
+      );
+    }
+    queryBuilder.orderBy([
+      sortAscending
+          ? OrderingTerm.asc(h.transactionDate)
+          : OrderingTerm.desc(h.transactionDate),
+      sortAscending ? OrderingTerm.asc(h.id) : OrderingTerm.desc(h.id),
+    ]);
+
+    final rows = await queryBuilder.get();
+    final effectivePage = page < 1 ? 1 : page;
+    final offset = (effectivePage - 1) * pageSize;
+    final pageRows = rows.skip(offset).take(pageSize);
+    return PurchaseTransactionHistoryPage(
+      totalCount: rows.length,
+      items: [
+        for (final row in pageRows)
+          PurchaseTransactionHistoryEntry(
+            transaction: _transactionFromRow(row.readTable(h)),
+            purchase: _fromTypedResult(row),
+          ),
+      ],
+    );
+  }
+
   // ──────────────────── GET BY ID ────────────────────
 
   /// Gets a purchase by ID with all line items.
@@ -189,6 +271,7 @@ class PurchaseRepository {
 
     final purchase = _fromTypedResult(row);
     final items = await _getItems(id);
+    final transactions = await _getTransactions(id);
 
     return PurchaseEntity(
       id: purchase.id,
@@ -213,6 +296,7 @@ class PurchaseRepository {
       createdAt: purchase.createdAt,
       updatedAt: purchase.updatedAt,
       items: items,
+      transactions: transactions,
     );
   }
 
@@ -231,7 +315,9 @@ class PurchaseRepository {
     required List<PurchaseItemInput> items,
   }) async {
     if (items.isEmpty) {
-      throw const PurchaseValidationException('At least one product is required.');
+      throw const PurchaseValidationException(
+        'At least one product is required.',
+      );
     }
 
     return _database.transaction(() async {
@@ -256,8 +342,7 @@ class PurchaseRepository {
 
         // Keyed by product *and* variant: two variants of the same parent
         // product are two distinct lines.
-        lineTotals[_itemKey(item.productId, item.variantId)] =
-            _LineCalculation(
+        lineTotals[_itemKey(item.productId, item.variantId)] = _LineCalculation(
           subtotal: lineSubtotal,
           discount: lineDiscount,
           tax: lineTax,
@@ -273,7 +358,9 @@ class PurchaseRepository {
 
       // Validate paid amount.
       if (paidAmount < 0) {
-        throw const PurchaseValidationException('Paid amount cannot be negative.');
+        throw const PurchaseValidationException(
+          'Paid amount cannot be negative.',
+        );
       }
       if (paidAmount > grandTotal) {
         throw const PurchaseValidationException(
@@ -285,69 +372,78 @@ class PurchaseRepository {
       final paymentStatus = _derivePaymentStatus(paidAmount, grandTotal);
 
       // 3. Insert purchase header.
-      final purchaseId = await _database.into(_database.purchases).insert(
-        db.PurchasesCompanion.insert(
-          purchaseNumber: purchaseNumber,
-          supplierId: supplierId,
-          purchaseDate: purchaseDate,
-          invoiceNumber: Value(invoiceNumber?.trim().isEmpty == true
-              ? null
-              : invoiceNumber?.trim()),
-          subtotal: Value(subtotal),
-          discount: Value(totalDiscount),
-          tax: Value(totalTax),
-          total: Value(grandTotal),
-          paidAmount: Value(paidAmount),
-          dueAmount: Value(dueAmount),
-          paymentStatus: Value(paymentStatus.dbValue),
-          paymentMethod: Value(paymentMethod),
-          notes: Value(_normalizeText(notes)),
-        ),
-      );
+      final purchaseId = await _database
+          .into(_database.purchases)
+          .insert(
+            db.PurchasesCompanion.insert(
+              purchaseNumber: purchaseNumber,
+              supplierId: supplierId,
+              purchaseDate: purchaseDate,
+              invoiceNumber: Value(
+                invoiceNumber?.trim().isEmpty == true
+                    ? null
+                    : invoiceNumber?.trim(),
+              ),
+              subtotal: Value(subtotal),
+              discount: Value(totalDiscount),
+              tax: Value(totalTax),
+              total: Value(grandTotal),
+              paidAmount: Value(paidAmount),
+              dueAmount: Value(dueAmount),
+              paymentStatus: Value(paymentStatus.dbValue),
+              paymentMethod: Value(paymentMethod),
+              notes: Value(_normalizeText(notes)),
+            ),
+          );
 
       // 4. Insert purchase items + inventory transactions.
       for (var i = 0; i < items.length; i++) {
         final item = items[i];
         final calc = lineTotals[_itemKey(item.productId, item.variantId)]!;
 
-        await _database.into(_database.purchaseItems).insert(
-          db.PurchaseItemsCompanion.insert(
-            purchaseId: purchaseId,
-            productId: item.productId,
-            variantId: Value(item.variantId),
-            quantity: item.quantity,
-            unitId: item.unitId,
-            purchasePrice: item.purchasePrice,
-            discount: Value(item.discount),
-            taxRate: Value(item.taxRate),
-            taxAmount: Value(calc.tax),
-            lineTotal: Value(calc.total),
-          ),
-        );
+        await _database
+            .into(_database.purchaseItems)
+            .insert(
+              db.PurchaseItemsCompanion.insert(
+                purchaseId: purchaseId,
+                productId: item.productId,
+                variantId: Value(item.variantId),
+                quantity: item.quantity,
+                unitId: item.unitId,
+                purchasePrice: item.purchasePrice,
+                discount: Value(item.discount),
+                taxRate: Value(item.taxRate),
+                taxAmount: Value(calc.tax),
+                lineTotal: Value(calc.total),
+              ),
+            );
 
-        // Inventory transaction.
-        await _database.into(_database.inventoryTransactions).insert(
-          db.InventoryTransactionsCompanion.insert(
-            productId: item.productId,
-            variantId: Value(item.variantId),
-            transactionType: 'PURCHASE',
-            quantity: item.quantity,
-            purchaseId: Value(purchaseId),
-            transactionDate: purchaseDate,
-            referenceNumber: Value(purchaseNumber),
-          ),
-        );
-
-        // Update current stock.
-        await _upsertStock(
+        // Stock increase + movement, recorded atomically by the stock
+        // service.
+        await _stockService.applyStockChange(
           productId: item.productId,
           variantId: item.variantId,
           delta: item.quantity,
+          transactionType: StockMovementType.purchase,
+          transactionDate: purchaseDate,
+          referenceNumber: purchaseNumber,
+          purchaseId: purchaseId,
         );
       }
 
       // 5. Update supplier outstanding balance.
       await _updateSupplierPayable(supplierId, delta: grandTotal - paidAmount);
+
+      // The opening event records the purchase amount and any initial payment
+      // once. Its total follows Debit - Credit.
+      await _appendTransaction(
+        purchaseId: purchaseId,
+        supplierId: supplierId,
+        credit: grandTotal,
+        debit: paidAmount,
+        transactionDate: purchaseDate,
+        note: _normalizeText(notes),
+      );
 
       return getById(purchaseId);
     });
@@ -367,7 +463,9 @@ class PurchaseRepository {
     required List<PurchaseItemInput> items,
   }) async {
     if (items.isEmpty) {
-      throw const PurchaseValidationException('At least one product is required.');
+      throw const PurchaseValidationException(
+        'At least one product is required.',
+      );
     }
 
     return _database.transaction(() async {
@@ -390,8 +488,7 @@ class PurchaseRepository {
 
         // Keyed by product *and* variant: two variants of the same parent
         // product are two distinct lines.
-        lineTotals[_itemKey(item.productId, item.variantId)] =
-            _LineCalculation(
+        lineTotals[_itemKey(item.productId, item.variantId)] = _LineCalculation(
           subtotal: lineSubtotal,
           discount: lineDiscount,
           tax: lineTax,
@@ -406,7 +503,9 @@ class PurchaseRepository {
       final grandTotal = subtotal - totalDiscount + totalTax;
 
       if (paidAmount < 0) {
-        throw const PurchaseValidationException('Paid amount cannot be negative.');
+        throw const PurchaseValidationException(
+          'Paid amount cannot be negative.',
+        );
       }
       if (paidAmount > grandTotal) {
         throw const PurchaseValidationException(
@@ -417,16 +516,29 @@ class PurchaseRepository {
       final dueAmount = grandTotal - paidAmount;
       final paymentStatus = _derivePaymentStatus(paidAmount, grandTotal);
 
+      // Financial history is delta based. A lower payable is a debit (it
+      // reduces what is owed); a reduced recorded payment is a credit.
+      final purchaseAmountDelta = grandTotal - existing.total;
+      final paymentDelta = paidAmount - existing.paidAmount;
+      final transactionCredit =
+          (purchaseAmountDelta > 0 ? purchaseAmountDelta : 0) +
+          (paymentDelta < 0 ? -paymentDelta : 0);
+      final transactionDebit =
+          (purchaseAmountDelta < 0 ? -purchaseAmountDelta : 0) +
+          (paymentDelta > 0 ? paymentDelta : 0);
+
       // 2. Update purchase header.
-      await (_database.update(_database.purchases)
-            ..where((t) => t.id.equals(id)))
-          .write(
+      await (_database.update(
+        _database.purchases,
+      )..where((t) => t.id.equals(id))).write(
         db.PurchasesCompanion(
           supplierId: Value(supplierId),
           purchaseDate: Value(purchaseDate),
-          invoiceNumber: Value(invoiceNumber?.trim().isEmpty == true
-              ? null
-              : invoiceNumber?.trim()),
+          invoiceNumber: Value(
+            invoiceNumber?.trim().isEmpty == true
+                ? null
+                : invoiceNumber?.trim(),
+          ),
           subtotal: Value(subtotal),
           discount: Value(totalDiscount),
           tax: Value(totalTax),
@@ -456,32 +568,33 @@ class PurchaseRepository {
 
       // Remove items that are no longer present — reverse their inventory.
       for (final entry in oldItemsMap.entries) {
-        if (!newItemsMap.containsKey(entry.value.variantId != null ? entry.key : entry.key)) {
+        if (!newItemsMap.containsKey(
+          entry.value.variantId != null ? entry.key : entry.key,
+        )) {
           final oldItem = entry.value;
-          // Only reverse items that haven't been returned.
-          final effectiveQty = oldItem.quantity - oldItem.returnedQuantity;
+          if (oldItem.returnedQuantity > 0) {
+            throw const PurchaseValidationException(
+              'Cannot remove an item that has already been returned. '
+              'Revert the return first.',
+            );
+          }
+          final effectiveQty = oldItem.quantity;
           if (effectiveQty > 0) {
-            await _upsertStock(
+            await _stockService.applyStockChange(
               productId: oldItem.productId,
               variantId: oldItem.variantId,
               delta: -effectiveQty,
-            );
-            await _database.into(_database.inventoryTransactions).insert(
-              db.InventoryTransactionsCompanion.insert(
-                productId: oldItem.productId,
-                variantId: Value(oldItem.variantId),
-                transactionType: 'PURCHASE_ADJUSTMENT',
-                quantity: -effectiveQty,
-                purchaseId: Value(id),
-                transactionDate: purchaseDate,
-                notes: const Value('Purchase item removed during edit'),
-              ),
+              transactionType: StockMovementType.purchaseAdjustment,
+              transactionDate: purchaseDate,
+              referenceNumber: existing.purchaseNumber,
+              purchaseId: id,
+              note: 'Purchase item removed during edit',
             );
           }
           // Delete the old purchase item.
-          await (_database.delete(_database.purchaseItems)
-                ..where((t) => t.id.equals(oldItem.id)))
-              .go();
+          await (_database.delete(
+            _database.purchaseItems,
+          )..where((t) => t.id.equals(oldItem.id))).go();
         }
       }
 
@@ -491,11 +604,18 @@ class PurchaseRepository {
         final existingItem = oldItemsMap[key];
 
         if (existingItem != null) {
+          if (item.quantity < existingItem.returnedQuantity) {
+            throw PurchaseValidationException(
+              'Cannot reduce item quantity below returned quantity '
+              '(${existingItem.returnedQuantity}).',
+            );
+          }
+
           // Update existing item.
           final calc = lineTotals[key]!;
-          await (_database.update(_database.purchaseItems)
-                ..where((t) => t.id.equals(existingItem.id)))
-              .write(
+          await (_database.update(
+            _database.purchaseItems,
+          )..where((t) => t.id.equals(existingItem.id))).write(
             db.PurchaseItemsCompanion(
               quantity: Value(item.quantity),
               unitId: Value(item.unitId),
@@ -508,63 +628,50 @@ class PurchaseRepository {
             ),
           );
 
-          // Adjust inventory: old qty vs new qty.
-          final oldQty = existingItem.quantity - existingItem.returnedQuantity;
-          final newQty = item.quantity;
-          final delta = newQty - oldQty;
+          // Adjust inventory: delta is new qty minus old qty.
+          final delta = item.quantity - existingItem.quantity;
 
           if (delta != 0) {
-            await _upsertStock(
+            await _stockService.applyStockChange(
               productId: item.productId,
               variantId: item.variantId,
               delta: delta,
-            );
-            await _database.into(_database.inventoryTransactions).insert(
-              db.InventoryTransactionsCompanion.insert(
-                productId: item.productId,
-                variantId: Value(item.variantId),
-                transactionType: 'PURCHASE_ADJUSTMENT',
-                quantity: delta,
-                purchaseId: Value(id),
-                transactionDate: purchaseDate,
-                notes: Value('Purchase item quantity adjusted during edit'),
-              ),
+              transactionType: StockMovementType.purchaseAdjustment,
+              transactionDate: purchaseDate,
+              referenceNumber: existing.purchaseNumber,
+              purchaseId: id,
+              note: 'Purchase item quantity adjusted during edit',
             );
           }
         } else {
           // New item — insert.
           final calc = lineTotals[key]!;
-          await _database.into(_database.purchaseItems).insert(
-            db.PurchaseItemsCompanion.insert(
-              purchaseId: id,
-              productId: item.productId,
-              variantId: Value(item.variantId),
-              quantity: item.quantity,
-              unitId: item.unitId,
-              purchasePrice: item.purchasePrice,
-              discount: Value(item.discount),
-              taxRate: Value(item.taxRate),
-              taxAmount: Value(calc.tax),
-              lineTotal: Value(calc.total),
-            ),
-          );
+          await _database
+              .into(_database.purchaseItems)
+              .insert(
+                db.PurchaseItemsCompanion.insert(
+                  purchaseId: id,
+                  productId: item.productId,
+                  variantId: Value(item.variantId),
+                  quantity: item.quantity,
+                  unitId: item.unitId,
+                  purchasePrice: item.purchasePrice,
+                  discount: Value(item.discount),
+                  taxRate: Value(item.taxRate),
+                  taxAmount: Value(calc.tax),
+                  lineTotal: Value(calc.total),
+                ),
+              );
 
           // Add inventory.
-          await _upsertStock(
+          await _stockService.applyStockChange(
             productId: item.productId,
             variantId: item.variantId,
             delta: item.quantity,
-          );
-          await _database.into(_database.inventoryTransactions).insert(
-            db.InventoryTransactionsCompanion.insert(
-              productId: item.productId,
-              variantId: Value(item.variantId),
-              transactionType: 'PURCHASE',
-              quantity: item.quantity,
-              purchaseId: Value(id),
-              transactionDate: purchaseDate,
-              referenceNumber: Value(existing.purchaseNumber),
-            ),
+            transactionType: StockMovementType.purchase,
+            transactionDate: purchaseDate,
+            referenceNumber: existing.purchaseNumber,
+            purchaseId: id,
           );
         }
       }
@@ -592,6 +699,22 @@ class PurchaseRepository {
         );
       }
 
+      // Note/invoice-only edits deliberately do not reach this branch. If the
+      // purchase date changed, it is the selected date for this event;
+      // otherwise use the actual edit time without rewriting the opening row.
+      if (transactionCredit != 0 || transactionDebit != 0) {
+        await _appendTransaction(
+          purchaseId: id,
+          supplierId: supplierId,
+          credit: transactionCredit,
+          debit: transactionDebit,
+          transactionDate: purchaseDate != existing.purchaseDate
+              ? purchaseDate
+              : DateTime.now(),
+          note: _normalizeText(notes),
+        );
+      }
+
       return getById(id);
     });
   }
@@ -607,7 +730,9 @@ class PurchaseRepository {
     required List<ReturnItemInput> returnItems,
   }) async {
     if (returnItems.isEmpty) {
-      throw const PurchaseValidationException('At least one product is required for return.');
+      throw const PurchaseValidationException(
+        'At least one product is required for return.',
+      );
     }
 
     return _database.transaction(() async {
@@ -616,7 +741,8 @@ class PurchaseRepository {
 
       for (final ri in returnItems) {
         final originalItem = originalPurchase.items.firstWhere(
-          (item) => item.productId == ri.productId && item.variantId == ri.variantId,
+          (item) =>
+              item.productId == ri.productId && item.variantId == ri.variantId,
           orElse: () => throw PurchaseValidationException(
             'Product/variant not found in original purchase.',
           ),
@@ -662,23 +788,25 @@ class PurchaseRepository {
       final grandTotal = subtotal - totalDiscount + totalTax;
 
       // Insert the return purchase header.
-      final purchaseId = await _database.into(_database.purchases).insert(
-        db.PurchasesCompanion.insert(
-          purchaseNumber: purchaseNumber,
-          supplierId: supplierId,
-          purchaseDate: returnDate,
-          subtotal: Value(subtotal),
-          discount: Value(totalDiscount),
-          tax: Value(totalTax),
-          total: Value(grandTotal),
-          paidAmount: const Value(0),
-          dueAmount: const Value(0),
-          paymentStatus: const Value('PAID'),
-          notes: Value(_normalizeText(notes)),
-          isReturn: const Value(true),
-          originalPurchaseId: Value(originalPurchaseId),
-        ),
-      );
+      final purchaseId = await _database
+          .into(_database.purchases)
+          .insert(
+            db.PurchasesCompanion.insert(
+              purchaseNumber: purchaseNumber,
+              supplierId: supplierId,
+              purchaseDate: returnDate,
+              subtotal: Value(subtotal),
+              discount: Value(totalDiscount),
+              tax: Value(totalTax),
+              total: Value(grandTotal),
+              paidAmount: const Value(0),
+              dueAmount: const Value(0),
+              paymentStatus: const Value('PAID'),
+              notes: Value(_normalizeText(notes)),
+              isReturn: const Value(true),
+              originalPurchaseId: Value(originalPurchaseId),
+            ),
+          );
 
       // Insert return items + adjust inventory.
       for (final ri in returnItems) {
@@ -688,50 +816,46 @@ class PurchaseRepository {
         final lineTax = (taxableAmount * ri.taxRate / 100).round();
         final lineTotal = taxableAmount + lineTax;
 
-        await _database.into(_database.purchaseItems).insert(
-          db.PurchaseItemsCompanion.insert(
-            purchaseId: purchaseId,
-            productId: ri.productId,
-            variantId: Value(ri.variantId),
-            quantity: ri.quantity,
-            unitId: ri.unitId,
-            purchasePrice: ri.purchasePrice,
-            discount: Value(ri.discount),
-            taxRate: Value(ri.taxRate),
-            taxAmount: Value(lineTax),
-            lineTotal: Value(lineTotal),
-          ),
-        );
+        await _database
+            .into(_database.purchaseItems)
+            .insert(
+              db.PurchaseItemsCompanion.insert(
+                purchaseId: purchaseId,
+                productId: ri.productId,
+                variantId: Value(ri.variantId),
+                quantity: ri.quantity,
+                unitId: ri.unitId,
+                purchasePrice: ri.purchasePrice,
+                discount: Value(ri.discount),
+                taxRate: Value(ri.taxRate),
+                taxAmount: Value(lineTax),
+                lineTotal: Value(lineTotal),
+              ),
+            );
 
-        // Reverse inventory (stock decrease).
-        await _upsertStock(
+        // Reverse inventory (stock decrease) via the stock service.
+        await _stockService.applyStockChange(
           productId: ri.productId,
           variantId: ri.variantId,
           delta: -ri.quantity,
-        );
-
-        // Inventory transaction.
-        await _database.into(_database.inventoryTransactions).insert(
-          db.InventoryTransactionsCompanion.insert(
-            productId: ri.productId,
-            variantId: Value(ri.variantId),
-            transactionType: 'PURCHASE_RETURN',
-            quantity: -ri.quantity,
-            purchaseId: Value(purchaseId),
-            transactionDate: returnDate,
-            referenceNumber: Value(purchaseNumber),
-          ),
+          transactionType: StockMovementType.purchaseReturn,
+          transactionDate: returnDate,
+          referenceNumber: purchaseNumber,
+          purchaseId: originalPurchaseId,
         );
 
         // Update the original purchase item's returned_quantity.
         final originalItem = originalPurchase.items.firstWhere(
-          (item) => item.productId == ri.productId && item.variantId == ri.variantId,
+          (item) =>
+              item.productId == ri.productId && item.variantId == ri.variantId,
         );
-        await (_database.update(_database.purchaseItems)
-              ..where((t) => t.id.equals(originalItem.id)))
-            .write(
+        await (_database.update(
+          _database.purchaseItems,
+        )..where((t) => t.id.equals(originalItem.id))).write(
           db.PurchaseItemsCompanion(
-            returnedQuantity: Value(originalItem.returnedQuantity + ri.quantity),
+            returnedQuantity: Value(
+              originalItem.returnedQuantity + ri.quantity,
+            ),
             updatedAt: Value(DateTime.now()),
           ),
         );
@@ -765,9 +889,9 @@ class PurchaseRepository {
     // Use a transactional sequence to guarantee uniqueness.
     return _database.transaction(() async {
       // Try to find existing sequence.
-      final existing = await (_database.select(_database.documentNumberSequences)
-            ..where((t) => t.documentType.equals('PURCHASE')))
-          .getSingleOrNull();
+      final existing = await (_database.select(
+        _database.documentNumberSequences,
+      )..where((t) => t.documentType.equals('PURCHASE'))).getSingleOrNull();
 
       int nextNumber;
       String prefix;
@@ -779,9 +903,9 @@ class PurchaseRepository {
         padding = existing.padding;
 
         // Update the sequence.
-        await (_database.update(_database.documentNumberSequences)
-              ..where((t) => t.id.equals(existing.id)))
-            .write(
+        await (_database.update(
+          _database.documentNumberSequences,
+        )..where((t) => t.id.equals(existing.id))).write(
           db.DocumentNumberSequencesCompanion(
             lastNumber: Value(nextNumber),
             updatedAt: Value(DateTime.now()),
@@ -793,55 +917,26 @@ class PurchaseRepository {
         prefix = 'PUR-';
         padding = 6;
 
-        await _database.into(_database.documentNumberSequences).insert(
-          db.DocumentNumberSequencesCompanion.insert(
-            documentType: 'PURCHASE',
-            prefix: prefix,
-            lastNumber: Value(nextNumber),
-            padding: Value(padding),
-          ),
-        );
+        await _database
+            .into(_database.documentNumberSequences)
+            .insert(
+              db.DocumentNumberSequencesCompanion.insert(
+                documentType: 'PURCHASE',
+                prefix: prefix,
+                lastNumber: Value(nextNumber),
+                padding: Value(padding),
+              ),
+            );
       }
 
       return '$prefix${nextNumber.toString().padLeft(padding, '0')}';
     });
   }
 
-  Future<void> _upsertStock({
-    required int productId,
-    int? variantId,
+  Future<void> _updateSupplierPayable(
+    int supplierId, {
     required int delta,
   }) async {
-    final existing = await (_database.select(_database.currentStocks)
-          ..where((t) =>
-              t.productId.equals(productId) &
-              (variantId != null
-                  ? t.variantId.equals(variantId)
-                  : t.variantId.isNull())))
-        .getSingleOrNull();
-
-    if (existing != null) {
-      final newQty = existing.quantity + delta;
-      await (_database.update(_database.currentStocks)
-            ..where((t) => t.id.equals(existing.id)))
-          .write(
-        db.CurrentStocksCompanion(
-          quantity: Value(newQty < 0 ? 0 : newQty),
-          updatedAt: Value(DateTime.now()),
-        ),
-      );
-    } else if (delta > 0) {
-      await _database.into(_database.currentStocks).insert(
-        db.CurrentStocksCompanion.insert(
-          productId: productId,
-          variantId: Value(variantId),
-          quantity: Value(delta),
-        ),
-      );
-    }
-  }
-
-  Future<void> _updateSupplierPayable(int supplierId, {required int delta}) async {
     if (delta == 0) return;
 
     await _database.customStatement(
@@ -850,6 +945,66 @@ class PurchaseRepository {
       'WHERE id = $supplierId',
     );
   }
+
+  Future<void> _appendTransaction({
+    required int purchaseId,
+    required int supplierId,
+    required int credit,
+    required int debit,
+    required DateTime transactionDate,
+    String? note,
+  }) async {
+    final t = _database.purchaseTransactions;
+    final previous =
+        await (_database.select(t)
+              ..where((row) => row.purchaseId.equals(purchaseId))
+              ..orderBy([
+                (row) => OrderingTerm.desc(row.transactionDate),
+                (row) => OrderingTerm.desc(row.id),
+              ])
+              ..limit(1))
+            .getSingleOrNull();
+    final previousTotal = previous?.runningTotal ?? 0;
+    await _database
+        .into(t)
+        .insert(
+          db.PurchaseTransactionsCompanion.insert(
+            purchaseId: purchaseId,
+            supplierId: supplierId,
+            credit: Value(credit),
+            debit: Value(debit),
+            runningTotal: previousTotal + debit - credit,
+            transactionDate: transactionDate,
+            note: Value(note),
+          ),
+        );
+  }
+
+  Future<List<PurchaseTransactionEntity>> _getTransactions(
+    int purchaseId,
+  ) async {
+    final rows =
+        await (_database.select(_database.purchaseTransactions)
+              ..where((t) => t.purchaseId.equals(purchaseId))
+              ..orderBy([
+                (t) => OrderingTerm.asc(t.transactionDate),
+                (t) => OrderingTerm.asc(t.id),
+              ]))
+            .get();
+    return [for (final row in rows) _transactionFromRow(row)];
+  }
+
+  PurchaseTransactionEntity _transactionFromRow(db.PurchaseTransaction row) =>
+      PurchaseTransactionEntity(
+        id: row.id,
+        purchaseId: row.purchaseId,
+        supplierId: row.supplierId,
+        credit: row.credit,
+        debit: row.debit,
+        runningTotal: row.runningTotal,
+        transactionDate: row.transactionDate,
+        note: row.note,
+      );
 
   /// Running balance for [purchase]'s supplier after [purchase]'s effect.
   ///
@@ -901,9 +1056,9 @@ class PurchaseRepository {
         );
       }
 
-      final hasReturns = await (_database.select(_database.purchases)
-            ..where((t) => t.originalPurchaseId.equals(id)))
-          .get();
+      final hasReturns = await (_database.select(
+        _database.purchases,
+      )..where((t) => t.originalPurchaseId.equals(id))).get();
       if (hasReturns.isNotEmpty) {
         throw const PurchaseDeletionException(
           'This purchase has returns against it. Delete those returns first.',
@@ -925,23 +1080,28 @@ class PurchaseRepository {
       for (final item in existing.items) {
         final effectiveQty = item.quantity - item.returnedQuantity;
         if (effectiveQty > 0) {
-          await _upsertStock(
+          await _stockService.applyStockChange(
             productId: item.productId,
             variantId: item.variantId,
             delta: -effectiveQty,
+            transactionType: StockMovementType.purchaseAdjustment,
+            transactionDate: DateTime.now(),
+            referenceNumber: existing.purchaseNumber,
+            purchaseId: id,
+            note: 'Purchase deleted',
           );
         }
       }
 
       // Remove the purchase's inventory transactions (PURCHASE + adjustments).
-      await (_database.delete(_database.inventoryTransactions)
-            ..where((t) => t.purchaseId.equals(id)))
-          .go();
+      await (_database.delete(
+        _database.inventoryTransactions,
+      )..where((t) => t.purchaseId.equals(id))).go();
 
       // Remove the purchase's line items.
-      await (_database.delete(_database.purchaseItems)
-            ..where((t) => t.purchaseId.equals(id)))
-          .go();
+      await (_database.delete(
+        _database.purchaseItems,
+      )..where((t) => t.purchaseId.equals(id))).go();
 
       // Reverse the supplier's payable balance for this purchase's net effect.
       await _updateSupplierPayable(
@@ -950,9 +1110,9 @@ class PurchaseRepository {
       );
 
       // Finally, remove the purchase header.
-      await (_database.delete(_database.purchases)
-            ..where((t) => t.id.equals(id)))
-          .go();
+      await (_database.delete(
+        _database.purchases,
+      )..where((t) => t.id.equals(id))).go();
     });
   }
 
@@ -978,7 +1138,8 @@ class PurchaseRepository {
     Expression<bool> predicate = const Constant(true);
 
     if (normalizedQuery.isNotEmpty) {
-      predicate = predicate &
+      predicate =
+          predicate &
           (t.purchaseNumber.lower().contains(normalizedQuery) |
               t.invoiceNumber.lower().contains(normalizedQuery) |
               s.supplierName.lower().contains(normalizedQuery));
@@ -993,17 +1154,19 @@ class PurchaseRepository {
     }
     if (filters.purchaseDateFrom != null) {
       predicate =
-          predicate & t.purchaseDate.isBiggerOrEqualValue(filters.purchaseDateFrom!);
+          predicate &
+          t.purchaseDate.isBiggerOrEqualValue(filters.purchaseDateFrom!);
     }
     if (filters.purchaseDateTo != null) {
       final endOfDay = DateTime(
         filters.purchaseDateTo!.year,
         filters.purchaseDateTo!.month,
         filters.purchaseDateTo!.day,
-        23, 59, 59,
+        23,
+        59,
+        59,
       );
-      predicate =
-          predicate & t.purchaseDate.isSmallerOrEqualValue(endOfDay);
+      predicate = predicate & t.purchaseDate.isSmallerOrEqualValue(endOfDay);
     }
     if (filters.minAmount != null) {
       predicate = predicate & t.total.isBiggerOrEqualValue(filters.minAmount!);
@@ -1020,7 +1183,9 @@ class PurchaseRepository {
         filters.createdTo!.year,
         filters.createdTo!.month,
         filters.createdTo!.day,
-        23, 59, 59,
+        23,
+        59,
+        59,
       );
       predicate = predicate & t.createdAt.isSmallerOrEqualValue(endOfDay);
     }
@@ -1084,32 +1249,34 @@ class PurchaseRepository {
     final pv = _database.productVariants;
     final u = _database.units;
 
-    final rows = await (_database.select(pi).join([
-      innerJoin(p, p.id.equalsExp(pi.productId)),
-      leftOuterJoin(pv, pv.id.equalsExp(pi.variantId)),
-      innerJoin(u, u.id.equalsExp(pi.unitId)),
-    ])
-          ..where(pi.purchaseId.equals(purchaseId))
-          ..orderBy([OrderingTerm.asc(pi.id)]))
-        .get();
+    final rows =
+        await (_database.select(pi).join([
+                leftOuterJoin(p, p.id.equalsExp(pi.productId)),
+                leftOuterJoin(pv, pv.id.equalsExp(pi.variantId)),
+                leftOuterJoin(u, u.id.equalsExp(pi.unitId)),
+              ])
+              ..where(pi.purchaseId.equals(purchaseId))
+              ..orderBy([OrderingTerm.asc(pi.id)]))
+            .get();
 
     return rows.map((row) {
       final item = row.readTable(pi);
-      final product = row.readTable(p);
+      final product = row.readTableOrNull(p);
       final variant = row.readTableOrNull(pv);
-      final unit = row.readTable(u);
+      final unit = row.readTableOrNull(u);
 
       return PurchaseItemEntity(
         id: item.id,
         purchaseId: item.purchaseId,
         productId: item.productId,
-        productName: product.productName,
-        productCode: product.productCode,
+        productName: product?.productName ?? 'Product #${item.productId}',
+        productCode: product?.productCode ?? '',
         variantId: item.variantId,
         variantName: variant?.variantName,
+        barcode: variant?.barcode ?? product?.barcode,
         quantity: item.quantity,
         unitId: item.unitId,
-        unitName: unit.unitName,
+        unitName: unit?.unitName ?? '',
         purchasePrice: item.purchasePrice,
         discount: item.discount,
         taxRate: item.taxRate,
@@ -1163,7 +1330,7 @@ class ReturnItemInput {
 
 class PurchaseNotFoundException implements Exception {
   const PurchaseNotFoundException(int id)
-      : message = 'Purchase with id $id not found.';
+    : message = 'Purchase with id $id not found.';
 
   final String message;
 

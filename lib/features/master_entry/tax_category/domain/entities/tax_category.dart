@@ -54,7 +54,8 @@ class TaxCategory {
           updatedAt == other.updatedAt;
 
   @override
-  int get hashCode => Object.hash(id, taxCategoryName, description, createdAt, updatedAt);
+  int get hashCode =>
+      Object.hash(id, taxCategoryName, description, createdAt, updatedAt);
 
   @override
   String toString() =>

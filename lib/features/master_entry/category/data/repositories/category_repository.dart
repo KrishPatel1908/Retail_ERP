@@ -46,15 +46,15 @@ class CategoryRepository {
   /// uniqueness during an edit.
   Future<bool> existsByName(String name, {int? excludeId}) async {
     final normalized = name.trim().toLowerCase();
-    final row =
-        await (_database.select(_database.categories)..where((t) {
-              final matches = t.categoryName.lower().equals(normalized);
-              if (excludeId == null) {
-                return matches;
-              }
-              return matches & t.id.isNotValue(excludeId);
-            }))
-            .getSingleOrNull();
+    final t = _database.categories;
+    final condition = excludeId == null
+        ? t.categoryName.lower().equals(normalized)
+        : t.categoryName.lower().equals(normalized) & t.id.isNotValue(excludeId);
+    final row = await (_database.selectOnly(t)
+          ..addColumns([t.id])
+          ..where(condition)
+          ..limit(1))
+        .getSingleOrNull();
     return row != null;
   }
 

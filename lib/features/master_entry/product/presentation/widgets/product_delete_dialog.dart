@@ -39,10 +39,7 @@ Future<bool> showProductDeleteConfirmDialog(
                   Expanded(
                     child: Text(
                       'This product has $variantCount variant(s) which will also be deleted.',
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: AppTheme.warning,
-                      ),
+                      style: TextStyle(fontSize: 13, color: AppTheme.warning),
                     ),
                   ),
                 ],

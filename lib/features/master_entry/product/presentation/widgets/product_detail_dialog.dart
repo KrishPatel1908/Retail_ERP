@@ -12,20 +12,13 @@ Future<void> showProductDetailDialog(
 }) {
   return showDialog<void>(
     context: context,
-    builder: (context) => ProductDetailDialog(
-      product: product,
-      onEdit: onEdit,
-    ),
+    builder: (context) => ProductDetailDialog(product: product, onEdit: onEdit),
   );
 }
 
 /// Dedicated read-only product detail dialog widget.
 class ProductDetailDialog extends StatelessWidget {
-  const ProductDetailDialog({
-    super.key,
-    required this.product,
-    this.onEdit,
-  });
+  const ProductDetailDialog({super.key, required this.product, this.onEdit});
 
   final ProductEntity product;
   final VoidCallback? onEdit;
@@ -124,26 +117,41 @@ class ProductDetailDialog extends StatelessWidget {
                       _buildSectionTitle(context, 'Basic Information'),
                       const SizedBox(height: 12),
                       _buildGrid([
-                        _buildDetailItem(context, 'Category',
-                            textOrDash(product.categoryName)),
-                        _buildDetailItem(context, 'Sub Category',
-                            textOrDash(product.subCategoryName)),
                         _buildDetailItem(
-                            context, 'Brand', textOrDash(product.brandName)),
+                          context,
+                          'Category',
+                          textOrDash(product.categoryName),
+                        ),
                         _buildDetailItem(
-                            context, 'Unit', textOrDash(product.unitName)),
-                        _buildDetailItem(context, 'Barcode / SKU',
-                            textOrDash(product.barcode)),
-                        _buildDetailItem(context, 'HSN/SAC Code',
-                            textOrDash(product.hsnCode)),
+                          context,
+                          'Sub Category',
+                          textOrDash(product.subCategoryName),
+                        ),
+                        _buildDetailItem(
+                          context,
+                          'Brand',
+                          textOrDash(product.brandName),
+                        ),
+                        _buildDetailItem(
+                          context,
+                          'Unit',
+                          textOrDash(product.unitName),
+                        ),
+                        _buildDetailItem(
+                          context,
+                          'Barcode / SKU',
+                          textOrDash(product.barcode),
+                        ),
+                        _buildDetailItem(
+                          context,
+                          'HSN/SAC Code',
+                          textOrDash(product.hsnCode),
+                        ),
                       ]),
                       const SizedBox(height: 20),
 
                       // Pricing & Tax Information
-                      _buildSectionTitle(
-                        context,
-                        'Pricing & Tax Information',
-                      ),
+                      _buildSectionTitle(context, 'Pricing & Tax Information'),
                       const SizedBox(height: 12),
                       _buildGrid([
                         _buildDetailItem(
@@ -172,6 +180,13 @@ class ProductDetailDialog extends StatelessWidget {
                           'Tax',
                           textOrDash(product.taxCategoryName),
                         ),
+                        _buildDetailItem(
+                          context,
+                          'Minimum Stock',
+                          product.minimumStock > 0
+                              ? '${product.minimumStock}'
+                              : '—',
+                        ),
                       ]),
                       const SizedBox(height: 20),
 
@@ -187,7 +202,10 @@ class ProductDetailDialog extends StatelessWidget {
                               : '—',
                         ),
                         _buildDetailItem(
-                            context, 'Notes', textOrDash(product.notes)),
+                          context,
+                          'Notes',
+                          textOrDash(product.notes),
+                        ),
                       ]),
                       const SizedBox(height: 20),
 
@@ -367,8 +385,7 @@ class ProductDetailDialog extends StatelessWidget {
           // Rows
           for (var i = 0; i < variants.length; i++)
             Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               decoration: BoxDecoration(
                 border: i < variants.length - 1
                     ? Border(
@@ -394,9 +411,7 @@ class ProductDetailDialog extends StatelessWidget {
                   SizedBox(
                     width: 90,
                     child: Text(
-                      ProductValidator.formatCurrency(
-                        variants[i].sellingPrice,
-                      ),
+                      ProductValidator.formatCurrency(variants[i].sellingPrice),
                       style: const TextStyle(fontWeight: FontWeight.w600),
                     ),
                   ),

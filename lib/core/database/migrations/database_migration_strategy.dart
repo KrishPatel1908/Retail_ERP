@@ -17,6 +17,9 @@ import 'upgrade_to_v9.dart';
 import 'upgrade_to_v10.dart';
 import 'upgrade_to_v11.dart';
 import 'upgrade_to_v12.dart';
+import 'upgrade_to_v13.dart';
+import 'upgrade_to_v14.dart';
+import 'upgrade_to_v15.dart';
 
 /// Builds the [MigrationStrategy] used by [AppDatabase].
 ///
@@ -106,5 +109,8 @@ abstract final class _UpgradeSteps {
     10: upgradeToV10,
     11: upgradeToV11,
     12: upgradeToV12,
+    13: upgradeToV13,
+    14: upgradeToV14,
+    15: upgradeToV15,
   };
 }

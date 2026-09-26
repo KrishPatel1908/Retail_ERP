@@ -5,6 +5,7 @@ import 'package:retail_erp/core/database/database_provider.dart';
 import 'package:retail_erp/features/master_entry/product/data/repositories/product_repository.dart';
 import 'package:retail_erp/features/master_entry/supplier/data/repositories/supplier_repository.dart';
 import 'package:retail_erp/features/purchase/data/repositories/purchase_repository.dart';
+import 'package:retail_erp/features/purchase/domain/entities/purchase.dart';
 
 import '../../helpers/test_database.dart';
 
@@ -14,8 +15,8 @@ void main() {
   Future<(int, int)> seedSupplierAndProduct({
     String productName = 'Parle-G',
     int? purchasePrice,
-    List<({String variantName, int? purchasePrice, String? barcode})>
-    variants = const [],
+    List<({String variantName, int? purchasePrice, String? barcode})> variants =
+        const [],
   }) async {
     final supplier = await SupplierRepository().createSupplier(
       supplierName: 'Acme Supplies',
@@ -90,36 +91,12 @@ void main() {
       expect(purchase.total, 87655);
     });
 
-    test('a 100% discount leaves a zero (never negative) payable amount', () async {
-      final (supplierId, productId) = await seedSupplierAndProduct();
-      final subtotal = 20000;
-      final purchase = await PurchaseRepository().createPurchase(
-        supplierId: supplierId,
-        purchaseDate: DateTime(2026, 8, 1),
-        paidAmount: 0,
-        items: [
-          PurchaseItemInput(
-            productId: productId,
-            quantity: 10,
-            unitId: 1,
-            purchasePrice: 2000,
-            discount: subtotal,
-            taxRate: 0,
-          ),
-        ],
-      );
-
-      expect(purchase.total, 0);
-      expect(purchase.total, greaterThanOrEqualTo(0));
-    });
-
-    test('an over-100% discount is rejected at the repository boundary', () async {
-      final (supplierId, productId) = await seedSupplierAndProduct();
-      // The UI clamps discounts, but if a value exceeding the subtotal ever
-      // reaches the repository the purchase must be rejected rather than
-      // writing a negative total.
-      expect(
-        () => PurchaseRepository().createPurchase(
+    test(
+      'a 100% discount leaves a zero (never negative) payable amount',
+      () async {
+        final (supplierId, productId) = await seedSupplierAndProduct();
+        final subtotal = 20000;
+        final purchase = await PurchaseRepository().createPurchase(
           supplierId: supplierId,
           purchaseDate: DateTime(2026, 8, 1),
           paidAmount: 0,
@@ -128,15 +105,45 @@ void main() {
               productId: productId,
               quantity: 10,
               unitId: 1,
-              purchasePrice: 1000,
-              discount: 15000,
+              purchasePrice: 2000,
+              discount: subtotal,
               taxRate: 0,
             ),
           ],
-        ),
-        throwsA(isA<PurchaseValidationException>()),
-      );
-    });
+        );
+
+        expect(purchase.total, 0);
+        expect(purchase.total, greaterThanOrEqualTo(0));
+      },
+    );
+
+    test(
+      'an over-100% discount is rejected at the repository boundary',
+      () async {
+        final (supplierId, productId) = await seedSupplierAndProduct();
+        // The UI clamps discounts, but if a value exceeding the subtotal ever
+        // reaches the repository the purchase must be rejected rather than
+        // writing a negative total.
+        expect(
+          () => PurchaseRepository().createPurchase(
+            supplierId: supplierId,
+            purchaseDate: DateTime(2026, 8, 1),
+            paidAmount: 0,
+            items: [
+              PurchaseItemInput(
+                productId: productId,
+                quantity: 10,
+                unitId: 1,
+                purchasePrice: 1000,
+                discount: 15000,
+                taxRate: 0,
+              ),
+            ],
+          ),
+          throwsA(isA<PurchaseValidationException>()),
+        );
+      },
+    );
 
     test('percentage discount is clamped to 100%', () async {
       final (supplierId, productId) = await seedSupplierAndProduct();
@@ -210,16 +217,16 @@ void main() {
       );
 
       final db = DatabaseProvider.instance.database;
-      final stock = await (db.select(db.currentStocks)
-            ..where(
-              (t) => t.productId.equals(productId) & t.variantId.isNull(),
-            ))
-          .getSingle();
+      final stock =
+          await (db.select(db.currentStocks)..where(
+                (t) => t.productId.equals(productId) & t.variantId.isNull(),
+              ))
+              .getSingle();
       expect(stock.quantity, 5);
 
-      final txns = await (db.select(db.inventoryTransactions)
-            ..where((t) => t.purchaseId.equals(purchase.id)))
-          .get();
+      final txns = await (db.select(
+        db.inventoryTransactions,
+      )..where((t) => t.purchaseId.equals(purchase.id))).get();
       expect(txns, hasLength(1));
       expect(txns.single.transactionType, 'PURCHASE');
       expect(txns.single.quantity, 5);
@@ -239,9 +246,7 @@ void main() {
 
       final variants = await ProductRepository().getVariants(productId);
       expect(variants, hasLength(2));
-      final byName = {
-        for (final v in variants) v.variantName: v,
-      };
+      final byName = {for (final v in variants) v.variantName: v};
 
       final purchase = await PurchaseRepository().createPurchase(
         supplierId: supplierId,
@@ -328,64 +333,214 @@ void main() {
     });
   });
 
-  group('date filters', () {
-    test('purchaseDateFrom and purchaseDateTo filter inclusive and through DB',
-        () async {
+  group('purchase transaction history', () {
+    Future<PurchaseEntity> makePurchase({int paidAmount = 0}) async {
       final (supplierId, productId) = await seedSupplierAndProduct();
-      final repo = PurchaseRepository();
-
-      Future<void> make(String inv, DateTime date) => repo.createPurchase(
-            supplierId: supplierId,
-            purchaseDate: date,
-            invoiceNumber: inv,
-            paidAmount: 0,
-            items: [
-              PurchaseItemInput(
-                productId: productId,
-                quantity: 1,
-                unitId: 1,
-                purchasePrice: 100,
-                taxRate: 0,
-              ),
-            ],
-          );
-
-      await make('P1', DateTime(2026, 8, 1));
-      await make('P2', DateTime(2026, 8, 15));
-      await make('P3', DateTime(2026, 8, 31));
-
-      // Only From → purchases from that date onward.
-      var page = await repo.fetchPage(
-        filters: PurchaseFilters(
-          purchaseDateFrom: DateTime(2026, 8, 15),
-          isReturn: false,
-        ),
+      return PurchaseRepository().createPurchase(
+        supplierId: supplierId,
+        purchaseDate: DateTime(2026, 8, 4),
+        paidAmount: paidAmount,
+        items: [
+          PurchaseItemInput(
+            productId: productId,
+            quantity: 20,
+            unitId: 1,
+            purchasePrice: 100000,
+            taxRate: 0,
+          ),
+        ],
       );
-      expect(page.items.map((p) => p.invoiceNumber),
-          containsAll(['P2', 'P3']));
-      expect(page.items.any((p) => p.invoiceNumber == 'P1'), isFalse);
+    }
 
-      // Only To → purchases up to that date (inclusive).
-      page = await repo.fetchPage(
-        filters: PurchaseFilters(
-          purchaseDateTo: DateTime(2026, 8, 15),
-          isReturn: false,
-        ),
-      );
-      expect(page.items.map((p) => p.invoiceNumber),
-          containsAll(['P1', 'P2']));
-      expect(page.items.any((p) => p.invoiceNumber == 'P3'), isFalse);
+    test('creates one opening event with Debit - Credit total', () async {
+      final purchase = await makePurchase();
+      final history = (await PurchaseRepository().getById(
+        purchase.id,
+      )).transactions;
 
-      // Both → inclusive range.
-      page = await repo.fetchPage(
-        filters: PurchaseFilters(
-          purchaseDateFrom: DateTime(2026, 8, 2),
-          purchaseDateTo: DateTime(2026, 8, 30),
-          isReturn: false,
-        ),
-      );
-      expect(page.items.map((p) => p.invoiceNumber), ['P2']);
+      expect(history, hasLength(1));
+      expect(history.single.credit, 2000000);
+      expect(history.single.debit, 0);
+      expect(history.single.runningTotal, -2000000);
     });
+
+    test('payment edits append only the payment delta', () async {
+      final purchase = await makePurchase(paidAmount: 800000);
+      final repo = PurchaseRepository();
+      await repo.updatePurchase(
+        purchase.id,
+        supplierId: purchase.supplierId,
+        purchaseDate: purchase.purchaseDate,
+        paidAmount: 1200000,
+        items: purchase.items
+            .map(
+              (item) => PurchaseItemInput(
+                productId: item.productId,
+                variantId: item.variantId,
+                quantity: item.quantity,
+                unitId: item.unitId,
+                purchasePrice: item.purchasePrice,
+                discount: item.discount,
+                taxRate: item.taxRate,
+              ),
+            )
+            .toList(),
+      );
+      final history = (await repo.getById(purchase.id)).transactions;
+
+      expect(history, hasLength(2));
+      expect(history[0].credit, 2000000);
+      expect(history[0].debit, 800000);
+      expect(history[1].credit, 0);
+      expect(history[1].debit, 400000);
+      expect(history[1].runningTotal, -800000);
+    });
+
+    test(
+      'price and quantity changes append only their financial delta',
+      () async {
+        final purchase = await makePurchase();
+        final item = purchase.items.single;
+        final repo = PurchaseRepository();
+        await repo.updatePurchase(
+          purchase.id,
+          supplierId: purchase.supplierId,
+          purchaseDate: purchase.purchaseDate,
+          items: [
+            PurchaseItemInput(
+              productId: item.productId,
+              quantity: 22,
+              unitId: item.unitId,
+              purchasePrice: item.purchasePrice,
+              taxRate: 0,
+            ),
+          ],
+        );
+        final history = (await repo.getById(purchase.id)).transactions;
+        expect(history, hasLength(2));
+        expect(history.last.credit, 200000);
+        expect(history.last.debit, 0);
+        expect(history.last.runningTotal, -2200000);
+      },
+    );
+
+    test('non-financial edits do not append an event', () async {
+      final purchase = await makePurchase();
+      final repo = PurchaseRepository();
+      await repo.updatePurchase(
+        purchase.id,
+        supplierId: purchase.supplierId,
+        purchaseDate: purchase.purchaseDate,
+        invoiceNumber: 'REVISED-ONLY',
+        notes: 'Changed note only',
+        items: purchase.items
+            .map(
+              (item) => PurchaseItemInput(
+                productId: item.productId,
+                quantity: item.quantity,
+                unitId: item.unitId,
+                purchasePrice: item.purchasePrice,
+                discount: item.discount,
+                taxRate: item.taxRate,
+              ),
+            )
+            .toList(),
+      );
+      expect((await repo.getById(purchase.id)).transactions, hasLength(1));
+    });
+
+    test('history total can be negative and zero', () async {
+      final purchase = await makePurchase();
+      final repo = PurchaseRepository();
+      Future<void> pay(int amount) => repo.updatePurchase(
+        purchase.id,
+        supplierId: purchase.supplierId,
+        purchaseDate: purchase.purchaseDate,
+        paidAmount: amount,
+        items: purchase.items
+            .map(
+              (item) => PurchaseItemInput(
+                productId: item.productId,
+                quantity: item.quantity,
+                unitId: item.unitId,
+                purchasePrice: item.purchasePrice,
+                discount: item.discount,
+                taxRate: item.taxRate,
+              ),
+            )
+            .toList(),
+      );
+      await pay(2000000);
+      var history = (await repo.getById(purchase.id)).transactions;
+      expect(history.last.runningTotal, 0);
+      expect(history.first.runningTotal, -2000000);
+    });
+  });
+
+  group('date filters', () {
+    test(
+      'purchaseDateFrom and purchaseDateTo filter inclusive and through DB',
+      () async {
+        final (supplierId, productId) = await seedSupplierAndProduct();
+        final repo = PurchaseRepository();
+
+        Future<void> make(String inv, DateTime date) => repo.createPurchase(
+          supplierId: supplierId,
+          purchaseDate: date,
+          invoiceNumber: inv,
+          paidAmount: 0,
+          items: [
+            PurchaseItemInput(
+              productId: productId,
+              quantity: 1,
+              unitId: 1,
+              purchasePrice: 100,
+              taxRate: 0,
+            ),
+          ],
+        );
+
+        await make('P1', DateTime(2026, 8, 1));
+        await make('P2', DateTime(2026, 8, 15));
+        await make('P3', DateTime(2026, 8, 31));
+
+        // Only From → purchases from that date onward.
+        var page = await repo.fetchPage(
+          filters: PurchaseFilters(
+            purchaseDateFrom: DateTime(2026, 8, 15),
+            isReturn: false,
+          ),
+        );
+        expect(
+          page.items.map((p) => p.invoiceNumber),
+          containsAll(['P2', 'P3']),
+        );
+        expect(page.items.any((p) => p.invoiceNumber == 'P1'), isFalse);
+
+        // Only To → purchases up to that date (inclusive).
+        page = await repo.fetchPage(
+          filters: PurchaseFilters(
+            purchaseDateTo: DateTime(2026, 8, 15),
+            isReturn: false,
+          ),
+        );
+        expect(
+          page.items.map((p) => p.invoiceNumber),
+          containsAll(['P1', 'P2']),
+        );
+        expect(page.items.any((p) => p.invoiceNumber == 'P3'), isFalse);
+
+        // Both → inclusive range.
+        page = await repo.fetchPage(
+          filters: PurchaseFilters(
+            purchaseDateFrom: DateTime(2026, 8, 2),
+            purchaseDateTo: DateTime(2026, 8, 30),
+            isReturn: false,
+          ),
+        );
+        expect(page.items.map((p) => p.invoiceNumber), ['P2']);
+      },
+    );
   });
 
   group('deletePurchase', () {
@@ -410,15 +565,15 @@ void main() {
 
       // Confirm stock and payable were created.
       final db = DatabaseProvider.instance.database;
-      final before = await (db.select(db.currentStocks)
-            ..where(
-              (t) => t.productId.equals(productId) & t.variantId.isNull(),
-            ))
-          .getSingle();
+      final before =
+          await (db.select(db.currentStocks)..where(
+                (t) => t.productId.equals(productId) & t.variantId.isNull(),
+              ))
+              .getSingle();
       expect(before.quantity, 5);
-      final supplierBefore = await (db.select(db.suppliers)
-            ..where((t) => t.id.equals(supplierId)))
-          .getSingle();
+      final supplierBefore = await (db.select(
+        db.suppliers,
+      )..where((t) => t.id.equals(supplierId))).getSingle();
       // 5 * 20.00 = 100.00 total, paid 20.00 → payable 80.00.
       expect(supplierBefore.outstandingBalance, 8000);
 
@@ -429,25 +584,22 @@ void main() {
       expect((await db.select(db.purchaseItems).get()), isEmpty);
 
       // Inventory transactions for the purchase gone, stock reversed.
-      final txns = await (db.select(db.inventoryTransactions)
-            ..where((t) => t.purchaseId.equals(purchase.id)))
-          .get();
+      final txns = await (db.select(
+        db.inventoryTransactions,
+      )..where((t) => t.purchaseId.equals(purchase.id))).get();
       expect(txns, isEmpty);
-      final stockAfter = await (db.select(db.currentStocks)
-            ..where(
-              (t) => t.productId.equals(productId) & t.variantId.isNull(),
-            ))
-          .getSingleOrNull();
+      final stockAfter =
+          await (db.select(db.currentStocks)..where(
+                (t) => t.productId.equals(productId) & t.variantId.isNull(),
+              ))
+              .getSingleOrNull();
       // Stock is reversed to zero (the row may remain, clamped to 0).
-      expect(
-        stockAfter?.quantity == 0 || stockAfter == null,
-        isTrue,
-      );
+      expect(stockAfter?.quantity == 0 || stockAfter == null, isTrue);
 
       // Supplier payable reversed to zero.
-      final supplierAfter = await (db.select(db.suppliers)
-            ..where((t) => t.id.equals(supplierId)))
-          .getSingle();
+      final supplierAfter = await (db.select(
+        db.suppliers,
+      )..where((t) => t.id.equals(supplierId))).getSingle();
       expect(supplierAfter.outstandingBalance, 0);
     });
 

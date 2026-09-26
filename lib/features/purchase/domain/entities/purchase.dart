@@ -66,6 +66,7 @@ class PurchaseEntity {
     required this.updatedAt,
     this.items = const [],
     this.runningBalance,
+    this.transactions = const [],
   });
 
   final int id;
@@ -111,8 +112,35 @@ class PurchaseEntity {
   /// the list/fetch path, in paise. Positive = we owe the supplier.
   final int? runningBalance;
 
+  /// Append-only financial events in chronological order. Populated by
+  /// [PurchaseRepository.getById].
+  final List<PurchaseTransactionEntity> transactions;
+
   /// Whether this is a return purchase.
   bool get isReturnPurchase => isReturn;
+}
+
+/// One financial event in a purchase's history. Amounts are in paise.
+class PurchaseTransactionEntity {
+  const PurchaseTransactionEntity({
+    required this.id,
+    required this.purchaseId,
+    required this.supplierId,
+    required this.credit,
+    required this.debit,
+    required this.runningTotal,
+    required this.transactionDate,
+    this.note,
+  });
+
+  final int id;
+  final int purchaseId;
+  final int supplierId;
+  final int credit;
+  final int debit;
+  final int runningTotal;
+  final DateTime transactionDate;
+  final String? note;
 }
 
 /// Domain model of a purchase line item.
@@ -127,6 +155,7 @@ class PurchaseItemEntity {
     this.productCode,
     this.variantId,
     this.variantName,
+    this.barcode,
     required this.quantity,
     required this.unitId,
     this.unitName,
@@ -147,6 +176,7 @@ class PurchaseItemEntity {
   final String? productCode;
   final int? variantId;
   final String? variantName;
+  final String? barcode;
   final int quantity;
   final int unitId;
   final String? unitName;

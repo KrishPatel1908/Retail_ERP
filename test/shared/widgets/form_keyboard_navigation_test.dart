@@ -78,46 +78,47 @@ void main() {
     expect(focus.hasFocus, isTrue);
   });
 
-  testWidgets('FormFocusController focuses the first invalid field and scrolls', (
-    tester,
-  ) async {
-    final focusController = FormFocusController();
-    final errors = {'field2': 'Field 2 is required.'};
-    final fieldOrder = ['field1', 'field2', 'field3'];
+  testWidgets(
+    'FormFocusController focuses the first invalid field and scrolls',
+    (tester) async {
+      final focusController = FormFocusController();
+      final errors = {'field2': 'Field 2 is required.'};
+      final fieldOrder = ['field1', 'field2', 'field3'];
 
-    await tester.pumpWidget(
-      MaterialApp(
-        home: Scaffold(
-          body: SingleChildScrollView(
-            child: Column(
-              children: [
-                const SizedBox(height: 1000), // Push field2 offscreen
-                LabelledField(
-                  label: 'Field 1',
-                  focusNode: focusController.node('field1'),
-                  containerKey: focusController.key('field1'),
-                ),
-                LabelledField(
-                  label: 'Field 2',
-                  errorText: errors['field2'],
-                  focusNode: focusController.node('field2'),
-                  containerKey: focusController.key('field2'),
-                ),
-                LabelledField(
-                  label: 'Field 3',
-                  focusNode: focusController.node('field3'),
-                  containerKey: focusController.key('field3'),
-                ),
-              ],
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Scaffold(
+            body: SingleChildScrollView(
+              child: Column(
+                children: [
+                  const SizedBox(height: 1000), // Push field2 offscreen
+                  LabelledField(
+                    label: 'Field 1',
+                    focusNode: focusController.node('field1'),
+                    containerKey: focusController.key('field1'),
+                  ),
+                  LabelledField(
+                    label: 'Field 2',
+                    errorText: errors['field2'],
+                    focusNode: focusController.node('field2'),
+                    containerKey: focusController.key('field2'),
+                  ),
+                  LabelledField(
+                    label: 'Field 3',
+                    focusNode: focusController.node('field3'),
+                    containerKey: focusController.key('field3'),
+                  ),
+                ],
+              ),
             ),
           ),
         ),
-      ),
-    );
+      );
 
-    focusController.focusFirstError(fieldOrder, errors);
-    await tester.pumpAndSettle();
+      focusController.focusFirstError(fieldOrder, errors);
+      await tester.pumpAndSettle();
 
-    expect(focusController.node('field2').hasFocus, isTrue);
-  });
+      expect(focusController.node('field2').hasFocus, isTrue);
+    },
+  );
 }

@@ -11,8 +11,12 @@ class CategoryStatusBadge extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final color = isActive ? const Color(0xFF15803D) : AppTheme.textSecondary;
-    final background = isActive ? const Color(0xFFF0FDF4) : const Color(0xFFF1F5F9);
-    final borderColor = isActive ? const Color(0xFFDCFCE7) : const Color(0xFFE2E8F0);
+    final background = isActive
+        ? const Color(0xFFF0FDF4)
+        : const Color(0xFFF1F5F9);
+    final borderColor = isActive
+        ? const Color(0xFFDCFCE7)
+        : const Color(0xFFE2E8F0);
     final dotColor = isActive ? AppTheme.success : AppTheme.textMuted;
 
     return Container(

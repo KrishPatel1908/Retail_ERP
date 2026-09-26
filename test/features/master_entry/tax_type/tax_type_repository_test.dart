@@ -79,10 +79,7 @@ void main() {
       expect(updated.description, 'Updated description');
 
       final reloaded = await repository.getAllTaxTypes();
-      expect(
-        reloaded.any((t) => t.taxTypeName == 'State Sales Tax'),
-        isTrue,
-      );
+      expect(reloaded.any((t) => t.taxTypeName == 'State Sales Tax'), isTrue);
     });
 
     test(
@@ -105,60 +102,64 @@ void main() {
       expect(remaining.length, initialCount - 1);
     });
 
-    test(
-      'deleteTaxType rejects tax types referenced by products',
-      () async {
-        final taxType = await repository.createTaxType(name: 'Special GST');
+    test('deleteTaxType rejects tax types referenced by products', () async {
+      final taxType = await repository.createTaxType(name: 'Special GST');
 
-        final categories = await database.select(database.categories).get();
-        final units = await database.select(database.units).get();
-        final brands = await database.select(database.brands).get();
+      final categories = await database.select(database.categories).get();
+      final units = await database.select(database.units).get();
+      final brands = await database.select(database.brands).get();
 
-        final categoryId = categories.isNotEmpty
-            ? categories.first.id
-            : await database.into(database.categories).insert(
-                db.CategoriesCompanion.insert(
-                  categoryCode: 'CAT-1',
-                  categoryName: 'Tech',
-                ),
-              );
+      final categoryId = categories.isNotEmpty
+          ? categories.first.id
+          : await database
+                .into(database.categories)
+                .insert(
+                  db.CategoriesCompanion.insert(
+                    categoryCode: 'CAT-1',
+                    categoryName: 'Tech',
+                  ),
+                );
 
-        final unitId = units.first.id;
-        final brandId = brands.first.id;
+      final unitId = units.first.id;
+      final brandId = brands.first.id;
 
-        await database.into(database.products).insert(
-          db.ProductsCompanion.insert(
-          productCode: 'P-200',
-          productName: 'Taxed Product',
-          categoryId: Value(categoryId),
-          brandId: Value(brandId),
-          unitId: unitId,
-            taxTypeId: Value(taxType.id),
-          ),
-        );
+      await database
+          .into(database.products)
+          .insert(
+            db.ProductsCompanion.insert(
+              productCode: 'P-200',
+              productName: 'Taxed Product',
+              categoryId: Value(categoryId),
+              brandId: Value(brandId),
+              unitId: unitId,
+              taxTypeId: Value(taxType.id),
+            ),
+          );
 
-        await expectLater(
-          repository.deleteTaxType(taxType.id),
-          throwsA(isA<TaxTypeInUseException>()),
-        );
-      },
-    );
+      await expectLater(
+        repository.deleteTaxType(taxType.id),
+        throwsA(isA<TaxTypeInUseException>()),
+      );
+    });
 
     test(
       'deleteTaxType rejects tax types referenced by tax category rates',
       () async {
         final taxType = await repository.createTaxType(name: 'Rate Tax');
-        final taxCategories =
-            await database.select(database.taxCategories).get();
+        final taxCategories = await database
+            .select(database.taxCategories)
+            .get();
         final taxCatId = taxCategories.first.id;
 
-        await database.into(database.taxCategoryRates).insert(
-          db.TaxCategoryRatesCompanion.insert(
-            taxCategoryId: taxCatId,
-            taxTypeId: taxType.id,
-            ratePercent: 18,
-          ),
-        );
+        await database
+            .into(database.taxCategoryRates)
+            .insert(
+              db.TaxCategoryRatesCompanion.insert(
+                taxCategoryId: taxCatId,
+                taxTypeId: taxType.id,
+                ratePercent: 18,
+              ),
+            );
 
         await expectLater(
           repository.deleteTaxType(taxType.id),
@@ -167,20 +168,31 @@ void main() {
       },
     );
 
-    test('searchTaxTypes filters case-insensitively by name or description', () async {
-      await repository.createTaxType(name: 'Luxury Tax', description: 'On cars');
-      await repository.createTaxType(name: 'Service Tax', description: 'On services');
+    test(
+      'searchTaxTypes filters case-insensitively by name or description',
+      () async {
+        await repository.createTaxType(
+          name: 'Luxury Tax',
+          description: 'On cars',
+        );
+        await repository.createTaxType(
+          name: 'Service Tax',
+          description: 'On services',
+        );
 
-      expect(
-        (await repository.searchTaxTypes('lux')).map((t) => t.taxTypeName),
-        ['Luxury Tax'],
-      );
-      expect(
-        (await repository.searchTaxTypes('services')).map((t) => t.taxTypeName),
-        ['Service Tax'],
-      );
-      expect(await repository.searchTaxTypes('zzz'), isEmpty);
-    });
+        expect(
+          (await repository.searchTaxTypes('lux')).map((t) => t.taxTypeName),
+          ['Luxury Tax'],
+        );
+        expect(
+          (await repository.searchTaxTypes(
+            'services',
+          )).map((t) => t.taxTypeName),
+          ['Service Tax'],
+        );
+        expect(await repository.searchTaxTypes('zzz'), isEmpty);
+      },
+    );
 
     test('existsByName is case-insensitive and honours excludeId', () async {
       final taxType = await repository.createTaxType(name: 'CGST_Custom');
@@ -188,7 +200,10 @@ void main() {
       expect(await repository.existsByName('CGST_CUSTOM'), isTrue);
       expect(await repository.existsByName('cgst_custom'), isTrue);
       expect(await repository.existsByName('SGST_Custom'), isFalse);
-      expect(await repository.existsByName('CGST_Custom', excludeId: taxType.id), isFalse);
+      expect(
+        await repository.existsByName('CGST_Custom', excludeId: taxType.id),
+        isFalse,
+      );
     });
 
     test('createTaxType rejects duplicate names', () async {

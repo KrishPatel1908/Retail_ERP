@@ -264,15 +264,16 @@ class _ProductListPageState extends State<ProductListPage> {
 
     final nameErr = ProductValidator.validateVariantName(name);
     final priceErr = ProductValidator.validateVariantSellingPrice(price);
-    final purchaseErr =
-        ProductValidator.validatePurchasePrice(purchasePrice);
+    final purchaseErr = ProductValidator.validatePurchasePrice(purchasePrice);
     final mrpErr = ProductValidator.validateMrp(mrp);
-    final wholesaleErr =
-        ProductValidator.validateWholesalePrice(wholesalePrice);
+    final wholesaleErr = ProductValidator.validateWholesalePrice(
+      wholesalePrice,
+    );
     final barcodeErr = ProductValidator.validateBarcode(barcode);
     final hsnErr = ProductValidator.validateHsnCode(hsnCode);
 
-    final firstError = nameErr ??
+    final firstError =
+        nameErr ??
         priceErr ??
         purchaseErr ??
         mrpErr ??
@@ -283,9 +284,7 @@ class _ProductListPageState extends State<ProductListPage> {
     if (firstError != null) {
       ScaffoldMessenger.of(context)
         ..hideCurrentSnackBar()
-        ..showSnackBar(SnackBar(
-          content: Text(firstError),
-        ));
+        ..showSnackBar(SnackBar(content: Text(firstError)));
       return;
     }
 
@@ -416,10 +415,8 @@ class _ProductListPageState extends State<ProductListPage> {
     final updated = await showDialog<bool>(
       context: context,
       barrierDismissible: false,
-      builder: (dialogContext) => VariantEditDialog(
-        variant: variant,
-        repository: _repository,
-      ),
+      builder: (dialogContext) =>
+          VariantEditDialog(variant: variant, repository: _repository),
     );
 
     if (updated == true && mounted) {
@@ -471,15 +468,18 @@ class _ProductListPageState extends State<ProductListPage> {
                       ),
                       const SizedBox(width: 12),
                       OutlinedButton.icon(
-                        onPressed: () =>
-                            setState(() => _filtersExpanded = !_filtersExpanded),
+                        onPressed: () => setState(
+                          () => _filtersExpanded = !_filtersExpanded,
+                        ),
                         icon: Icon(
                           _filtersExpanded
                               ? Icons.filter_list_off_rounded
                               : Icons.filter_list_rounded,
                           size: 18,
                         ),
-                        label: Text(_hasActiveFilters ? 'Filters ●' : 'Filters'),
+                        label: Text(
+                          _hasActiveFilters ? 'Filters ●' : 'Filters',
+                        ),
                       ),
                       if (_hasActiveFilters) ...[
                         const SizedBox(width: 8),
@@ -533,11 +533,7 @@ class _ProductListPageState extends State<ProductListPage> {
 
       // Expanded variant rows.
       if (isExpanded) {
-        rows.add(_buildExpandedVariantSection(
-          product,
-          colorScheme,
-          textTheme,
-        ));
+        rows.add(_buildExpandedVariantSection(product, colorScheme, textTheme));
       }
     }
 
@@ -579,37 +575,36 @@ class _ProductListPageState extends State<ProductListPage> {
                     ),
                   )
                 : _products.isEmpty
-                    ? EmptyState(
-                        icon: Icons.inventory_2_outlined,
-                        title: _query.isEmpty && !_hasActiveFilters
-                            ? 'No products yet'
-                            : 'No products found',
-                        message: _query.isEmpty && !_hasActiveFilters
-                            ? 'Click "Add Product" to create your first product.'
-                            : 'Try a different search term or clear the filters.',
-                      )
-                    : SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: SizedBox(
-                          width: 1380,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            children: [
-                              _buildHeaderRow(colorScheme, textTheme),
-                              ListView.builder(
-                                physics: const NeverScrollableScrollPhysics(),
-                                shrinkWrap: true,
-                                itemCount: rows.length,
-                                itemBuilder: (context, index) => rows[index],
-                              ),
-                            ],
+                ? EmptyState(
+                    icon: Icons.inventory_2_outlined,
+                    title: _query.isEmpty && !_hasActiveFilters
+                        ? 'No products yet'
+                        : 'No products found',
+                    message: _query.isEmpty && !_hasActiveFilters
+                        ? 'Click "Add Product" to create your first product.'
+                        : 'Try a different search term or clear the filters.',
+                  )
+                : SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: SizedBox(
+                      width: 1380,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          _buildHeaderRow(colorScheme, textTheme),
+                          ListView.builder(
+                            physics: const NeverScrollableScrollPhysics(),
+                            shrinkWrap: true,
+                            itemCount: rows.length,
+                            itemBuilder: (context, index) => rows[index],
                           ),
-                        ),
+                        ],
                       ),
+                    ),
+                  ),
           ),
           // Pagination footer.
-          if (!_loading)
-            _buildPaginationFooter(textTheme, colorScheme),
+          if (!_loading) _buildPaginationFooter(textTheme, colorScheme),
         ],
       ),
     );
@@ -669,8 +664,12 @@ class _ProductListPageState extends State<ProductListPage> {
           // Selling Price (placed aside Product Name)
           SizedBox(
             width: 110,
-            child: _buildSortableHeader(4, 'Selling Price', textTheme,
-                numeric: true),
+            child: _buildSortableHeader(
+              4,
+              'Selling Price',
+              textTheme,
+              numeric: true,
+            ),
           ),
           // Expiry Date (placed aside Selling Price)
           SizedBox(
@@ -683,10 +682,7 @@ class _ProductListPageState extends State<ProductListPage> {
             child: _buildSortableHeader(6, 'Category', textTheme),
           ),
           // Brand
-          Expanded(
-            flex: 1,
-            child: _buildSortableHeader(7, 'Brand', textTheme),
-          ),
+          Expanded(flex: 1, child: _buildSortableHeader(7, 'Brand', textTheme)),
           // Unit
           SizedBox(
             width: 80,
@@ -740,8 +736,7 @@ class _ProductListPageState extends State<ProductListPage> {
 
     return InkWell(
       onTap: () {
-        final ascending =
-            isSorted ? !_sortAscending : true;
+        final ascending = isSorted ? !_sortAscending : true;
         _onSort(index, ascending);
       },
       child: Container(
@@ -767,8 +762,8 @@ class _ProductListPageState extends State<ProductListPage> {
             Icon(
               isSorted
                   ? (_sortAscending
-                      ? Icons.arrow_downward_rounded
-                      : Icons.arrow_upward_rounded)
+                        ? Icons.arrow_downward_rounded
+                        : Icons.arrow_upward_rounded)
                   : Icons.unfold_more_rounded,
               size: 14,
               color: isSorted ? AppTheme.primary : AppTheme.textMuted,
@@ -858,8 +853,10 @@ class _ProductListPageState extends State<ProductListPage> {
                 child: Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   child: Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 2,
+                    ),
                     decoration: BoxDecoration(
                       color: product.isActive
                           ? AppTheme.success.withValues(alpha: 0.1)
@@ -869,8 +866,9 @@ class _ProductListPageState extends State<ProductListPage> {
                     child: Text(
                       product.isActive ? 'Active' : 'Inactive',
                       style: textTheme.labelSmall?.copyWith(
-                        color:
-                            product.isActive ? AppTheme.success : AppTheme.danger,
+                        color: product.isActive
+                            ? AppTheme.success
+                            : AppTheme.danger,
                         fontSize: 11,
                       ),
                     ),
@@ -995,9 +993,7 @@ class _ProductListPageState extends State<ProductListPage> {
     return Container(
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerLowest,
-        border: Border(
-          bottom: BorderSide(color: colorScheme.outlineVariant),
-        ),
+        border: Border(bottom: BorderSide(color: colorScheme.outlineVariant)),
       ),
       child: Padding(
         padding: const EdgeInsets.fromLTRB(60, 0, 0, 0),
@@ -1120,8 +1116,7 @@ class _ProductListPageState extends State<ProductListPage> {
                 child: SizedBox(
                   height: 32,
                   child: OutlinedButton.icon(
-                    onPressed: () =>
-                        _startInlineVariantCreation(product.id),
+                    onPressed: () => _startInlineVariantCreation(product.id),
                     icon: const Icon(Icons.add_rounded, size: 14),
                     label: const Text(
                       'Add Variant',
@@ -1303,8 +1298,10 @@ class _ProductListPageState extends State<ProductListPage> {
                 decoration: const InputDecoration(
                   hintText: 'Variant name *',
                   isDense: true,
-                  contentPadding:
-                      EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 8,
+                  ),
                 ),
                 textInputAction: TextInputAction.next,
               ),
@@ -1328,8 +1325,10 @@ class _ProductListPageState extends State<ProductListPage> {
                 decoration: const InputDecoration(
                   hintText: 'Sell ₹*',
                   isDense: true,
-                  contentPadding:
-                      EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 8,
+                  ),
                 ),
                 textInputAction: TextInputAction.next,
               ),
@@ -1353,8 +1352,10 @@ class _ProductListPageState extends State<ProductListPage> {
                 decoration: const InputDecoration(
                   hintText: 'Buy ₹',
                   isDense: true,
-                  contentPadding:
-                      EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 8,
+                  ),
                 ),
                 textInputAction: TextInputAction.next,
               ),
@@ -1378,8 +1379,10 @@ class _ProductListPageState extends State<ProductListPage> {
                 decoration: const InputDecoration(
                   hintText: 'MRP ₹',
                   isDense: true,
-                  contentPadding:
-                      EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 8,
+                  ),
                 ),
                 textInputAction: TextInputAction.next,
               ),
@@ -1403,8 +1406,10 @@ class _ProductListPageState extends State<ProductListPage> {
                 decoration: const InputDecoration(
                   hintText: 'Wholesale ₹',
                   isDense: true,
-                  contentPadding:
-                      EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 8,
+                  ),
                 ),
                 textInputAction: TextInputAction.next,
               ),
@@ -1422,8 +1427,10 @@ class _ProductListPageState extends State<ProductListPage> {
                 decoration: const InputDecoration(
                   hintText: 'Barcode',
                   isDense: true,
-                  contentPadding:
-                      EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 8,
+                  ),
                 ),
                 textInputAction: TextInputAction.next,
               ),
@@ -1447,12 +1454,16 @@ class _ProductListPageState extends State<ProductListPage> {
               },
               child: Container(
                 height: 36,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   border: Border(
                     bottom: BorderSide(
-                      color: colorScheme.onSurfaceVariant.withValues(alpha: 0.3),
+                      color: colorScheme.onSurfaceVariant.withValues(
+                        alpha: 0.3,
+                      ),
                     ),
                   ),
                 ),
@@ -1483,7 +1494,10 @@ class _ProductListPageState extends State<ProductListPage> {
                   onPressed: () => _saveInlineVariant(productId),
                   color: AppTheme.primary,
                   padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                  constraints: const BoxConstraints(
+                    minWidth: 32,
+                    minHeight: 32,
+                  ),
                 ),
                 IconButton(
                   icon: const Icon(Icons.close_rounded, size: 18),
@@ -1491,7 +1505,10 @@ class _ProductListPageState extends State<ProductListPage> {
                   onPressed: _cancelInlineVariantCreation,
                   color: AppTheme.textSecondary,
                   padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(minWidth: 32, minHeight: 32),
+                  constraints: const BoxConstraints(
+                    minWidth: 32,
+                    minHeight: 32,
+                  ),
                 ),
               ],
             ),
@@ -1539,17 +1556,17 @@ class _ProductListPageState extends State<ProductListPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Category',
-            style: textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w600)),
+        Text(
+          'Category',
+          style: textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w600),
+        ),
         const SizedBox(height: 6),
         DropdownButtonFormField<int>(
           initialValue: _categoryId,
           isDense: true,
           isExpanded: true,
           items: [
-            const DropdownMenuItem<int>(
-              child: Text('All Categories'),
-            ),
+            const DropdownMenuItem<int>(child: Text('All Categories')),
             for (final c in _categories)
               DropdownMenuItem(value: c.id, child: Text(c.name)),
           ],
@@ -1565,31 +1582,29 @@ class _ProductListPageState extends State<ProductListPage> {
     );
   }
 
-  Widget _buildSubCategoryFilter(
-    ColorScheme colorScheme,
-    TextTheme textTheme,
-  ) {
+  Widget _buildSubCategoryFilter(ColorScheme colorScheme, TextTheme textTheme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Sub Category',
-            style: textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w600)),
+        Text(
+          'Sub Category',
+          style: textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w600),
+        ),
         const SizedBox(height: 6),
         DropdownButtonFormField<int>(
           initialValue: _subCategoryId,
           isDense: true,
           isExpanded: true,
           items: [
-            const DropdownMenuItem<int>(
-              child: Text('All Sub Categories'),
-            ),
+            const DropdownMenuItem<int>(child: Text('All Sub Categories')),
             for (final s in _subCategories)
               DropdownMenuItem(value: s.id, child: Text(s.name)),
           ],
           onChanged: (value) {
             setState(() {
-              _subCategoryId =
-                  value == _subCategories.firstOrNull?.id ? null : value;
+              _subCategoryId = value == _subCategories.firstOrNull?.id
+                  ? null
+                  : value;
             });
             _applyFilters();
           },
@@ -1602,17 +1617,17 @@ class _ProductListPageState extends State<ProductListPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Brand',
-            style: textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w600)),
+        Text(
+          'Brand',
+          style: textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w600),
+        ),
         const SizedBox(height: 6),
         DropdownButtonFormField<int>(
           initialValue: _brandId,
           isDense: true,
           isExpanded: true,
           items: [
-            const DropdownMenuItem<int>(
-              child: Text('All Brands'),
-            ),
+            const DropdownMenuItem<int>(child: Text('All Brands')),
             for (final b in _brands)
               DropdownMenuItem(value: b.id, child: Text(b.name)),
           ],
@@ -1631,23 +1646,25 @@ class _ProductListPageState extends State<ProductListPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Price Range (₹)',
-            style: textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w600)),
+        Text(
+          'Price Range (₹)',
+          style: textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w600),
+        ),
         const SizedBox(height: 6),
         Row(
           children: [
             Expanded(
               child: TextField(
                 keyboardType: TextInputType.number,
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly,
-                ],
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 style: const TextStyle(fontSize: 13),
                 decoration: const InputDecoration(
                   hintText: 'Min',
                   isDense: true,
-                  contentPadding:
-                      EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 8,
+                  ),
                 ),
                 onChanged: (value) {
                   _minPrice = int.tryParse(value) != null
@@ -1664,15 +1681,15 @@ class _ProductListPageState extends State<ProductListPage> {
             Expanded(
               child: TextField(
                 keyboardType: TextInputType.number,
-                inputFormatters: [
-                  FilteringTextInputFormatter.digitsOnly,
-                ],
+                inputFormatters: [FilteringTextInputFormatter.digitsOnly],
                 style: const TextStyle(fontSize: 13),
                 decoration: const InputDecoration(
                   hintText: 'Max',
                   isDense: true,
-                  contentPadding:
-                      EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                  contentPadding: EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 8,
+                  ),
                 ),
                 onChanged: (value) {
                   _maxPrice = int.tryParse(value) != null
@@ -1688,15 +1705,14 @@ class _ProductListPageState extends State<ProductListPage> {
     );
   }
 
-  Widget _buildCreatedDateFilter(
-    ColorScheme colorScheme,
-    TextTheme textTheme,
-  ) {
+  Widget _buildCreatedDateFilter(ColorScheme colorScheme, TextTheme textTheme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Created Date',
-            style: textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w600)),
+        Text(
+          'Created Date',
+          style: textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w600),
+        ),
         const SizedBox(height: 6),
         Row(
           children: [
@@ -1756,8 +1772,10 @@ class _ProductListPageState extends State<ProductListPage> {
         decoration: InputDecoration(
           hintText: label,
           isDense: true,
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 10,
+            vertical: 8,
+          ),
           suffixIcon: date != null
               ? IconButton(
                   icon: const Icon(Icons.clear_rounded, size: 14),
@@ -1849,7 +1867,10 @@ class _ProductListPageState extends State<ProductListPage> {
                     items: const [10, 25, 50, 100].map((sz) {
                       return DropdownMenuItem<int>(
                         value: sz,
-                        child: Text('$sz', style: const TextStyle(fontSize: 13)),
+                        child: Text(
+                          '$sz',
+                          style: const TextStyle(fontSize: 13),
+                        ),
                       );
                     }).toList(),
                     onChanged: (val) {
@@ -1862,7 +1883,9 @@ class _ProductListPageState extends State<ProductListPage> {
                 children: [
                   IconButton(
                     icon: const Icon(Icons.chevron_left_rounded, size: 20),
-                    onPressed: (page > 1) ? () => _onPageChanged(page - 1) : null,
+                    onPressed: (page > 1)
+                        ? () => _onPageChanged(page - 1)
+                        : null,
                     tooltip: 'Previous page',
                   ),
                   Padding(
@@ -1932,8 +1955,8 @@ class _ActionIconState extends State<_ActionIcon> {
             decoration: BoxDecoration(
               color: _hovered
                   ? (widget.color != null
-                      ? widget.color!.withValues(alpha: 0.1)
-                      : AppTheme.primary.withValues(alpha: 0.1))
+                        ? widget.color!.withValues(alpha: 0.1)
+                        : AppTheme.primary.withValues(alpha: 0.1))
                   : Colors.transparent,
               borderRadius: BorderRadius.circular(6),
             ),

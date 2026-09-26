@@ -51,38 +51,39 @@ void main() {
     expect(find.text('PROD00001'), findsOneWidget);
   });
 
-  testWidgets('clicking Add Variant adds and removes variant rows dynamically', (
-    tester,
-  ) async {
-    await seedPrerequisites();
-    await openProductPage(tester);
+  testWidgets(
+    'clicking Add Variant adds and removes variant rows dynamically',
+    (tester) async {
+      await seedPrerequisites();
+      await openProductPage(tester);
 
-    await tester.tap(find.text('Add Product'));
-    await tester.pumpAndSettle();
+      await tester.tap(find.text('Add Product'));
+      await tester.pumpAndSettle();
 
-    expect(find.text('Create Product'), findsWidgets);
-    expect(find.text('Add Variant'), findsOneWidget);
+      expect(find.text('Create Product'), findsWidgets);
+      expect(find.text('Add Variant'), findsOneWidget);
 
-    // Click Add Variant to add first variant
-    await tester.tap(find.text('Add Variant'));
-    await tester.pumpAndSettle();
+      // Click Add Variant to add first variant
+      await tester.tap(find.text('Add Variant'));
+      await tester.pumpAndSettle();
 
-    expect(find.text('Variant 1'), findsOneWidget);
-    expect(find.text('Variant Name'), findsOneWidget);
+      expect(find.text('Variant 1'), findsOneWidget);
+      expect(find.text('Variant Name'), findsOneWidget);
 
-    // Click Add Variant again to add second variant
-    await tester.tap(find.text('Add Variant'));
-    await tester.pumpAndSettle();
+      // Click Add Variant again to add second variant
+      await tester.tap(find.text('Add Variant'));
+      await tester.pumpAndSettle();
 
-    expect(find.text('Variant 2'), findsOneWidget);
+      expect(find.text('Variant 2'), findsOneWidget);
 
-    // Remove first variant
-    await tester.tap(find.byTooltip('Remove variant').first);
-    await tester.pumpAndSettle();
+      // Remove first variant
+      await tester.tap(find.byTooltip('Remove variant').first);
+      await tester.pumpAndSettle();
 
-    expect(find.text('Variant 1'), findsOneWidget);
-    expect(find.text('Variant 2'), findsNothing);
-  });
+      expect(find.text('Variant 1'), findsOneWidget);
+      expect(find.text('Variant 2'), findsNothing);
+    },
+  );
 
   testWidgets('creates a product with variants and saves to database', (
     tester,
@@ -118,10 +119,7 @@ void main() {
       find.byKey(const ValueKey('product-purchase-price')),
       '15',
     );
-    await tester.enterText(
-      find.byKey(const ValueKey('product-mrp')),
-      '22',
-    );
+    await tester.enterText(find.byKey(const ValueKey('product-mrp')), '22');
     await tester.enterText(
       find.byKey(const ValueKey('product-wholesale-price')),
       '18',
@@ -141,18 +139,12 @@ void main() {
       find.byKey(const ValueKey('variant-0-name')),
       '50g Pack',
     );
-    await tester.enterText(
-      find.byKey(const ValueKey('variant-0-price')),
-      '10',
-    );
+    await tester.enterText(find.byKey(const ValueKey('variant-0-price')), '10');
     await tester.enterText(
       find.byKey(const ValueKey('variant-0-purchase-price')),
       '8',
     );
-    await tester.enterText(
-      find.byKey(const ValueKey('variant-0-mrp')),
-      '11',
-    );
+    await tester.enterText(find.byKey(const ValueKey('variant-0-mrp')), '11');
     await tester.enterText(
       find.byKey(const ValueKey('variant-0-wholesale-price')),
       '9',
@@ -254,7 +246,6 @@ void main() {
     expect(total, 18.0);
   });
 
-
   testWidgets('validates required fields on Save Product', (tester) async {
     await openProductPage(tester);
 
@@ -302,7 +293,10 @@ void main() {
     expect(find.text('Edit Variant'), findsOneWidget);
 
     // Change variant name and price
-    await tester.enterText(find.widgetWithText(TextField, '50g Small'), '100g Large');
+    await tester.enterText(
+      find.widgetWithText(TextField, '50g Small'),
+      '100g Large',
+    );
     await tester.enterText(find.widgetWithText(TextField, '5'), '15');
 
     await tester.tap(find.text('Save Changes'));

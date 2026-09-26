@@ -1,7 +1,9 @@
+import 'package:drift/drift.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:retail_erp/app/theme/app_theme.dart';
+import 'package:retail_erp/core/database/app_database.dart' as db;
 import 'package:retail_erp/core/database/database_provider.dart';
 import 'package:retail_erp/features/master_entry/product/data/repositories/product_repository.dart';
 import 'package:retail_erp/features/master_entry/supplier/data/repositories/supplier_repository.dart';
@@ -86,11 +88,12 @@ void main() {
       }
     });
 
-    testWidgets('renders Credit (red), Debit (green) and signed Total',
-        (tester) async {
+    testWidgets('renders Credit (red), Debit (green) and signed Total', (
+      tester,
+    ) async {
       await seedSupplierAndProduct();
-      // Purchase: total ₹10, paid ₹4 → credit ₹6, running total +₹6.
-      await PurchaseRepository().createPurchase(
+      // Opening event: credit ₹10, debit ₹4, running total -₹6.
+      final purchase = await PurchaseRepository().createPurchase(
         supplierId: 1,
         purchaseDate: DateTime(2026, 8, 4),
         paidAmount: 400,
@@ -106,14 +109,30 @@ void main() {
         ],
       );
 
+      // Positive totals can occur in correction/import history. The display
+      // remains green for that valid historical state.
+      final database = DatabaseProvider.instance.database;
+      await database
+          .into(database.purchaseTransactions)
+          .insert(
+            db.PurchaseTransactionsCompanion.insert(
+              purchaseId: purchase.id,
+              supplierId: purchase.supplierId,
+              debit: const Value(1000),
+              runningTotal: 400,
+              transactionDate: DateTime(2026, 8, 5),
+            ),
+          );
+
       await pumpHistoryPage(tester);
 
-      // Credit ₹6 in red.
-      expect(find.text('₹6'), findsOneWidget);
+      // Credit ₹10 in red.
+      expect(find.text('₹10'), findsNWidgets(2));
       // Debit ₹4 in green.
       expect(find.text('₹4'), findsOneWidget);
-      // Running balance +₹6 (signed with '+').
-      expect(find.text('+₹6'), findsOneWidget);
+      // Total follows Debit - Credit.
+      expect(find.text('-₹6'), findsOneWidget);
+      expect(find.text('+₹4'), findsOneWidget);
     });
   });
 
@@ -140,10 +159,12 @@ void main() {
       expect(find.text('—'), findsWidgets);
     });
 
-    testWidgets('clicking a note opens the full dialog with copy and close',
-        (tester) async {
+    testWidgets('clicking a note opens the full dialog with copy and close', (
+      tester,
+    ) async {
       await seedSupplierAndProduct();
-      final longNote = 'Please deliver to the back entrance between 9am and 5pm.';
+      final longNote =
+          'Please deliver to the back entrance between 9am and 5pm.';
       await PurchaseRepository().createPurchase(
         supplierId: 1,
         purchaseDate: DateTime(2026, 8, 4),

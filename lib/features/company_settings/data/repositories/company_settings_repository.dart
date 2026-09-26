@@ -36,14 +36,16 @@ class CompanySettingsRepository {
 
     try {
       final now = DateTime.now();
-      await database.into(database.companySettingsTable).insert(
-        db.CompanySettingsTableCompanion.insert(
-          id: const Value(CompanySettings.singletonId),
-          companyName: '',
-          createdAt: Value(now),
-          updatedAt: Value(now),
-        ),
-      );
+      await database
+          .into(database.companySettingsTable)
+          .insert(
+            db.CompanySettingsTableCompanion.insert(
+              id: const Value(CompanySettings.singletonId),
+              companyName: '',
+              createdAt: Value(now),
+              updatedAt: Value(now),
+            ),
+          );
       final created = await _getById();
       if (created == null) {
         throw const DatabaseOperationException(
@@ -74,16 +76,14 @@ class CompanySettingsRepository {
         final existing = await _getById();
         if (existing == null) {
           final now = DateTime.now();
-          await database.into(database.companySettingsTable).insert(
-            _toInsertCompanion(draft, now: now),
-          );
+          await database
+              .into(database.companySettingsTable)
+              .insert(_toInsertCompanion(draft, now: now));
           return;
         }
-        await (database.update(
-          database.companySettingsTable,
-        )..where((t) => t.id.equals(CompanySettings.singletonId))).write(
-          _toUpdateCompanion(draft, existing: existing),
-        );
+        await (database.update(database.companySettingsTable)
+              ..where((t) => t.id.equals(CompanySettings.singletonId)))
+            .write(_toUpdateCompanion(draft, existing: existing));
       });
       final saved = await _getById();
       if (saved == null) {
@@ -104,9 +104,8 @@ class CompanySettingsRepository {
   }
 
   Future<db.CompanySettings?> _getById() async {
-    return (database.select(
-      database.companySettingsTable,
-    )..where((t) => t.id.equals(CompanySettings.singletonId)))
+    return (database.select(database.companySettingsTable)
+          ..where((t) => t.id.equals(CompanySettings.singletonId)))
         .getSingleOrNull();
   }
 
@@ -153,9 +152,7 @@ class CompanySettingsRepository {
       currencyCode: Value(
         _optional(draft.currencyCode)?.toUpperCase() ?? 'INR',
       ),
-      currencySymbol: Value(
-        _optional(draft.currencySymbol) ?? '\u20B9',
-      ),
+      currencySymbol: Value(_optional(draft.currencySymbol) ?? '\u20B9'),
       decimalPlaces: Value(draft.decimalPlaces),
       bankName: Value(_optional(draft.bankName)),
       bankAccountName: Value(_optional(draft.bankAccountName)),
@@ -204,9 +201,7 @@ class CompanySettingsRepository {
       currencyCode: Value(
         _optional(draft.currencyCode)?.toUpperCase() ?? 'INR',
       ),
-      currencySymbol: Value(
-        _optional(draft.currencySymbol) ?? '\u20B9',
-      ),
+      currencySymbol: Value(_optional(draft.currencySymbol) ?? '\u20B9'),
       decimalPlaces: Value(draft.decimalPlaces),
       bankName: Value(_optional(draft.bankName)),
       bankAccountName: Value(_optional(draft.bankAccountName)),
