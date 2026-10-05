@@ -44,6 +44,7 @@ enum AppPage {
   salesPos('Sales (POS)', Icons.point_of_sale_outlined, Icons.point_of_sale),
   inventory('Inventory', Icons.warehouse_outlined, Icons.warehouse),
   reports('Reports', Icons.bar_chart_outlined, Icons.bar_chart),
+  billFormat('Bill Format', Icons.receipt_long_outlined, Icons.receipt_long),
   settings('Settings', Icons.settings_outlined, Icons.settings);
 
   const AppPage(this.title, this.outlinedIcon, this.filledIcon);

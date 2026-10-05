@@ -399,24 +399,23 @@ class _InventoryListPageState extends State<InventoryListPage> {
                         ? 'No stock items yet'
                         : 'No matching stock items',
                     message: _query.isEmpty && !_hasActiveFilters
-                        ? 'Stock appears here after your first purchase or '
-                            'stock adjustment.'
+                        ? 'Add products in Product Master to see them in inventory.'
                         : 'Try a different search term or clear the filters.',
                   )
                 : SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: SizedBox(
-                      width: 1180,
+                      width: 1200,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           _buildHeaderRow(colorScheme, textTheme),
-                          ListView.builder(
-                            physics: const NeverScrollableScrollPhysics(),
-                            shrinkWrap: true,
-                            itemCount: _items.length,
-                            itemBuilder: (context, index) =>
-                                _buildDataRow(_items[index], textTheme),
+                          Expanded(
+                            child: ListView.builder(
+                              itemCount: _items.length,
+                              itemBuilder: (context, index) =>
+                                  _buildDataRow(_items[index], textTheme),
+                            ),
                           ),
                         ],
                       ),
@@ -452,7 +451,7 @@ class _InventoryListPageState extends State<InventoryListPage> {
           Expanded(flex: 2, child: _pad('Brand', cell)),
           SizedBox(width: 90, child: _pad('Stock', cell, right: true)),
           SizedBox(width: 80, child: _pad('Unit', cell)),
-          SizedBox(width: 100, child: _pad('Price', cell, right: true)),
+          SizedBox(width: 110, child: _pad('Selling Price', cell, right: true)),
           SizedBox(width: 100, child: _pad('MRP', cell, right: true)),
           SizedBox(width: 110, child: _pad('Status', cell)),
           SizedBox(width: 100, child: _pad('Actions', cell)),
@@ -577,13 +576,13 @@ class _InventoryListPageState extends State<InventoryListPage> {
             ),
           ),
           SizedBox(
-            width: 100,
+            width: 110,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 12),
               child: Text(
-                item.purchasePrice == null
+                item.sellingPrice == null
                     ? '—'
-                    : _formatCurrency(item.purchasePrice!),
+                    : _formatCurrency(item.sellingPrice!),
                 style: textTheme.bodySmall,
                 textAlign: TextAlign.right,
               ),

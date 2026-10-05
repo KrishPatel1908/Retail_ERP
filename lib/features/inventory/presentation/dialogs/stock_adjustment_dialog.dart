@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
@@ -53,9 +55,7 @@ class _StockAdjustmentDialogState extends State<_StockAdjustmentDialog> {
   final _reasonFocusNode = FocusNode();
   final _noteFocusNode = FocusNode();
 
-  List<StockAdjustmentOption> _options = const [];
   StockAdjustmentOption? _selected;
-  bool _loadingOptions = true;
   StockAdjustmentDirection _direction = StockAdjustmentDirection.increase;
   bool _saving = false;
   String? _quantityError;
@@ -65,7 +65,17 @@ class _StockAdjustmentDialogState extends State<_StockAdjustmentDialog> {
   void initState() {
     super.initState();
     _repository = InventoryRepository();
-    _loadOptions();
+    if (widget.preselected != null) {
+      _selected = StockAdjustmentOption(
+        productId: widget.preselected!.productId,
+        variantId: widget.preselected!.variantId,
+        itemName: widget.preselected!.displayName,
+        variantName: widget.preselected!.variantName,
+        barcode: widget.preselected!.barcode,
+        currentStock: widget.preselected!.currentStock,
+        unitName: widget.preselected!.unitName ?? '',
+      );
+    }
   }
 
   @override
@@ -79,27 +89,20 @@ class _StockAdjustmentDialogState extends State<_StockAdjustmentDialog> {
     super.dispose();
   }
 
-  Future<void> _loadOptions() async {
-    try {
-      final options = await _repository.adjustmentOptions();
-      if (!mounted) return;
+  Future<void> _openProductPicker() async {
+    if (_saving) return;
+    final option = await showDialog<StockAdjustmentOption>(
+      context: context,
+      builder: (ctx) => _StockAdjustmentOptionPickerDialog(
+        repository: _repository,
+        selectedKey: _selected?.key,
+      ),
+    );
+    if (option != null && mounted) {
       setState(() {
-        _options = options;
-        _loadingOptions = false;
-        if (widget.preselected != null) {
-          _selected = options
-              .where(
-                (o) =>
-                    o.productId == widget.preselected!.productId &&
-                    o.variantId == widget.preselected!.variantId,
-              )
-              .firstOrNull;
-        }
+        _selected = option;
+        _quantityError = _validateQuantity(null);
       });
-    } catch (error) {
-      if (!mounted) return;
-      setState(() => _loadingOptions = false);
-      debugPrint('Failed to load stock items: $error');
     }
   }
 
@@ -235,100 +238,168 @@ class _StockAdjustmentDialogState extends State<_StockAdjustmentDialog> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 520),
-        child: Padding(
-          padding: const EdgeInsets.all(28),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 44,
-                      height: 44,
-                      decoration: BoxDecoration(
-                        color: colorScheme.primaryContainer,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Icon(
-                        Icons.tune_rounded,
-                        color: colorScheme.onPrimaryContainer,
-                        size: 24,
-                      ),
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Text(
-                        'Stock Adjustment',
-                        style: textTheme.titleLarge?.copyWith(
-                          fontWeight: FontWeight.w700,
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(28),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        width: 44,
+                        height: 44,
+                        decoration: BoxDecoration(
+                          color: colorScheme.primaryContainer,
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Icon(
+                          Icons.tune_rounded,
+                          color: colorScheme.onPrimaryContainer,
+                          size: 24,
                         ),
                       ),
-                    ),
-                    IconButton(
-                      icon: const Icon(Icons.close_rounded),
-                      tooltip: 'Close',
-                      onPressed: _saving ? null : () => Navigator.pop(context),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
+                      const SizedBox(width: 14),
+                      Expanded(
+                        child: Text(
+                          'Stock Adjustment',
+                          style: textTheme.titleLarge?.copyWith(
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.close_rounded),
+                        tooltip: 'Close',
+                        onPressed: _saving ? null : () => Navigator.pop(context),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
 
-                if (_loadingOptions)
-                  const Center(
-                    child: Padding(
-                      padding: EdgeInsets.all(24),
-                      child: CircularProgressIndicator(strokeWidth: 2.5),
-                    ),
-                  )
-                else ...[
-                  // Product / Variant picker.
+                  // Searchable Product / Variant picker.
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Product / Variant',
-                        style: textTheme.bodySmall?.copyWith(
-                          fontWeight: FontWeight.w600,
-                        ),
+                      Row(
+                        children: [
+                          Text(
+                            'Product / Variant',
+                            style: textTheme.bodySmall?.copyWith(
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            '*',
+                            style: textTheme.bodySmall?.copyWith(
+                              color: colorScheme.error,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 6),
-                      DropdownButtonFormField<StockAdjustmentOption>(
-                        initialValue: _selected,
-                        isDense: true,
-                        isExpanded: true,
-                        decoration: const InputDecoration(
-                          hintText: 'Select a product or variant',
-                        ),
-                        items: [
-                          for (final option in _options)
-                            DropdownMenuItem(
-                              value: option,
-                              child: Text(
-                                '${option.itemName}'
-                                '${option.barcode == null ? '' : '  ·  ${option.barcode}'}',
-                                overflow: TextOverflow.ellipsis,
-                              ),
+                      InkWell(
+                        onTap: _saving ? null : _openProductPicker,
+                        borderRadius: BorderRadius.circular(10),
+                        child: InputDecorator(
+                          decoration: InputDecoration(
+                            isDense: true,
+                            hintText: 'Select a product or variant',
+                            errorText: _selected == null && _quantityError != null
+                                ? 'Select a product or variant first.'
+                                : null,
+                            suffixIcon: const Icon(
+                              Icons.search_rounded,
+                              size: 20,
+                              color: AppTheme.textMuted,
                             ),
-                        ],
-                        onChanged: _saving
-                            ? null
-                            : (value) => setState(() {
-                                _selected = value;
-                                _quantityError = null;
-                              }),
+                          ),
+                          child: Text(
+                            _selected == null
+                                ? 'Search and select a product or variant...'
+                                : '${_selected!.itemName}${_selected!.barcode == null ? '' : '  ·  ${_selected!.barcode}'}',
+                            style: textTheme.bodyMedium?.copyWith(
+                              color: _selected == null
+                                  ? AppTheme.textMuted
+                                  : AppTheme.textPrimary,
+                              fontWeight: _selected == null
+                                  ? FontWeight.w400
+                                  : FontWeight.w500,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                            maxLines: 1,
+                          ),
+                        ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 14),
 
-                  // Current stock + adjustment type.
+                  // Adjustment type + Current stock.
                   Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Adjustment Type',
+                              style: textTheme.bodySmall?.copyWith(
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: 6),
+                            SizedBox(
+                              height: 44,
+                              child: SegmentedButton<StockAdjustmentDirection>(
+                                style: SegmentedButton.styleFrom(
+                                  visualDensity: VisualDensity.compact,
+                                  textStyle: textTheme.bodyMedium?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                segments: const [
+                                  ButtonSegment(
+                                    value: StockAdjustmentDirection.increase,
+                                    icon: Icon(Icons.add_rounded, size: 16),
+                                    label: Text(
+                                      'Increase',
+                                      maxLines: 1,
+                                      softWrap: false,
+                                    ),
+                                  ),
+                                  ButtonSegment(
+                                    value: StockAdjustmentDirection.decrease,
+                                    icon: Icon(Icons.remove_rounded, size: 16),
+                                    label: Text(
+                                      'Decrease',
+                                      maxLines: 1,
+                                      softWrap: false,
+                                    ),
+                                  ),
+                                ],
+                                selected: {_direction},
+                                onSelectionChanged: _saving
+                                    ? null
+                                    : (selection) => setState(() {
+                                        _direction = selection.first;
+                                        _quantityError =
+                                            _validateQuantity(null);
+                                      }),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 14),
+                      SizedBox(
+                        width: 150,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -362,42 +433,6 @@ class _StockAdjustmentDialogState extends State<_StockAdjustmentDialog> {
                           ],
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Adjustment Type',
-                              style: textTheme.bodySmall?.copyWith(
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            const SizedBox(height: 6),
-                            SegmentedButton<StockAdjustmentDirection>(
-                              segments: const [
-                                ButtonSegment(
-                                  value: StockAdjustmentDirection.increase,
-                                  icon: Icon(Icons.add_rounded, size: 16),
-                                  label: Text('Increase'),
-                                ),
-                                ButtonSegment(
-                                  value: StockAdjustmentDirection.decrease,
-                                  icon: Icon(Icons.remove_rounded, size: 16),
-                                  label: Text('Decrease'),
-                                ),
-                              ],
-                              selected: {_direction},
-                              onSelectionChanged: _saving
-                                  ? null
-                                  : (selection) => setState(() {
-                                      _direction = selection.first;
-                                      _quantityError = _validateQuantity(null);
-                                    }),
-                            ),
-                          ],
-                        ),
-                      ),
                     ],
                   ),
                   const SizedBox(height: 14),
@@ -423,8 +458,9 @@ class _StockAdjustmentDialogState extends State<_StockAdjustmentDialog> {
                           }),
                         ),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
+                      const SizedBox(width: 14),
+                      SizedBox(
+                        width: 150,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -514,9 +550,215 @@ class _StockAdjustmentDialogState extends State<_StockAdjustmentDialog> {
                     ],
                   ),
                 ],
-              ],
+              ),
             ),
           ),
+        ),
+      ),
+    );
+  }
+}
+
+/// Searchable modal dialog for picking a product/variant for stock adjustment.
+class _StockAdjustmentOptionPickerDialog extends StatefulWidget {
+  const _StockAdjustmentOptionPickerDialog({
+    required this.repository,
+    this.selectedKey,
+  });
+
+  final InventoryRepository repository;
+  final String? selectedKey;
+
+  @override
+  State<_StockAdjustmentOptionPickerDialog> createState() =>
+      _StockAdjustmentOptionPickerDialogState();
+}
+
+class _StockAdjustmentOptionPickerDialogState
+    extends State<_StockAdjustmentOptionPickerDialog> {
+  final _searchController = TextEditingController();
+  List<StockAdjustmentOption> _options = const [];
+  bool _loading = true;
+  Timer? _debounce;
+  int _requestId = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchOptions('');
+  }
+
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _onSearchChanged(String value) {
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 200), () {
+      _fetchOptions(value);
+    });
+  }
+
+  Future<void> _fetchOptions(String query) async {
+    final requestId = ++_requestId;
+    setState(() => _loading = true);
+    try {
+      final results = await widget.repository.adjustmentOptions(
+        query: query,
+        limit: 50,
+      );
+      if (!mounted || requestId != _requestId) return;
+      setState(() {
+        _options = results;
+        _loading = false;
+      });
+    } catch (e) {
+      if (!mounted || requestId != _requestId) return;
+      setState(() => _loading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
+
+    return AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      titlePadding: const EdgeInsets.fromLTRB(24, 20, 24, 12),
+      contentPadding: const EdgeInsets.fromLTRB(24, 0, 24, 20),
+      title: Row(
+        children: [
+          Icon(Icons.inventory_2_outlined, size: 22, color: colorScheme.primary),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              'Select Product / Variant',
+              style: textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+            ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.close_rounded, size: 20),
+            tooltip: 'Close',
+            onPressed: () => Navigator.of(context).pop(),
+          ),
+        ],
+      ),
+      content: SizedBox(
+        width: 480,
+        height: 480,
+        child: Column(
+          children: [
+            TextField(
+              controller: _searchController,
+              autofocus: true,
+              onChanged: _onSearchChanged,
+              decoration: InputDecoration(
+                hintText: 'Search product, variant, or barcode...',
+                prefixIcon: const Icon(Icons.search_rounded, size: 20),
+                suffixIcon: _searchController.text.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear_rounded, size: 18),
+                        onPressed: () {
+                          _searchController.clear();
+                          _fetchOptions('');
+                        },
+                      )
+                    : null,
+                isDense: true,
+              ),
+            ),
+            const SizedBox(height: 12),
+            Expanded(
+              child: _loading
+                  ? const Center(
+                      child: Padding(
+                        padding: EdgeInsets.all(24),
+                        child: CircularProgressIndicator(strokeWidth: 2.5),
+                      ),
+                    )
+                  : _options.isEmpty
+                      ? Center(
+                          child: Text(
+                            'No items match your search.',
+                            style: textTheme.bodyMedium?.copyWith(
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                          ),
+                        )
+                      : ListView.separated(
+                          itemCount: _options.length,
+                          separatorBuilder: (_, _) => const Divider(height: 1),
+                          itemBuilder: (context, index) {
+                            final option = _options[index];
+                            final isSelected = option.key == widget.selectedKey;
+                            return ListTile(
+                              dense: true,
+                              title: Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      option.itemName,
+                                      style: textTheme.bodyMedium?.copyWith(
+                                        fontWeight: isSelected
+                                            ? FontWeight.w700
+                                            : FontWeight.w600,
+                                        color: isSelected
+                                            ? colorScheme.primary
+                                            : textTheme.bodyMedium?.color,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                  if (option.variantName != null) ...[
+                                    const SizedBox(width: 8),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 6,
+                                        vertical: 1,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: AppTheme.hover,
+                                        borderRadius: BorderRadius.circular(4),
+                                      ),
+                                      child: Text(
+                                        'Variant',
+                                        style: textTheme.labelSmall?.copyWith(
+                                          fontSize: 10,
+                                          color: AppTheme.textSecondary,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                              subtitle: Text(
+                                [
+                                  if (option.barcode != null)
+                                    'Barcode: ${option.barcode}',
+                                  'Current Stock: ${option.currentStock} ${option.unitName}',
+                                ].join('  ·  '),
+                                style: textTheme.bodySmall?.copyWith(
+                                  color: AppTheme.textSecondary,
+                                ),
+                              ),
+                              trailing: isSelected
+                                  ? Icon(
+                                      Icons.check_circle_rounded,
+                                      size: 18,
+                                      color: colorScheme.primary,
+                                    )
+                                  : null,
+                              onTap: () => Navigator.of(context).pop(option),
+                            );
+                          },
+                        ),
+            ),
+          ],
         ),
       ),
     );

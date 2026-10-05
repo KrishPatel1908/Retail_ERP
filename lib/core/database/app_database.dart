@@ -23,6 +23,9 @@ import 'tables/current_stock_table.dart';
 import 'tables/purchase_transaction_table.dart';
 import 'tables/purchase_return_table.dart';
 import 'tables/purchase_return_item_table.dart';
+import 'tables/sale_table.dart';
+import 'tables/sale_item_table.dart';
+import 'tables/customer_transaction_table.dart';
 
 part 'app_database.g.dart';
 
@@ -55,6 +58,9 @@ part 'app_database.g.dart';
     PurchaseTransactions,
     PurchaseReturns,
     PurchaseReturnItems,
+    Sales,
+    SaleItems,
+    CustomerTransactions,
   ],
 )
 class AppDatabase extends _$AppDatabase {

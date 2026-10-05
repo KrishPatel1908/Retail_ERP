@@ -40,6 +40,9 @@ const _expectedTables = {
   'purchase_transaction',
   'purchase_return',
   'purchase_return_item',
+  'sale',
+  'sale_item',
+  'customer_transaction',
 };
 
 /// The 10 case-insensitive unique indexes of the approved blueprint. Units
@@ -85,7 +88,7 @@ void main() {
       expect(result.single.data.values.single, 1);
     });
 
-    test('registers all 22 blueprint tables', () async {
+    test('registers all 25 blueprint tables', () async {
       final db = AppDatabase(NativeDatabase.memory());
       addTearDown(db.close);
       await db.customSelect('SELECT 1').get();
@@ -104,11 +107,11 @@ void main() {
       final db = AppDatabase(NativeDatabase.memory());
       addTearDown(db.close);
 
-      expect(db.schemaVersion, 15);
+      expect(db.schemaVersion, 16);
       await db.customSelect('SELECT 1').get();
 
       final row = (await db.customSelect('PRAGMA user_version').get()).single;
-      expect(row.read<int>('user_version'), 15);
+      expect(row.read<int>('user_version'), 16);
     });
 
     test('creates the case-insensitive unique indexes', () async {
@@ -519,10 +522,10 @@ void main() {
         addTearDown(db.close);
         await db.customSelect('SELECT 1').get();
 
-        expect(db.schemaVersion, 15);
+        expect(db.schemaVersion, 16);
         final versionRow =
             (await db.customSelect('PRAGMA user_version').get()).single;
-        expect(versionRow.read<int>("user_version"), 15);
+        expect(versionRow.read<int>("user_version"), 16);
 
         // The old columns are gone and the new ones are present.
         final unitColumns = await db
@@ -695,10 +698,10 @@ void main() {
       final db = AppDatabase(NativeDatabase(file));
       addTearDown(db.close);
       await db.customSelect('SELECT 1').get();
-      expect(db.schemaVersion, 15);
+      expect(db.schemaVersion, 16);
       final versionRow =
           (await db.customSelect('PRAGMA user_version').get()).single;
-      expect(versionRow.read<int>("user_version"), 15);
+      expect(versionRow.read<int>("user_version"), 16);
 
       // Customer gained the new columns and `address` became line 1.
       final customerColumns = await db
@@ -795,7 +798,7 @@ void main() {
       final db = AppDatabase(NativeDatabase(file));
       addTearDown(db.close);
       await db.customSelect('SELECT 1').get();
-      expect(db.schemaVersion, 15);
+      expect(db.schemaVersion, 16);
 
       final customerCols =
           (await db
@@ -883,10 +886,10 @@ void main() {
       final db = AppDatabase(NativeDatabase(file));
       addTearDown(db.close);
       await db.customSelect('SELECT 1').get();
-      expect(db.schemaVersion, 15);
+      expect(db.schemaVersion, 16);
       final versionRow =
           (await db.customSelect('PRAGMA user_version').get()).single;
-      expect(versionRow.read<int>("user_version"), 15);
+      expect(versionRow.read<int>("user_version"), 16);
 
       final columns =
           (await db
@@ -938,6 +941,59 @@ void main() {
       expect(row.currencySymbol, '₹');
       expect(row.decimalPlaces, 2);
       expect(row.showLogoOnInvoice, isTrue);
+    });
+
+    test('Migration v15 → v16 creates sales tables and columns', () async {
+      final tempDir = await Directory.systemTemp.createTemp('retail_erp_v16_');
+      addTearDown(() => tempDir.delete(recursive: true));
+      final file = File(p.join(tempDir.path, 'test_v15.db'));
+
+      final v15 = sq.sqlite3.open(file.path);
+      v15.execute('''
+        CREATE TABLE inventory_transaction (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          product_id INTEGER NOT NULL,
+          variant_id INTEGER,
+          transaction_type TEXT NOT NULL,
+          quantity INTEGER NOT NULL,
+          previous_quantity INTEGER NOT NULL,
+          new_quantity INTEGER NOT NULL,
+          reference_number TEXT,
+          purchase_id INTEGER,
+          purchase_return_id INTEGER,
+          stock_adjustment_id INTEGER,
+          notes TEXT,
+          transaction_date INTEGER NOT NULL,
+          created_at INTEGER NOT NULL
+        );
+        PRAGMA user_version = 15;
+      ''');
+      v15.close();
+
+      final db = AppDatabase(NativeDatabase(file));
+      addTearDown(db.close);
+      await db.customSelect('SELECT 1').get();
+
+      expect(db.schemaVersion, 16);
+      final versionRow =
+          (await db.customSelect('PRAGMA user_version').get()).single;
+      expect(versionRow.read<int>('user_version'), 16);
+
+      final tables = await _tableNames(db);
+      expect(
+        tables,
+        containsAll(['sale', 'sale_item', 'customer_transaction']),
+      );
+
+      final columns =
+          (await db
+                  .customSelect(
+                    "SELECT name FROM pragma_table_info('inventory_transaction')",
+                  )
+                  .get())
+              .map((r) => r.read<String>('name'))
+              .toSet();
+      expect(columns, contains('sale_id'));
     });
   });
 }

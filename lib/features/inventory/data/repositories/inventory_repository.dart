@@ -151,6 +151,7 @@ class InventoryRepository {
   /// by name or barcode.
   Future<List<StockAdjustmentOption>> adjustmentOptions({
     String query = '',
+    int limit = 50,
   }) async {
     final normalized = query.trim().toLowerCase();
     final stock = _database.currentStocks;
@@ -179,14 +180,17 @@ class InventoryRepository {
       predicate = predicate &
           (product.productName.lower().contains(normalized) |
               variant.variantName.lower().contains(normalized) |
-              product.barcode.lower().contains(normalized) |
-              variant.barcode.lower().contains(normalized));
+              (variant.id.isNull() & product.barcode.lower().contains(normalized)) |
+              (variant.id.isNotNull() & variant.barcode.lower().contains(normalized)));
     }
     rowsQuery.where(predicate);
     rowsQuery.orderBy([
       OrderingTerm.asc(product.productName.lower()),
       OrderingTerm.asc(variant.variantName.lower()),
     ]);
+    if (limit > 0) {
+      rowsQuery.limit(limit);
+    }
 
     final rows = await rowsQuery.get();
     return [
@@ -378,8 +382,8 @@ class InventoryRepository {
           predicate &
           (product.productName.lower().contains(normalizedQuery) |
               variant.variantName.lower().contains(normalizedQuery) |
-              product.barcode.lower().contains(normalizedQuery) |
-              variant.barcode.lower().contains(normalizedQuery));
+              (variant.id.isNull() & product.barcode.lower().contains(normalizedQuery)) |
+              (variant.id.isNotNull() & variant.barcode.lower().contains(normalizedQuery)));
     }
 
     if (filters.categoryId != null) {

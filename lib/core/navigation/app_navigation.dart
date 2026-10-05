@@ -39,6 +39,7 @@ const List<NavSection> appNavigation = [
     NavItem('Sales (POS)', AppPage.salesPos),
     NavItem('Inventory', AppPage.inventory),
     NavItem('Reports', AppPage.reports),
+    NavItem('Bill Format', AppPage.billFormat),
     NavItem('Settings', AppPage.settings),
   ]),
 ];

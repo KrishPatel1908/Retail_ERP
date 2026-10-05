@@ -73,5 +73,9 @@ abstract final class DatabaseSchemaVersion {
   /// for the Inventory module's low-stock status.
   static const int v15 = 15;
 
-  static const int latest = v15;
+  /// Schema version 16 — adds Sales POS module tables: sale, sale_item,
+  /// customer_transaction, and adds sale_id reference to inventory_transaction.
+  static const int v16 = 16;
+
+  static const int latest = v16;
 }

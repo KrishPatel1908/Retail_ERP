@@ -20,6 +20,7 @@ import 'upgrade_to_v12.dart';
 import 'upgrade_to_v13.dart';
 import 'upgrade_to_v14.dart';
 import 'upgrade_to_v15.dart';
+import 'upgrade_to_v16.dart';
 
 /// Builds the [MigrationStrategy] used by [AppDatabase].
 ///
@@ -89,6 +90,8 @@ class DatabaseMigrationStrategy {
     await _db.customStatement('PRAGMA journal_mode = WAL');
     // Prevents "database is locked" errors under concurrent access.
     await _db.customStatement('PRAGMA busy_timeout = 5000');
+    // Ensure any legacy transactions missing previous/new quantities are backfilled.
+    await backfillInventoryTransactionQuantities(_db);
   }
 }
 
@@ -112,5 +115,6 @@ abstract final class _UpgradeSteps {
     13: upgradeToV13,
     14: upgradeToV14,
     15: upgradeToV15,
+    16: upgradeToV16,
   };
 }

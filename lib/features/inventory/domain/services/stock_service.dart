@@ -82,6 +82,7 @@ class StockService {
     String? referenceNumber,
     String? note,
     int? purchaseId,
+    int? saleId,
     int? quantity,
   }) async {
     final movementQuantity = quantity ?? delta;
@@ -106,6 +107,7 @@ class StockService {
             previousQuantity: Value(stock),
             newQuantity: Value(newStock),
             purchaseId: Value(purchaseId),
+            saleId: Value(saleId),
             transactionDate: transactionDate,
             referenceNumber: Value(referenceNumber),
             notes: Value(_normalizeText(note)),

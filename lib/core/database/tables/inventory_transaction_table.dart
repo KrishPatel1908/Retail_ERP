@@ -2,11 +2,12 @@ import 'package:drift/drift.dart';
 
 import 'product_table.dart';
 import 'purchase_table.dart';
+import 'sale_table.dart';
 
 /// Inventory transaction — records every stock change with its cause.
 ///
 /// Enables future reports such as "Where did this stock come from?"
-/// Types: PURCHASE, PURCHASE_RETURN, MANUAL_ADJUSTMENT, SALE (future).
+/// Types: PURCHASE, PURCHASE_RETURN, MANUAL_ADJUSTMENT, SALE.
 @DataClassName('InventoryTransaction')
 @TableIndex(
   name: 'idx_inv_txn_product_variant',
@@ -15,6 +16,7 @@ import 'purchase_table.dart';
 @TableIndex(name: 'idx_inv_txn_type', columns: {#transactionType})
 @TableIndex(name: 'idx_inv_txn_date', columns: {#transactionDate})
 @TableIndex(name: 'idx_inv_txn_purchase', columns: {#purchaseId})
+@TableIndex(name: 'idx_inv_txn_sale', columns: {#saleId})
 class InventoryTransactions extends Table {
   @override
   String get tableName => 'inventory_transaction';
@@ -40,6 +42,9 @@ class InventoryTransactions extends Table {
 
   /// Reference purchase ID for purchase/return transactions.
   IntColumn get purchaseId => integer().nullable().references(Purchases, #id)();
+
+  /// Reference sale ID for sale/return transactions.
+  IntColumn get saleId => integer().nullable().references(Sales, #id)();
 
   DateTimeColumn get transactionDate => dateTime()();
 

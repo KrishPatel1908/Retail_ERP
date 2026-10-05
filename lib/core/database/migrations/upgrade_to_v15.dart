@@ -51,6 +51,87 @@ Future<void> _upgradeToV15(Migrator migrator, AppDatabase database) async {
         'ALTER TABLE inventory_transaction ADD COLUMN new_quantity INTEGER',
       );
     }
+    await backfillInventoryTransactionQuantities(database);
+  }
+}
+
+/// Backfills `previous_quantity` and `new_quantity` on pre-existing
+/// `inventory_transaction` rows that were written before schema v15.
+///
+/// Replays transactions chronologically for each product/variant so each
+/// movement's previous and new stock levels are accurately persisted in SQLite.
+Future<void> backfillInventoryTransactionQuantities(AppDatabase database) async {
+  if (!await _tableExists(database, 'inventory_transaction')) return;
+
+  final txnColumns = await database
+      .customSelect(
+        "SELECT name FROM pragma_table_info('inventory_transaction')",
+      )
+      .get();
+  final txnNames = txnColumns
+      .map((row) => row.read<String>('name'))
+      .toSet();
+  if (!txnNames.contains('previous_quantity') || !txnNames.contains('new_quantity')) {
+    return;
+  }
+
+  final nullRows = await database.customSelect('''
+    SELECT DISTINCT product_id, variant_id 
+    FROM inventory_transaction 
+    WHERE previous_quantity IS NULL OR new_quantity IS NULL
+  ''').get();
+
+  if (nullRows.isEmpty) return;
+
+  for (final pair in nullRows) {
+    final productId = pair.read<int>('product_id');
+    final variantId = pair.readNullable<int>('variant_id');
+
+    final transactions = variantId != null
+        ? await database.customSelect(
+            '''
+            SELECT id, quantity, previous_quantity, new_quantity
+            FROM inventory_transaction
+            WHERE product_id = ? AND variant_id = ?
+            ORDER BY transaction_date ASC, id ASC
+            ''',
+            variables: [
+              Variable<int>(productId),
+              Variable<int>(variantId),
+            ],
+          ).get()
+        : await database.customSelect(
+            '''
+            SELECT id, quantity, previous_quantity, new_quantity
+            FROM inventory_transaction
+            WHERE product_id = ? AND (variant_id IS NULL OR variant_id = 0)
+            ORDER BY transaction_date ASC, id ASC
+            ''',
+            variables: [
+              Variable<int>(productId),
+            ],
+          ).get();
+
+    int runningStock = 0;
+    for (final txn in transactions) {
+      final id = txn.read<int>('id');
+      final qty = txn.read<int>('quantity');
+      final prev = txn.readNullable<int>('previous_quantity') ?? runningStock;
+      final next = txn.readNullable<int>('new_quantity') ?? (prev + qty);
+
+      if (txn.readNullable<int>('previous_quantity') == null ||
+          txn.readNullable<int>('new_quantity') == null) {
+        await database.customStatement(
+          '''
+          UPDATE inventory_transaction
+          SET previous_quantity = ?, new_quantity = ?
+          WHERE id = ?
+          ''',
+          [prev, next, id],
+        );
+      }
+      runningStock = next;
+    }
   }
 }
 

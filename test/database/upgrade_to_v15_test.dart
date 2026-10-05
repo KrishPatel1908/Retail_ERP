@@ -68,10 +68,10 @@ void main() {
     addTearDown(db.close);
     await db.customSelect('SELECT 1').get();
 
-    expect(db.schemaVersion, 15);
+    expect(db.schemaVersion, 16);
     final versionRow =
         (await db.customSelect('PRAGMA user_version').get()).single;
-    expect(versionRow.read<int>('user_version'), 15);
+    expect(versionRow.read<int>('user_version'), 16);
 
     final productColumns =
         (await db
@@ -97,13 +97,13 @@ void main() {
     )..where((t) => t.id.equals(1))).getSingle();
     expect(product.minimumStock, 0);
 
-    // The pre-existing movement survived with null previous/new quantities.
+    // The pre-existing movement was backfilled with accurate previous/new quantities.
     final movement = await (db.select(
       db.inventoryTransactions,
     )..where((t) => t.id.equals(1))).getSingle();
     expect(movement.quantity, 5);
-    expect(movement.previousQuantity, isNull);
-    expect(movement.newQuantity, isNull);
+    expect(movement.previousQuantity, 0);
+    expect(movement.newQuantity, 5);
   });
 
   test('fresh creates include the v15 columns with correct defaults', () async {
@@ -111,7 +111,7 @@ void main() {
     addTearDown(db.close);
     await db.customSelect('SELECT 1').get();
 
-    expect(db.schemaVersion, 15);
+    expect(db.schemaVersion, 16);
 
     await db
         .into(db.products)

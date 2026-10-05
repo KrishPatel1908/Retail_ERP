@@ -19,11 +19,13 @@ class AppSidebar extends StatefulWidget {
     required this.expanded,
     required this.selectedPage,
     required this.onSelect,
+    this.onToggleSidebar,
   });
 
   final bool expanded;
   final AppPage selectedPage;
   final ValueChanged<AppPage> onSelect;
+  final VoidCallback? onToggleSidebar;
 
   @override
   State<AppSidebar> createState() => _AppSidebarState();
@@ -69,6 +71,7 @@ class _AppSidebarState extends State<AppSidebar> {
                     : AppConstants.sidebarCollapsedWidth,
                 child: Column(
                   children: [
+                    _buildSidebarHeader(),
                     Expanded(
                       child: AnimatedSwitcher(
                         duration: const Duration(milliseconds: 180),
@@ -96,6 +99,81 @@ class _AppSidebarState extends State<AppSidebar> {
           },
         ),
       ),
+    );
+  }
+
+  Widget _buildSidebarHeader() {
+    final colorScheme = Theme.of(context).colorScheme;
+    final textTheme = Theme.of(context).textTheme;
+
+    return Container(
+      height: AppConstants.topBarHeight,
+      padding: const EdgeInsets.symmetric(horizontal: 14),
+      decoration: BoxDecoration(
+        color: colorScheme.surface,
+        border: Border(bottom: BorderSide(color: colorScheme.outlineVariant)),
+      ),
+      child: widget.expanded
+          ? Row(
+              children: [
+                Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: colorScheme.primary,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(
+                    Icons.storefront_rounded,
+                    size: 20,
+                    color: colorScheme.onPrimary,
+                  ),
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    AppConstants.appName,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      letterSpacing: -0.3,
+                    ),
+                  ),
+                ),
+                if (widget.onToggleSidebar != null)
+                  IconButton(
+                    key: const ValueKey('sidebar-toggle'),
+                    onPressed: widget.onToggleSidebar,
+                    tooltip: 'Collapse sidebar',
+                    icon: const Icon(
+                      Icons.menu_open_rounded,
+                      size: 20,
+                    ),
+                  ),
+              ],
+            )
+          : Center(
+              child: IconButton(
+                key: const ValueKey('sidebar-toggle'),
+                onPressed: widget.onToggleSidebar,
+                tooltip: 'Expand sidebar',
+                padding: EdgeInsets.zero,
+                icon: Container(
+                  width: 36,
+                  height: 36,
+                  decoration: BoxDecoration(
+                    color: colorScheme.primary,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Icon(
+                    Icons.storefront_rounded,
+                    size: 20,
+                    color: colorScheme.onPrimary,
+                  ),
+                ),
+              ),
+            ),
     );
   }
 

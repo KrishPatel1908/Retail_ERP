@@ -373,7 +373,7 @@ class _StockItemDetailDialogState extends State<_StockItemDetailDialog> {
           SizedBox(width: 110, child: pad('Reference')),
           SizedBox(width: 70, child: pad('In', right: true)),
           SizedBox(width: 70, child: pad('Out', right: true)),
-          SizedBox(width: 70, child: pad('Previous', right: true)),
+          SizedBox(width: 80, child: pad('Previous', right: true)),
           SizedBox(width: 70, child: pad('New', right: true)),
           Expanded(child: pad('Note')),
           const SizedBox(width: 8),
@@ -429,40 +429,52 @@ class _StockItemDetailDialogState extends State<_StockItemDetailDialog> {
           ),
           SizedBox(
             width: 70,
-            child: Text(
-              movement.isIn ? '+${movement.quantity}' : '—',
-              style: textTheme.bodySmall?.copyWith(
-                color: inColor,
-                fontWeight: FontWeight.w600,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: Text(
+                movement.isIn ? '+${movement.quantity}' : '—',
+                style: textTheme.bodySmall?.copyWith(
+                  color: inColor,
+                  fontWeight: FontWeight.w600,
+                ),
+                textAlign: TextAlign.right,
               ),
-              textAlign: TextAlign.right,
             ),
           ),
           SizedBox(
             width: 70,
-            child: Text(
-              movement.isOut ? '${movement.quantity}' : '—',
-              style: textTheme.bodySmall?.copyWith(
-                color: outColor,
-                fontWeight: FontWeight.w600,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: Text(
+                movement.isOut ? '${movement.quantity}' : '—',
+                style: textTheme.bodySmall?.copyWith(
+                  color: outColor,
+                  fontWeight: FontWeight.w600,
+                ),
+                textAlign: TextAlign.right,
               ),
-              textAlign: TextAlign.right,
+            ),
+          ),
+          SizedBox(
+            width: 80,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: Text(
+                qtyOrDash(movement.previousQuantity),
+                style: textTheme.bodySmall,
+                textAlign: TextAlign.right,
+              ),
             ),
           ),
           SizedBox(
             width: 70,
-            child: Text(
-              qtyOrDash(movement.previousQuantity),
-              style: textTheme.bodySmall,
-              textAlign: TextAlign.right,
-            ),
-          ),
-          SizedBox(
-            width: 70,
-            child: Text(
-              qtyOrDash(movement.newQuantity),
-              style: textTheme.bodySmall,
-              textAlign: TextAlign.right,
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8),
+              child: Text(
+                qtyOrDash(movement.newQuantity),
+                style: textTheme.bodySmall,
+                textAlign: TextAlign.right,
+              ),
             ),
           ),
           Expanded(

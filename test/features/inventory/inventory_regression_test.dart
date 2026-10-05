@@ -2,14 +2,18 @@ import 'package:drift/drift.dart' hide isNull, isNotNull;
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:retail_erp/app/theme/app_theme.dart';
+import 'package:retail_erp/core/database/app_database.dart';
 import 'package:retail_erp/core/database/database_provider.dart';
+import 'package:retail_erp/core/database/migrations/upgrade_to_v15.dart';
 import 'package:retail_erp/features/inventory/data/repositories/inventory_repository.dart';
 import 'package:retail_erp/features/inventory/domain/entities/inventory.dart';
 import 'package:retail_erp/features/inventory/domain/services/stock_service.dart';
+import 'package:retail_erp/features/inventory/presentation/dialogs/stock_adjustment_dialog.dart';
 import 'package:retail_erp/features/inventory/presentation/pages/inventory_list_page.dart';
 import 'package:retail_erp/features/master_entry/product/data/repositories/product_repository.dart';
 import 'package:retail_erp/features/master_entry/supplier/data/repositories/supplier_repository.dart';
 import 'package:retail_erp/features/purchase/data/repositories/purchase_repository.dart';
+import 'package:retail_erp/features/purchase/data/repositories/purchase_return_repository.dart';
 
 import '../../helpers/test_database.dart';
 
@@ -279,6 +283,263 @@ void main() {
 
       expect(tester.takeException(), isNull);
       expect(find.text('Responsive Item'), findsOneWidget);
+    });
+  });
+
+  group('Stock Flow Regression & Movement History', () {
+    test('Initial 0 -> Purchase +10 -> Return -2 -> Adjustment +5 -> Adjustment -3 = 10 with accurate Previous/New in history', () async {
+      final supplierRepo = SupplierRepository();
+      final productRepo = ProductRepository();
+      final purchaseRepo = PurchaseRepository();
+      final returnRepo = PurchaseReturnRepository();
+      final inventoryRepo = InventoryRepository();
+
+      final supplier = await supplierRepo.createSupplier(
+        supplierName: 'Parle Distributor',
+        mobile: '9876543210',
+      );
+      final product = await productRepo.createProduct(
+        productName: 'Biscuits',
+        unitId: 1,
+        sellingPrice: 1000,
+        purchasePrice: 800,
+      );
+
+      // Initial 0
+      expect(await stockOf(product.id), 0);
+
+      // 1. Purchase +10 -> 10
+      final purchase = await purchaseRepo.createPurchase(
+        supplierId: supplier.id,
+        purchaseDate: DateTime(2026, 9, 1),
+        items: [
+          PurchaseItemInput(
+            productId: product.id,
+            quantity: 10,
+            unitId: 1,
+            purchasePrice: 800,
+            taxRate: 0,
+          ),
+        ],
+      );
+      expect(await stockOf(product.id), 10);
+
+      // 2. Purchase Return -2 -> 8
+      await returnRepo.createReturn(
+        originalPurchaseId: purchase.id,
+        supplierId: supplier.id,
+        returnDate: DateTime(2026, 9, 2),
+        items: [
+          PurchaseReturnItemInput(
+            purchaseItemId: purchase.items.single.id,
+            productId: product.id,
+            returnQuantity: 2,
+            purchasePrice: 800,
+            taxRate: 0,
+          ),
+        ],
+      );
+      expect(await stockOf(product.id), 8);
+
+      // 3. Adjustment +5 -> 13
+      await inventoryRepo.createAdjustment(
+        productId: product.id,
+        direction: StockAdjustmentDirection.increase,
+        quantity: 5,
+        reason: 'Found extra in stockroom',
+        adjustmentDate: DateTime(2026, 9, 3),
+      );
+      expect(await stockOf(product.id), 13);
+
+      // 4. Adjustment -3 -> 10
+      await inventoryRepo.createAdjustment(
+        productId: product.id,
+        direction: StockAdjustmentDirection.decrease,
+        quantity: 3,
+        reason: 'Damaged in transit',
+        adjustmentDate: DateTime(2026, 9, 4),
+      );
+      expect(await stockOf(product.id), 10);
+
+      // Verify Movement History
+      final movements = (await inventoryRepo.fetchMovements(productId: product.id)).items;
+      expect(movements.length, 4);
+
+      // Movements are ordered in reverse chronological order
+      final adjDec = movements[0];
+      expect(adjDec.transactionType, StockMovementType.stockAdjustment);
+      expect(adjDec.quantity, -3);
+      expect(adjDec.previousQuantity, 13);
+      expect(adjDec.newQuantity, 10);
+
+      final adjInc = movements[1];
+      expect(adjInc.transactionType, StockMovementType.stockAdjustment);
+      expect(adjInc.quantity, 5);
+      expect(adjInc.previousQuantity, 8);
+      expect(adjInc.newQuantity, 13);
+
+      final ret = movements[2];
+      expect(ret.transactionType, StockMovementType.purchaseReturn);
+      expect(ret.quantity, -2);
+      expect(ret.previousQuantity, 10);
+      expect(ret.newQuantity, 8);
+
+      final pur = movements[3];
+      expect(pur.transactionType, StockMovementType.purchase);
+      expect(pur.quantity, 10);
+      expect(pur.previousQuantity, 0);
+      expect(pur.newQuantity, 10);
+    });
+  });
+
+  group('Legacy Movement Backfill', () {
+    test('backfillInventoryTransactionQuantities fills NULL previous/new quantities', () async {
+      final db = DatabaseProvider.instance.database;
+      final productRepo = ProductRepository();
+      final product = await productRepo.createProduct(
+        productName: 'Legacy Item',
+        unitId: 1,
+        sellingPrice: 100,
+      );
+
+      // Insert legacy rows with null previous_quantity and new_quantity
+      await db.into(db.inventoryTransactions).insert(
+        InventoryTransactionsCompanion.insert(
+          productId: product.id,
+          transactionType: 'PURCHASE',
+          quantity: 10,
+          transactionDate: DateTime(2026, 1, 1),
+          createdAt: Value(DateTime(2026, 1, 1)),
+          previousQuantity: const Value.absent(),
+          newQuantity: const Value.absent(),
+        ),
+      );
+      await db.into(db.inventoryTransactions).insert(
+        InventoryTransactionsCompanion.insert(
+          productId: product.id,
+          transactionType: 'PURCHASE_RETURN',
+          quantity: -3,
+          transactionDate: DateTime(2026, 1, 2),
+          createdAt: Value(DateTime(2026, 1, 2)),
+          previousQuantity: const Value.absent(),
+          newQuantity: const Value.absent(),
+        ),
+      );
+
+      // Run backfill
+      await backfillInventoryTransactionQuantities(db);
+
+      final rows = await (db.select(db.inventoryTransactions)
+            ..where((t) => t.productId.equals(product.id))
+            ..orderBy([(t) => OrderingTerm.asc(t.id)]))
+          .get();
+
+      expect(rows[0].previousQuantity, 0);
+      expect(rows[0].newQuantity, 10);
+      expect(rows[1].previousQuantity, 10);
+      expect(rows[1].newQuantity, 7);
+    });
+  });
+
+  group('Barcode Isolation & Exact Sellable Variant Search', () {
+    test('searching barcode of Variant A returns ONLY Variant A and never Variant B', () async {
+      final productRepo = ProductRepository();
+      final inventoryRepo = InventoryRepository();
+
+      final product = await productRepo.createProduct(
+        productName: 'T-Shirt',
+        unitId: 1,
+        sellingPrice: 50000,
+        variants: [
+          const VariantInput(variantName: 'Red Small', sellingPrice: 50000, barcode: 'BAR-RED-S'),
+          const VariantInput(variantName: 'Blue Large', sellingPrice: 55000, barcode: 'BAR-BLU-L'),
+        ],
+      );
+
+      final redVariant = product.variants.firstWhere((v) => v.variantName == 'Red Small');
+      final blueVariant = product.variants.firstWhere((v) => v.variantName == 'Blue Large');
+
+      // Test adjustmentOptions
+      final redOptions = await inventoryRepo.adjustmentOptions(query: 'BAR-RED-S');
+      expect(redOptions.length, 1);
+      expect(redOptions.first.variantId, redVariant.id);
+      expect(redOptions.first.itemName, 'Red Small');
+
+      final blueOptions = await inventoryRepo.adjustmentOptions(query: 'BAR-BLU-L');
+      expect(blueOptions.length, 1);
+      expect(blueOptions.first.variantId, blueVariant.id);
+      expect(blueOptions.first.itemName, 'Blue Large');
+
+      // Test stockItems listing filter
+      final redListing = (await inventoryRepo.fetchPage(query: 'BAR-RED-S')).items;
+      expect(redListing.length, 1);
+      expect(redListing.first.variantId, redVariant.id);
+    });
+  });
+
+  group('Selling Price Column in Inventory List', () {
+    testWidgets('displays "Selling Price" column header and formatted selling price', (tester) async {
+      tester.view.physicalSize = const Size(1200, 800);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+
+      final productRepo = ProductRepository();
+      await productRepo.createProduct(
+        productName: 'Luxury Pen',
+        unitId: 1,
+        sellingPrice: 125000, // ₹1,250.00
+        purchasePrice: 80000,  // ₹800.00
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.light,
+          home: const Scaffold(body: InventoryListPage()),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      expect(find.text('Selling Price'), findsOneWidget);
+      expect(find.text('₹1250'), findsOneWidget);
+      expect(find.text('₹800.00'), findsNothing);
+    });
+  });
+
+  group('Stock Adjustment Dialog UI', () {
+    testWidgets('Segmented button renders Increase and Decrease without wrapping or overflow', (tester) async {
+      tester.view.physicalSize = const Size(900, 700);
+      tester.view.devicePixelRatio = 1.0;
+      addTearDown(tester.view.reset);
+
+      final productRepo = ProductRepository();
+      await productRepo.createProduct(
+        productName: 'Shampoo',
+        unitId: 1,
+        sellingPrice: 25000,
+      );
+
+      await tester.pumpWidget(
+        MaterialApp(
+          theme: AppTheme.light,
+          home: Scaffold(
+            body: Builder(
+              builder: (context) => ElevatedButton(
+                onPressed: () => showStockAdjustmentDialog(context),
+                child: const Text('Open Dialog'),
+              ),
+            ),
+          ),
+        ),
+      );
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Open Dialog'));
+      await tester.pumpAndSettle();
+
+      expect(tester.takeException(), isNull);
+      expect(find.text('Increase'), findsOneWidget);
+      expect(find.text('Decrease'), findsOneWidget);
+      expect(find.text('Select a product or variant'), findsOneWidget);
     });
   });
 }

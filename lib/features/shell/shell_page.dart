@@ -42,9 +42,10 @@ import '../master_entry/unit/presentation/pages/unit_list_page.dart';
 import '../master_entry/uom_conversion/domain/entities/uom_conversion.dart';
 import '../master_entry/uom_conversion/presentation/pages/create_uom_conversion_page.dart';
 import '../master_entry/uom_conversion/presentation/pages/uom_conversion_list_page.dart';
+import '../sales/presentation/pages/bill_format_settings_page.dart';
+import '../sales/presentation/pages/sales_pos_page.dart';
 import 'content_route.dart';
 import 'widgets/app_sidebar.dart';
-import 'widgets/app_top_bar.dart';
 import 'widgets/page_placeholder.dart';
 import 'widgets/status_bar.dart';
 
@@ -253,6 +254,8 @@ class _ShellPageState extends State<ShellPage> {
             });
           },
         ),
+        AppPage.salesPos => const SalesPosPage(),
+        AppPage.billFormat => const BillFormatSettingsPage(),
         _ => PagePlaceholder(page: page),
       },
       CategoryFormRoute(:final category) => CreateCategoryPage(
@@ -383,21 +386,18 @@ class _ShellPageState extends State<ShellPage> {
                   constraints.maxWidth >=
                       AppConstants.autoCollapseSidebarBelowWidth;
 
-              return Column(
+              return Row(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  AppTopBar(
+                  AppSidebar(
+                    expanded: expanded,
+                    selectedPage: _selectedPage,
+                    onSelect: _onPageSelected,
                     onToggleSidebar: _toggleSidebar,
-                    sidebarExpanded: expanded,
                   ),
                   Expanded(
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                    child: Column(
                       children: [
-                        AppSidebar(
-                          expanded: expanded,
-                          selectedPage: _selectedPage,
-                          onSelect: _onPageSelected,
-                        ),
                         Expanded(
                           child: AnimatedSwitcher(
                             duration: const Duration(milliseconds: 250),
@@ -421,10 +421,10 @@ class _ShellPageState extends State<ShellPage> {
                             ),
                           ),
                         ),
+                        StatusBar(selectedPage: _selectedPage),
                       ],
                     ),
                   ),
-                  StatusBar(selectedPage: _selectedPage),
                 ],
               );
             },
